@@ -1,0 +1,95 @@
+\input{Header-Circuits.tex}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%							COMPONENTES								%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%74LS139 Decoder
+\newcommand{\deco}[1] % #1 = name
+{node(#1_origin){}
+	node[dipchip, num pins=8, hide numbers, no topmark, external pins width=0](C3){}
+	
+	($ (C3.bpin 1) !.5! (C3.bpin 8) $) ++ (0,0.5) node[](){$74LS139$}
+
+	%LEFT NODES
+	node[right, font=\footnotesize] at (C3.bpin 1) {$A$}
+	node[right, font=\footnotesize] at (C3.bpin 2) {$B$}	
+	node[right, font=\footnotesize] at (C3.bpin 4) {$E$}		
+
+	(C3.bpin 1) -- ++ (-0.5,0) node[](#1_a){}	
+	(C3.bpin 2) -- ++ (-0.5,0) node[](#1_b){}
+	(C3.bpin 4) -- ++ (-0.5,0) node[](#1_e){}
+	(C3.bpin 4) -- ++ (-0.075,0) node[ocirc](){}
+
+	%RIGHT NODES
+	node[left, font=\footnotesize] at (C3.bpin 5) {$Y_0$}	
+	node[left, font=\footnotesize] at (C3.bpin 6) {$Y_1$}	
+	node[left, font=\footnotesize] at (C3.bpin 7) {$Y_2$}
+	node[left, font=\footnotesize] at (C3.bpin 8) {$Y_3$}
+	
+	(C3.bpin 5) -- ++ (0.5,0) node[](#1_y0){}
+	(C3.bpin 6) -- ++ (0.5,0) node[](#1_y1){}
+	(C3.bpin 7) -- ++ (0.5,0) node[](#1_y2){}
+	(C3.bpin 8) -- ++ (0.5,0) node[](#1_y3){}	
+	
+	(C3.bpin 5) -- ++ (0.075,0) node[ocirc](){}
+	(C3.bpin 6) -- ++ (0.075,0) node[ocirc](){}
+	(C3.bpin 7) -- ++ (0.075,0) node[ocirc](){}
+	(C3.bpin 8) -- ++ (0.075,0) node[ocirc](){}
+	
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%							CIRCUITOS								%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%1A 
+\begin{page}
+\begin{circuitikz}
+
+	\node[american and port](a1){};
+
+	\draw 		
+		(a1.out) -- ++ (0.5,0) node[circ, label=right:$CS0$](){}
+		(a1.in 1) -| ++ (-0.75,0.5) node[american not port, anchor = out, xscale = 0.5, yscale = 0.5](n1){}
+		(n1.in) -- ++ (-0.25,0) node[circ, label=left:$A15$](){}
+		(a1.in 2) -- ++ (-0.5,0) node[circ, label=left:$A14$](){}
+	;
+
+%	%NODOS AUXILIARES
+%	\draw[color = red]	
+%	
+%	;
+
+\end{circuitikz}
+\end{page}
+
+%1B
+\begin{page}
+\begin{circuitikz}
+	\ctikzset{multipoles/thickness=3}				%Ancho de las lineas de las cajas
+	\ctikzset{diodes/scale=0.6}	
+	\ctikzset{multipoles/dipchip/width=1.5}			%Ancho del Decoer
+	
+	\draw 
+		(0,0) ++ (2,0) \deco{dec}
+		(dec_a.center) -- ++ (-0.5,0) node[circ, label=left:$A14$](){}
+		(dec_b.center) -- ++ (-0.5,0) node[circ, label=left:$A15$](){}
+		
+		(dec_y1.center) -- ++ (0.5,0) node[circ, label=right:$CS$](){}
+		
+	;
+		
+%	%NODOS AUXILIARES
+%	\draw[color = red]	
+%	
+%	;	
+\end{circuitikz}
+\end{page}
+
+
+
+\end{document}
