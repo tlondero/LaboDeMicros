@@ -1,0 +1,150 @@
+\input{Header-Circuits.tex}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%							COMPONENTES								%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Mux
+\newcommand{\Mux}[1] % #1 = name
+{node(#1_origin){}
+	node[dipchip, num pins=8, hide numbers, no topmark, external pins width=0](C3){}
+	
+	($ (C3.bpin 1) !.5! (C3.bpin 8) $) ++ (0,0.5) node[](){$74LS139$}
+
+	%LEFT NODES
+	node[right, font=\footnotesize] at (C3.bpin 1) {$A$}
+	node[right, font=\footnotesize] at (C3.bpin 2) {$B$}	
+	node[right, font=\footnotesize] at (C3.bpin 4) {$E$}		
+
+	(C3.bpin 1) -- ++ (-0.5,0) node[](#1_a){}	
+	(C3.bpin 2) -- ++ (-0.5,0) node[](#1_b){}
+	(C3.bpin 4) -- ++ (-0.5,0) node[](#1_e){}
+	(C3.bpin 4) -- ++ (-0.075,0) node[ocirc](){}
+
+	%RIGHT NODES
+	node[left, font=\footnotesize] at (C3.bpin 5) {$Y_0$}	
+	node[left, font=\footnotesize] at (C3.bpin 6) {$Y_1$}	
+	node[left, font=\footnotesize] at (C3.bpin 7) {$Y_2$}
+	node[left, font=\footnotesize] at (C3.bpin 8) {$Y_3$}
+	
+	(C3.bpin 5) -- ++ (0.5,0) node[](#1_y0){}
+	(C3.bpin 6) -- ++ (0.5,0) node[](#1_y1){}
+	(C3.bpin 7) -- ++ (0.5,0) node[](#1_y2){}
+	(C3.bpin 8) -- ++ (0.5,0) node[](#1_y3){}	
+	
+	(C3.bpin 5) -- ++ (0.075,0) node[ocirc](){}
+	(C3.bpin 6) -- ++ (0.075,0) node[ocirc](){}
+	(C3.bpin 7) -- ++ (0.075,0) node[ocirc](){}
+	(C3.bpin 8) -- ++ (0.075,0) node[ocirc](){}
+	
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%							CIRCUITOS								%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%2 
+\begin{page}
+\tikzset{mux/.style={muxdemux, muxdemux def={Lh=2, NL=1, Rh=5, NR=2, NB=0, NT=1, w=2, inset w=1, inset Lh=0, inset Rh=2, square pins=1}}}
+\begin{circuitikz}[american voltages]
+
+	\def\xspace{0.75}
+		
+	\draw
+		%DIBUJO LOS PUNTOS a
+		(0,0) node[circ, label=above:$a_{15}$](a15){}
+		(a15) ++ (\xspace ,0) node[circ, label=above:$a_{14}$](a14){}
+		(a14) ++ (\xspace ,0) node[circ, label=above:$a_{13}$](a13){}
+		(a13) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{12}}$](a12){}
+		(a12) ++ (\xspace ,0) node[circ, label=above:$a_{11}$](a11){}
+		(a11) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{10}}$](a10){}
+		(a10) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{9}}$](a9){}
+		(a9) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{8}}$](a8){}
+		(a8) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{7}}$](a7){}
+		(a7) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{6}}$](a6){}
+		(a6) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{5}}$](a5){}
+		(a5) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{4}}$](a4){}
+		(a4) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{3}}$](a3){}
+		(a3) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{2}}$](a2){}
+		(a2) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{1}}$](a1){}
+		(a1) ++ (\xspace ,0) node[circ, label=above:$\overline{a_{0}}$](a0){}
+		
+		
+		%CONECTO a CON AND ENORME
+		(a0.center) |- node[pos=.5, circ](){} ++ (1,-1.5) node[american and port, number inputs = 15, anchor = in 1, yscale = 1.5](and1){}
+		(a1.center) |- node[pos=.5, circ](){} (and1.in 2)
+		(a2.center) |- node[pos=.5, circ](){} (and1.in 3)
+		(a3.center) |- node[pos=.5, circ](){} (and1.in 4)
+		(a4.center) |- node[pos=.5, circ](){} (and1.in 5)
+		(a5.center) |- node[pos=.5, circ](){} (and1.in 6)
+		(a6.center) |- node[pos=.5, circ](){} (and1.in 7)
+		(a7.center) |- node[pos=.5, circ](){} (and1.in 8)
+		(a8.center) |- node[pos=.5, circ](){} (and1.in 9)
+		(a9.center) |- node[pos=.5, circ](){} (and1.in 10)
+		(a10.center) |- node[pos=.5, circ](){} (and1.in 11)
+		(a12.center) |- node[pos=.5, circ](){} (and1.in 12)
+		(a13.center) |- node[pos=.5, circ](){} (and1.in 13)
+		(a14.center) |- node[pos=.5, circ](){} (and1.in 14)
+		(a15.center) |- node[pos=.5, circ](){} (and1.in 15)	
+		
+		(and1.bin 14) ++ (-0.075,0) node[ocirc](){}
+		
+	
+		%CONECTO MUX
+		(and1.out) -- ++ (0.5,0) node[mux, xscale = 0.75, yscale = 0.75, anchor = lpin 1](mu){}
+		(mu.brpin 1) node[label=left:$1$](){}
+		(mu.brpin 2) node[label=left:$0$](){}
+		
+		(mu.rpin 1) -- ++ (0.5,0) node[circ, label=right:$CS3$](){}
+		(mu.rpin 2) -- ++ (0.5,0) node[circ, label=right:$CS2$](){}
+		
+		(a11.center) |- (mu.tpin 1)
+		
+		
+		%DIBUJO SEGUNDA AND		
+		(and1) ++ (0,-3) node[american and port, number inputs = 4, yscale = 1.5](and2){}
+		(a12.center) |- node[pos=.5, circ](){} (and2.in 1)
+		(a13.center) |- node[pos=.5, circ](){} (and2.in 2)
+		(a14.center) |- node[pos=.5, circ](){} (and2.in 3)
+		(a15.center) |- node[pos=.5, circ](){} (and2.in 4)
+		
+		(and2.out) -- ++ (1,0) node[circ, label=right:$CS1$](){}
+		
+		(and2.bin 3) ++ (-0.075,0) node[ocirc](){}
+		(and2.bin 4) ++ (-0.075,0) node[ocirc](){}
+		
+		%DIBUJO TERCER AND		
+		(and2) ++ (0,-3) node[american and port, yscale = 1.5](and3){}
+		(a14.center) |- node[pos=.5, circ](){} (and3.in 1)
+		(a15.center) |- node[pos=.5, circ](){} (and3.in 2)
+		
+		(and3.out) -- ++ (1,0) node[circ, label=right:$CS0$](){}
+		
+		
+		
+		
+		
+
+		
+		
+		
+			
+		
+	;
+
+%	%NODOS AUXILIARES
+%	\draw[color = red]	
+%	
+%	;
+
+\end{circuitikz}
+\end{page}
+
+
+
+
+
+\end{document}
