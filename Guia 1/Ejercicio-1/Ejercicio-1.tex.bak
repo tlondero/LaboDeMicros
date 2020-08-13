@@ -4,12 +4,12 @@
 \subsection{Análisis y construcción del diagrama de tiempos}
 Se construyó para el microprocesador M68HC11 el diagrama de tiempos para un ciclo de lectura/escritura, usando como ejemplo la posición de memoria \$2345, la cual está dentro de la hipotética región del mapa de memoria donde se aloja la memoria para la cual se diseñó el decodificador anteriormente.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{ImagenesEjercicio1/diagtiempos.png}
-  \caption{Ciclo de lectura/escritura de \textit{DATA} en la dirección de memoria \textit{\$2345}}.
-  \label{diagtiempos}
-\end{figure}
+%\begin{figure}[H]
+%  \centering
+%  \includesvg{ImagenesEjercicio1/diagtiempos.svg}
+%  \caption{Ciclo de lectura/escritura de \textit{DATA} en la dirección de memoria \textit{\$2345}}.
+%  \label{diagtiempos}
+%\end{figure}
  
 Para el análisis de tiempos se tiene en cuenta una frecuencia característica de $2 \ MHz$. Dado esto, se obtiene un rise time de las señales de $t_4 = 20 \ ns$ y un periodo entre ciclos de lectura/escritura de $t_1 = 500 \ ns$, por lo que los tiempos en alto y bajo de la señal \textbf{E} de enable serán de $t_3 = 230 ns$ respectivamente. 
 
