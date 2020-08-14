@@ -4,12 +4,12 @@
 \subsection{Análisis y construcción del diagrama de tiempos}
 Se construyó para el microprocesador M68HC11 el diagrama de tiempos para un ciclo de lectura/escritura, usando como ejemplo la posición de memoria \$2345, la cual está dentro de la hipotética región del mapa de memoria donde se aloja la memoria para la cual se diseñó el decodificador anteriormente.
 
-%\begin{figure}[H]
-%  \centering
-%  \includesvg{ImagenesEjercicio1/diagtiempos.svg}
-%  \caption{Ciclo de lectura/escritura de \textit{DATA} en la dirección de memoria \textit{\$2345}}.
-%  \label{diagtiempos}
-%\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ImagenesEjercicio1/diagtiempos.png}
+  \caption{Ciclo de lectura/escritura de \textit{DATA} en la dirección de memoria \textit{\$2345}}.
+  \label{diagtiempos}
+\end{figure}
  
 Para el análisis de tiempos se tiene en cuenta una frecuencia característica de $2 \ MHz$. Dado esto, se obtiene un rise time de las señales de $t_4 = 20 \ ns$ y un periodo entre ciclos de lectura/escritura de $t_1 = 500 \ ns$, por lo que los tiempos en alto y bajo de la señal \textbf{E} de enable serán de $t_3 = 230 ns$ respectivamente. 
 
@@ -21,7 +21,8 @@ El puerto C tiene la dirección de memoria por un tiempo válido de $t_{t22} = 8
 
 \subsubsection{Segunda mitad del ciclo de escritura/lectura} 
 \textbf{Lectura:}
-En el caso de la lectura, el puerto C obtiene el dato a leer luego de $t_3 - t_{17} = 200 \ ns$ y será valido por $t_{17}+t_{18A} = 40 \ ns$, para luego pasar a hiZ pasados $t_{18B} = 83 \ ns$ como máximo del tiempo valido de lectura. 
+En el caso de la lectura, el tiempo de setup para que el periférico coloque el dato a su salida y lo mantenga estable antes del flanco descendente de la señal de enable es de $t_{17} = 30 \ ns$ y debe ser mantenido estable por $t_{18A} = 10 \ ns$ pasado dicho flanco. Luego pasa a hiZ el puerto C pasados $t_{18B} = 83 \ ns$ de dicho flanco.
+
 \textbf{Escritura:}
 Para el caso de la escritura, el puerto C tiene un delay máximo para contener el dato a escribir de $t_{19} = 128 \ ns$ y un tiempo de hold de $t_{21} = 33 \ ns$ como mínimo, por lo cual el tiempo de escritura deberá ser como máximo de $t_{3} + t_{21} - t_{19} = 143 \ ns$.
 
