@@ -1,17 +1,34 @@
 \input{../Informe/Header.tex}
 
 \begin{document}
-
+Para este ejercicio se implemento el decodificador de direcciones con un integrado 74LS138 y lógica combinacional.
+Valiendonos de que dado a que únicamente se utilizaran estos 4 periféricos es posible asignar cantidades de memoria por demás a los periféricos.
+quedando de la siguiente manera la tabla de direcciones.
 \begin{table}[H]
 \centering
-\begin{tabular}{ccccccc}
-\hline	
-\textbf{Adress} & \textbf{Dispositivo} & \textbf{Binario Comienzo} & \textbf{Binario Fin} &  &  & \\ \hline
-C000 & ROM16K & 1100000000000000 & 1111111111111111 &  &  &  \\ 
-2000 & RAM4K & 0010000000000000 & 0011000000000000 &  &  &  \\
-A000 & Salida 8 Bits & 1010000000000000 & 1010000000001000 &  &  &  \\ 
-A800 & Entrada 8 Bits & 1010100000000000 & 1010100000001000 &  &  &  \\ \hline
+\begin{tabular}{|c|c|c|c|}
+\hline
+Adress & Dispositivo & Binario Comienzo & Binario Fin \\ \hline
+C000 & ROM16K & 1100000000000000 & 1111111111111111 \\ \hline
+A800 & Entrada 8 Bits & 1010100000000000 & 1011111111111111 \\ \hline
+A000 & Salida 8 Bits & 1010000000000000 & 1010011111111111 \\ \hline
+2000 & RAM4K & 0010000000000000 & 0010111111111111 \\ \hline
 \end{tabular}
 \end{table}
+Basta con conectar los siguientes bits con el decoder
+\begin{align}
+a_{14} \implies C\\
+a_{15} \implies B\\
+a_{11} \implies A
+\end{align}
+así también conectar las salidas $Y_0$ $Y_1$  con una compuerta or, al igual que las $Y_6$ $Y_7$ con otra.
+quedando definidos los chip select de la siguiente manera.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.7\textwidth]{ImagenesEjercicio2/fotofea.png}
+  \caption{Diagrama en bloques}.
+  \label{fig:fotofea}
+\end{figure}
 
 \end{document}
