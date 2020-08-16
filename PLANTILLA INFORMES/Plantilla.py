@@ -13,7 +13,7 @@ WINDOW_NAME = "Template Maker"
 MAXCHAR = 39
 
 Y_SCREEN = 235 #150
-X_SCREEN = 315
+X_SCREEN = 630 #315
 
 TEXPATH = "./Ejercicio-N/Ejercicio-N.tex"
 PENDPATH = "./Ejercicio-N/ImagenesEjercicioN/pend.jpg"
@@ -27,12 +27,24 @@ class cvGui():
     def __init__(self, *args, **kw):
         self.timer = 0
         self.t0 = 0
-        self.numberFolder = [5]
+        self.t1 = 0
         self.startCopy = False
 
         # String
         self.folderName = ''
         self.folderPath = ''
+        self.subjectName = ''
+        self.tempName = ''
+
+        self.names = []
+
+        # Numbers
+        self.numberFolder = [5]
+        self.day = [1]
+        self.month = [10]
+        self.year = [20]
+        self.group = [3]
+        self.tp = [1]
 
         # Frames
         self.frame = np.zeros((Y_SCREEN, X_SCREEN, 3), np.uint8)
@@ -42,52 +54,92 @@ class cvGui():
     def onWork(self):
         self.frame[:] = (49, 52, 49)
         char = cv.waitKey(1)
-        t1 = 0
+
         doOverw = False
 
-        stringCopy = ""
+        writeOnName = False
+        writeOnSubject = False
+        writeOnProf = False
+
+        stringCopy = ''
         stringCopyColor = 0x10dca1
 
         while True:
 
-            cvui.window(self.frame, 5, 5, X_SCREEN - 10, 40, "Folder Name")
+            cursor = cvui.mouse(WINDOW_NAME)
+            click = cvui.mouse(cvui.CLICK)
 
-            if len(self.folderName) < MAXCHAR:
-                if 32 == char or 48 <= char <= 57 or 65 <= char <= 90 or 97 <= char <= 122:
-                    self.folderName = self.folderName + chr(char)
-                elif char == 8 and not len(self.folderName) == 0:
-                    self.folderName = self.folderName[:-1]
-            elif 8 == char:
-                self.folderName = self.folderName[:-1]
+            writeOnName, self.folderName = self.textInput(5, 5, X_SCREEN/2 - 10, 40, "Folder Name:", char, self.folderName, cursor, click, writeOnName)
 
-            t2 = time.perf_counter()
-            if t2 - t1 <= 1:
-                cvui.printf(self.frame, 10, 30, 0.4, 0xdd97fb, f'{self.folderName}|')
-            elif 1 < t2 - t1 <= 2:
-                cvui.printf(self.frame, 10, 30, 0.4, 0xdd97fb, f'{self.folderName}')
-            else:
-                t1 = t2
+            writeOnSubject, self.subjectName = self.textInput(5 + X_SCREEN / 2, 5, X_SCREEN / 2 - 10, 40, "Subject Name:", char, self.subjectName, cursor, click, writeOnSubject)
 
-            cvui.printf(self.frame, 10, 55, 0.4, 0xdd97fb, f'Number Of Folders/Exercises:')
-            cvui.trackbar(self.frame, 10, 70, X_SCREEN - 20, self.numberFolder, 1.0, 15.0, 1, "%1.0Lf", cvui.TRACKBAR_HIDE_SEGMENT_LABELS, 1)
-            self.numberFolder[0] = int(self.numberFolder[0])
+            writeOnProf, self.tempName = self.textInput(5 + X_SCREEN / 2, 105, X_SCREEN / 2 - 10, 40, "Professors:", char, self.tempName, cursor, click, writeOnProf)
+            cvui.rect(self.frame, 6 + X_SCREEN / 2, 155, X_SCREEN / 2 - 63, Y_SCREEN - 165, 0x8d9797, 0x3c4747)
+            cvui.rect(self.frame, X_SCREEN - 52, 155, 47, Y_SCREEN - 165, 0x8d9797, 0x293939)
+            if cvui.button(self.frame, X_SCREEN - 49, 157, "+") and not self.tempName == '' and len(self.names) < 4:
+                self.names.append(self.tempName)
+                self.tempName = ''
+            if cvui.button(self.frame, X_SCREEN - 49, 196, "-") and not len(self.names) == 0:
+                del self.names[-1]
 
-            if cvui.button(self.frame, 5, 120, "Folder Path") and not doOverw:
+            for i in range(len(self.names)):
+                cvui.printf(self.frame, 10 + X_SCREEN / 2, 160 + 15*i, 0.4, 0xdd97fb, self.names[i])
+
+
+            cvui.printf(self.frame, 5, 55, 0.4, 0xdd97fb, f'N Exercises:')
+            cvui.counter(self.frame, 5, 70, self.numberFolder)
+            if self.numberFolder[0] <= 1:
+                self.numberFolder[0] = 1
+
+            cvui.printf(self.frame, 5 + X_SCREEN / 6, 55, 0.4, 0xdd97fb, f'Day:')
+            cvui.counter(self.frame, 5 + X_SCREEN / 6, 70, self.day)
+            if self.day[0] <= 1:
+                self.day[0] = 1
+            elif self.day[0] >= 31:
+                self.day[0] = 31
+
+            cvui.printf(self.frame, 5 + X_SCREEN * 2 / 6, 55, 0.4, 0xdd97fb, f'Month:')
+            cvui.counter(self.frame, 5 + X_SCREEN * 2 / 6, 70, self.month)
+            if self.month[0] <= 1:
+                self.month[0] = 1
+            elif self.month[0] >= 12:
+                self.month[0] = 12
+
+            cvui.printf(self.frame, 5 + X_SCREEN * 3 / 6, 55, 0.4, 0xdd97fb, f'Year:')
+            cvui.counter(self.frame, 5 + X_SCREEN * 3 / 6, 70, self.year)
+            if self.year[0] <= 20:
+                self.year[0] = 20
+            elif self.year[0] >= 22:
+                self.year[0] = 22
+
+            cvui.printf(self.frame, 5 + X_SCREEN * 4 / 6, 55, 0.4, 0xdd97fb, f'N Group:')
+            cvui.counter(self.frame, 5 + X_SCREEN * 4 / 6, 70, self.group)
+            if self.group[0] <= 1:
+                self.group[0] = 1
+            elif self.group[0] >= 7:
+                self.group[0] = 7
+
+            cvui.printf(self.frame, 5 + X_SCREEN * 5 / 6, 55, 0.4, 0xdd97fb, f'N TP:')
+            cvui.counter(self.frame, 5 + X_SCREEN * 5 / 6, 70, self.tp)
+            if self.tp[0] <= 1:
+                self.tp[0] = 1
+
+            if cvui.button(self.frame, 5, 120, "Load Folder Path") and not doOverw:
                 self.folderPath = self.getPath()
 
-            cvui.window(self.frame, 5, 155, X_SCREEN - 10, 40, "Folder Path Selected")
+            cvui.window(self.frame, 5, 155, X_SCREEN/2 - 10, 40, "Folder Path Selected")
             if len(self.folderPath) < MAXCHAR + 3:
                 cvui.printf(self.frame, 10, 180, 0.4, 0xdd97fb, self.folderPath)
             else:
                 cvui.printf(self.frame, 10, 180, 0.4, 0xdd97fb, self.folderPath[0:MAXCHAR + 2] + '...')
 
-            if (not self.folderPath == '') and (not self.folderName == ''):
+            if (not self.folderPath == '') and (not self.folderName == '') and (not self.subjectName == ''):
                 if cvui.button(self.frame, 5, 200, "Start Copy"):
                     self.startCopy = True
                     stringCopy = "Wait While Copying..."
                     stringCopyColor = 0xdc1076
 
-            x = int(X_SCREEN / 2)
+            x = int(X_SCREEN / 4)
             cvui.printf(self.frame, x, 210, 0.4, stringCopyColor, stringCopy)
 
             if self.startCopy:
@@ -128,6 +180,47 @@ class cvGui():
             if (char == 27) or not cv.getWindowProperty(WINDOW_NAME, cv.WND_PROP_VISIBLE):
                 break
 
+    def textInput(self, x, y, w, h, title, char, writeOn, cursor, click, writeOnBool):
+
+        cvui.window(self.frame, x, y, w, h, title)
+        # cvui.rect(self.frame, x + 1, y + 17, w - 2, h - 18, 0xf20c0c, 0xf20c0c)
+        inBox = ((x + 1 <= cursor.x <= x + 1 + w - 2) and (y + 17 <= cursor.y <= y + 17 + h - 18))
+
+        if (inBox and click) or writeOnBool:
+            writeOnBool = True
+            if len(writeOn) < MAXCHAR:
+
+                validChar = (32 <= char <= 33 or 35 <= char <= 41 or 43 <= char <= 46 or 48 <= char <= 57 or
+                             char == 59 or char == 61 or 64 <= char <= 91 or 93 <= char <= 123 or
+                             125 <= char <= 127)
+                if validChar:
+                    writeOn = writeOn + chr(char)
+                elif char == 8 and not len(writeOn) == 0:
+                    writeOn = writeOn[:-1]
+            elif 8 == char:
+                writeOn = writeOn[:-1]
+
+            self.t1 = self.darwBar(writeOn, self.t1, x + 5, y + 25)
+
+        else:
+            cvui.printf(self.frame, x + 5, y + 25, 0.4, 0xdd97fb, f'{writeOn}')
+
+        if click and not inBox:
+            writeOnBool = False
+
+        return writeOnBool, writeOn
+
+    def darwBar(self, text, t1, x, y):
+        t2 = time.perf_counter()
+        if t2 - t1 <= 1:
+            cvui.printf(self.frame, x, y, 0.4, 0xdd97fb, f'{text}|')
+            return t1
+        elif 1 < t2 - t1 <= 2:
+            cvui.printf(self.frame, x, y, 0.4, 0xdd97fb, f'{text}')
+            return t1
+        else:
+            return t2
+
     def getPath(self):
         root = tk.Tk()
         root.withdraw()
@@ -141,10 +234,7 @@ class cvGui():
         elif os.path.exists(TEXPATH) and os.path.exists(PENDPATH) and os.path.exists(INFORPATH) and os.path.exists(INFOTEXRPATH) and os.path.exists(INFOHEADRPATH) and os.path.exists(INFOCARPATH):
             os.mkdir(finalPath)
 
-            os.mkdir(finalPath + "/Informe")
-            shutil.copyfile(INFOTEXRPATH, finalPath + "/Informe/Informe.tex")
-            shutil.copyfile(INFOHEADRPATH, finalPath + "/Informe/Header.tex")
-            shutil.copyfile(INFOCARPATH, finalPath + "/Informe/Caratula.tex")
+            graphicspath = ''
 
             for f in range(numberOfExs):
                 n = str(f + 1)
@@ -153,11 +243,43 @@ class cvGui():
                 imgFolderPath = exFolderPath + "/ImagenesEjercicio" + n
                 texName = "/Ejercicio-" + n + ".tex"
 
+                graphicspath = graphicspath + '{../Ejercicio-' + n + '/}'
+
                 os.mkdir(exFolderPath)              #Creo la carpeta del ejercicio
                 os.mkdir(imgFolderPath)             #Creo la carpeta de imagenes del ejercicio
 
                 shutil.copyfile(TEXPATH, exFolderPath + texName)            #Copio y renombro .tex
                 shutil.copyfile(PENDPATH, imgFolderPath + "/pend.jpg")      #Copio img
+
+            os.mkdir(finalPath + "/Informe")
+            shutil.copyfile(INFOTEXRPATH, finalPath + "/Informe/Informe.tex")
+            shutil.copyfile(INFOHEADRPATH, finalPath + "/Informe/Header.tex")
+            shutil.copyfile(INFOCARPATH, finalPath + "/Informe/Caratula.tex")
+
+            with open(finalPath + '/Informe/Header.tex', 'r') as file:
+                data = file.readlines()
+
+            data[37] = '\graphicspath{' + graphicspath + '}\n'
+            if not self.subjectName == '':
+                data[41] = '\lhead{' + self.subjectName + '}\n'
+
+
+            with open(finalPath + '/Informe/Header.tex', 'w') as file:
+                file.writelines(data)
+
+            with open(finalPath + '/Informe/Caratula.tex', 'r') as file:
+                data = file.readlines()
+
+            data[8] = '{ \Huge \bfseries Trabajo práctico N$^{\circ}$' + str(self.tp[0]) + '}\\[0.4cm] \n'
+            data[14] = '\emph{Grupo' + str(self.group[0]) + '}\ \ \n'
+            data[38] = 'Presentado: & ' + str(self.day[0]) + '/' + str(self.month[0]) + '/' + str(self.year[0]) + '\\ \n'
+
+            if not len(self.names) == 0:
+                for i in range(len(self.names)):
+                    data[27 + i] = self.names[i] + '\\ \n'
+
+            with open(finalPath + '/Informe/Caratula.tex', 'w') as file:
+                file.writelines(data)
 
             return True
         else:
@@ -169,13 +291,10 @@ class cvGui():
 
         cvui.window(self.frame, 5, 5, X_SCREEN - 10, Y_SCREEN - 10, "Folder Alredy Exist")
 
-        cvui.printf(self.frame, 10, 50, 0.4, 0xdd97fb, "Do you want to delete the original folder and")
-        cvui.printf(self.frame, 10, 70, 0.4, 0xdd97fb, "overwrite it with the new copy?")
-        cvui.printf(self.frame, 10, 90, 0.4, 0xdd97fb, "Everything in the original folder will be")
-        cvui.printf(self.frame, 10, 110, 0.4, 0xdd97fb, "deleted!!!!")
+        cvui.printf(self.frame, 10, 50, 0.4, 0xee1c1c, "Do you want to delete the original folder and overwrite it with the new copy? Everything in the")
+        cvui.printf(self.frame, X_SCREEN/2 - 100, 70, 0.4, 0xee1c1c, "original folder will be deleted!!!!")
 
-
-        if cvui.button(self.frame, 10, 140, "Yes, Overwrite"):
+        if cvui.button(self.frame, X_SCREEN/2 - (14*10 + 10), 140, "Yes, Overwrite"):
             shutil.rmtree(finalPath)
             coping = self.copyFolders(self.numberFolder[0], finalPath, False)
             if coping == None:
@@ -183,7 +302,7 @@ class cvGui():
             else:
                 return True
 
-        if cvui.button(self.frame, 155, 140, "No Fuck! Go Back!"):
+        if cvui.button(self.frame, X_SCREEN/2 + 5, 140, "No Fuck! Go Back!"):
             return False
 
         return -1
@@ -195,3 +314,11 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+    # params = {"bins": self.MF.hist_filter.bins_opti,
+    #           "mask_blur": self.MF.hist_filter.mask_blur_size_opti,
+    #           "kernel_blur": self.MF.hist_filter.kernel_blur_size_opti,
+    #           "low_pth": self.MF.hist_filter.low_pth_opti}
+    # return params
+    #
+    # self.camShift_bins[0] = params["bins"]
