@@ -148,8 +148,8 @@
 		(mu.brpin 1) node[label=left:$1$](){}
 		(mu.brpin 2) node[label=left:$0$](){}
 		
-		(mu.rpin 1) -- ++ (0.5,0) node[circ, label=right:$CS3$](){}
-		(mu.rpin 2) -- ++ (0.5,0) node[circ, label=right:$CS2$](){}
+		(mu.rpin 1) -- ++ (0.5,0) node[circ, label=right:$CS_ROM$](){}
+		(mu.rpin 2) -- ++ (0.5,0) node[circ, label=right:$CS_I$](){}
 		
 		(a11.center) |- (mu.tpin 1)
 		
@@ -161,7 +161,7 @@
 		(a14p.center) |- node[pos=.5, circ](a14pp){} (and2.in 3)
 		(a15p.center) |- node[pos=.5, circ](a15pp){} (and2.in 4)
 		
-		(and2.out) -- ++ (1,0) node[circ, label=right:$CS1$](){}
+		(and2.out) -- ++ (1,0) node[circ, label=right:$CS_O$](){}
 		
 		(and2.bin 3) ++ (-0.075,0) node[ocirc](){}
 		(and2.bin 4) ++ (-0.075,0) node[ocirc](){}
@@ -171,7 +171,7 @@
 		(a14pp.center) |- node[pos=.5, circ](){} (and3.in 1)
 		(a15pp.center) |- node[pos=.5, circ](){} (and3.in 2)
 		
-		(and3.out) -- ++ (1,0) node[circ, label=right:$CS0$](){}				
+		(and3.out) -- ++ (1,0) node[circ, label=right:$CS_RAM$](){}				
 	;
 
 \end{circuitikz}
