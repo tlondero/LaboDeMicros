@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2019.4.5)  16 AUG 2020 14:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2019.4.5)  16 AUG 2020 16:02
 entering extended mode
 **./Ejercicio-1.tex
 (Ejercicio-1.tex
@@ -992,12 +992,12 @@ LaTeX Info: Redefining \nameref on input line 3.
 \@outlinefile=\write4
 \openout4 = `Ejercicio-1.out'.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 6.
+LaTeX Font Info:    Try loading font information for U+msa on input line 8.
 
 ("C:\Users\Guido\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 6.
+LaTeX Font Info:    Try loading font information for U+msb on input line 8.
 ("C:\Users\Guido\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
@@ -1005,54 +1005,40 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: ImagenesEjercicio1/Circuits.pdf Graphic file (type pdf)
 <use ImagenesEjercicio1/Circuits.pdf, page 1>
 Package pdftex.def Info: ImagenesEjercicio1/Circuits.pdf , page1 used on input 
-line 30.
+line 35.
 (pdftex.def)             Requested size: 256.0748pt x 96.02122pt.
 <ImagenesEjercicio1/Circuits.pdf, id=31, page=2, 205.71054pt x 106.43665pt>
 File: ImagenesEjercicio1/Circuits.pdf Graphic file (type pdf)
 <use ImagenesEjercicio1/Circuits.pdf, page 2>
 Package pdftex.def Info: ImagenesEjercicio1/Circuits.pdf , page2 used on input 
-line 38.
+line 43.
 (pdftex.def)             Requested size: 256.0748pt x 132.50952pt.
-
-Package caption Warning: \label without proper reference on input line 25.
-See the caption package documentation for explanation.
-
-
-LaTeX Warning: Reference `tab:truetab' on page 1 undefined on input line 43.
-
 [1{C:/Users/Guido/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}
 
  <./ImagenesEjercicio1/Circuits.pdf> <./ImagenesEjercicio1/Circuits.pdf>]
-<ImagenesEjercicio1/diagtiempos.png, id=70, 963.6pt x 578.16pt>
+<ImagenesEjercicio1/diagtiempos.png, id=67, 963.6pt x 578.16pt>
 File: ImagenesEjercicio1/diagtiempos.png Graphic file (type png)
 <use ImagenesEjercicio1/diagtiempos.png>
 Package pdftex.def Info: ImagenesEjercicio1/diagtiempos.png  used on input line
- 54.
+ 59.
 (pdftex.def)             Requested size: 512.1496pt x 307.2967pt.
  [2 <./ImagenesEjercicio1/diagtiempos.png>] [3]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 125.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 125.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 130.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 130.
  (Ejercicio-1.aux
 LaTeX Info: Redefining \. on input line 19.
 LaTeX Info: Redefining \% on input line 19.
 )
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 125.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 125.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 130.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 130.
 Package rerunfilecheck Info: File `Ejercicio-1.out' has not changed.
 (rerunfilecheck)             Checksum: 5A4BA07D02DFDE956B21B089AD23ADC9;554.
-
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 125.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 130.
  ) 
 Here is how much of TeX's memory you used:
- 28883 strings out of 492970
- 661663 string characters out of 3126595
- 855444 words of memory out of 3000000
+ 28881 strings out of 492970
+ 661642 string characters out of 3126595
+ 855393 words of memory out of 3000000
  32341 multiletter control sequences out of 15000+200000
  6951 words of font info for 27 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1070,9 +1056,9 @@ msfonts/cm/cmr7.pfb><C:/Users/Guido/AppData/Local/Programs/MiKTeX 2.9/fonts/typ
 e1/public/amsfonts/cm/cmsl10.pfb><C:/Users/Guido/AppData/Local/Programs/MiKTeX 
 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Guido/AppData/Local/Pro
 grams/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on Ejercicio-1.pdf (3 pages, 191373 bytes).
+Output written on Ejercicio-1.pdf (3 pages, 189694 bytes).
 PDF statistics:
- 123 PDF objects out of 1000 (max. 8388607)
- 19 named destinations out of 1000 (max. 500000)
+ 120 PDF objects out of 1000 (max. 8388607)
+ 17 named destinations out of 1000 (max. 500000)
  76 words of extra memory for PDF output out of 10000 (max. 10000000)
 
