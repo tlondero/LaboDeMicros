@@ -26,10 +26,10 @@
 	\draw[-][draw=black, very thick] (-0.2 + #1,0) -- (0.2 + #1,0);
 	\draw[-][draw=black, very thick] (-0.2 + #1,#8) -- (0.2 + #1,#8);
 	
-	\node [left] at (-0.2 + #1,#8) {#8 V};
-	\node [right] at (0.2 + #1,#8) {$V_{CC}$};	
-	\node [left] at (-0.2 + #1,0) {0 V};
-	\node [right] at (0.2 + #1,0) {$GND$};
+	\node [left] at (-0.2 + #1,#8 + 0.2) {#8 V};
+	\node [right] at (0.2 + #1,#8 + 0.2) {$V_{CC}$};	
+	\node [left] at (-0.2 + #1,-0.2) {0 V};
+	\node [right] at (0.2 + #1,-0.2) {$GND$};
 	
 	%Punto medio
 	\draw[-][draw=black, very thick] (-0.1 + #1,#5) -- (0.1 + #1,#5);
@@ -75,12 +75,29 @@
 \end{tikzpicture}
 \end{page}
 
+%DIBUJO 2
+\begin{page}
+\begin{tikzpicture}[yscale=1]
+
+	%#1 = Xpos #2 = name #3 = VOL #4 = VIL #5 = Vt #6 = VIH #7 = VOH #8 = VCC
+	
+	\barra{0}{CMOS}{0.2}{1.3}{2.5}{3.7}{4.7}{5}
+	
+	\barra{4}{TTL/CMOS}{0.2}{0.8}{1.5}{2}{4.7}{5}
+	
+	\barra{8}{TTL}{0.35}{0.8}{1.5}{2}{3.3}{5}
+	
+	\barra{12}{LVTTL}{0.4}{0.8}{1.5}{2}{2.4}{3.6}	
+
+\end{tikzpicture}
+\end{page}
+
 %DIBUJO 3
 \begin{page}
 \begin{circuitikz}[american voltages]	
 		
 	\draw
-		(0,0) node[nigfete,solderdot, rotate = -90](fet){}
+		(0,0) node[nigfete,solderdot, rotate = -90, label=below:2N7000](fet){}
 		
 		(fet.S) -| node[pos=.5, circ](r1){} (-2,-1) node[ocirc, label=below:$3.3 \ v$ Signal](){}
 		(fet.D) -| node[pos=.5, circ](r2){} (2,-1) node[ocirc, label=below:$5 \ v$ Signal](){}
