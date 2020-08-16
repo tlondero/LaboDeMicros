@@ -1,6 +1,51 @@
 \input{../Informe/Header.tex}
 
 \begin{document}
+\subsection{Implementación por lógica discreta}
+Para la lógica combinacional lo primero que se hizo fue escribir las posiciones de memoria en las que vivirá nuestro periférico en binario.
+\begin{align}
+0x4000 \implies 16384 \implies 0100 0000 0000\\
+0x2000 \implies 8192(Memory)\\
+0x6000 \implies 24576 \implies 011000000000 
+\end{align}
+De aqui se arma la tabla de verdad de los últimos 3 bits mas significativos.
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+$a_{15}$ & $a_{14}$ & \multicolumn{1}{c|}{$a_{13}$} & CS \\ \hline
+0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 1 \\
+0 & 1 & 1 & 1 \\
+1 & 0 & 0 & 0 \\
+1 & 0 & 1 & 0 \\
+1 & 1 & 0 & 0 \\
+1 & 1 & 1 & 0
+\end{tabular}
+\label{tab:truetab}
+\end{table}
+De aquí se puede solucionar el mapa de karnaugh para la siguiente configuración:
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,page = 1]{ImagenesEjercicio1/Circuits.pdf}
+  \caption{Lógica Discreta}.
+  \label{fig:circLog}
+\end{figure}
+\subsection{Implementación por lógica de baja complejidad}
+Se utilizó el decodificador 74LS139, conectando a los pines $a_{15}$ y $a_{14}$ a las entradas B y A respectivamente, el CS será la salida $Y_1$ quedando de la siguiente manera
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,page = 2]{ImagenesEjercicio1/Circuits.pdf}
+  \caption{Lógica de baja complejidad}.
+  \label{fig:circdec}
+\end{figure}
+\subsection{Implementación por medio de una PAL}
+Se utilizó una PAL como decodificador de direcciones,como se observa en la tabla (\ref{tab:truetab}) es posible detectar el perisferico viendo únicamente los bits $a_{15}$ y $a_{14}$ asi se llega a la siguiente ecuación:
+\begin{align}
+x_1 = a_{15} \ \ \  \  \  \  \  \  \  \ x_2=a_{14} \\
+f1=CS \ \ \ f1= \bar{x_1} \  \&  \ x_2
+\end{align}
+
 \subsection{Análisis y construcción del diagrama de tiempos}
 Se construyó para el microprocesador M68HC11 el diagrama de tiempos para un ciclo de lectura/escritura, usando como ejemplo la posición de memoria \$2345, la cual está dentro de la hipotética región del mapa de memoria donde se aloja la memoria para la cual se diseñó el decodificador anteriormente.
 
