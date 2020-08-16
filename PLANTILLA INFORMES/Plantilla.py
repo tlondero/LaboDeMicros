@@ -88,41 +88,53 @@ class cvGui():
 
             cvui.printf(self.frame, 5, 55, 0.4, 0xdd97fb, f'N Exercises:')
             cvui.counter(self.frame, 5, 70, self.numberFolder)
-            if self.numberFolder[0] <= 1:
+            if self.numberFolder[0] <= 0:
+                cvui.rect(self.frame, 5 + 25, 72, 40, 17, 0x292929, 0x292929)
                 self.numberFolder[0] = 1
+                cvui.printf(self.frame, 5 + 41, 76, 0.4, 0x9C9C9C, '1')
 
             cvui.printf(self.frame, 5 + X_SCREEN / 6, 55, 0.4, 0xdd97fb, f'Day:')
             cvui.counter(self.frame, 5 + X_SCREEN / 6, 70, self.day)
-            if self.day[0] <= 1:
+            if self.day[0] <= 0:
+                cvui.rect(self.frame, 5 + X_SCREEN / 6 + 25, 72, 40, 17, 0x292929, 0x292929)
                 self.day[0] = 1
+                cvui.printf(self.frame, 5 + X_SCREEN / 6 + 41, 76, 0.4, 0x9C9C9C, '1')
             elif self.day[0] >= 31:
                 self.day[0] = 31
 
             cvui.printf(self.frame, 5 + X_SCREEN * 2 / 6, 55, 0.4, 0xdd97fb, f'Month:')
             cvui.counter(self.frame, 5 + X_SCREEN * 2 / 6, 70, self.month)
-            if self.month[0] <= 1:
+            if self.month[0] <= 0:
+                cvui.rect(self.frame, 5 + X_SCREEN * 2 / 6 + 25, 72, 40, 17, 0x292929, 0x292929)
                 self.month[0] = 1
+                cvui.printf(self.frame, 5 + X_SCREEN * 2 / 6 + 41, 76, 0.4, 0x9C9C9C, '1')
             elif self.month[0] >= 12:
                 self.month[0] = 12
 
             cvui.printf(self.frame, 5 + X_SCREEN * 3 / 6, 55, 0.4, 0xdd97fb, f'Year:')
             cvui.counter(self.frame, 5 + X_SCREEN * 3 / 6, 70, self.year)
-            if self.year[0] <= 20:
+            if self.year[0] <= 19:
+                cvui.rect(self.frame, 5 + X_SCREEN * 3 / 6 + 25, 72, 40, 17, 0x292929, 0x292929)
                 self.year[0] = 20
+                cvui.printf(self.frame, 5 + X_SCREEN * 3 / 6 + 37, 76, 0.4, 0x9C9C9C, '20')
             elif self.year[0] >= 22:
                 self.year[0] = 22
 
             cvui.printf(self.frame, 5 + X_SCREEN * 4 / 6, 55, 0.4, 0xdd97fb, f'N Group:')
             cvui.counter(self.frame, 5 + X_SCREEN * 4 / 6, 70, self.group)
-            if self.group[0] <= 1:
+            if self.group[0] <= 0:
+                cvui.rect(self.frame, 5 + X_SCREEN * 4 / 6 + 25, 72, 40, 17, 0x292929, 0x292929)
                 self.group[0] = 1
+                cvui.printf(self.frame, 5 + X_SCREEN * 4 / 6 + 41, 76, 0.4, 0x9C9C9C, '1')
             elif self.group[0] >= 7:
                 self.group[0] = 7
 
             cvui.printf(self.frame, 5 + X_SCREEN * 5 / 6, 55, 0.4, 0xdd97fb, f'N TP:')
             cvui.counter(self.frame, 5 + X_SCREEN * 5 / 6, 70, self.tp)
-            if self.tp[0] <= 1:
+            if self.tp[0] <= 0:
+                cvui.rect(self.frame, 5 + X_SCREEN * 5 / 6 + 25, 72, 40, 17, 0x292929, 0x292929)
                 self.tp[0] = 1
+                cvui.printf(self.frame, 5 + X_SCREEN * 5 / 6 + 41, 76, 0.4, 0x9C9C9C, '1')
 
             if cvui.button(self.frame, 5, 120, "Load Folder Path") and not doOverw:
                 self.folderPath = self.getPath()
@@ -250,11 +262,13 @@ class cvGui():
 
                 shutil.copyfile(TEXPATH, exFolderPath + texName)            #Copio y renombro .tex
                 shutil.copyfile(PENDPATH, imgFolderPath + "/pend.jpg")      #Copio img
+                shutil.copyfile(PENDPATH, imgFolderPath + "/Circuits.tex")  # Copio img
 
             os.mkdir(finalPath + "/Informe")
             shutil.copyfile(INFOTEXRPATH, finalPath + "/Informe/Informe.tex")
             shutil.copyfile(INFOHEADRPATH, finalPath + "/Informe/Header.tex")
             shutil.copyfile(INFOCARPATH, finalPath + "/Informe/Caratula.tex")
+            shutil.copyfile(INFOCARPATH, finalPath + "/Informe/Header-Circuits.tex")
 
             with open(finalPath + '/Informe/Header.tex', 'r') as file:
                 data = file.readlines()
