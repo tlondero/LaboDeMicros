@@ -2,12 +2,15 @@
 
 \begin{document}
 \subsection{Implementación por lógica discreta}
-Para la lógica combinacional lo primero que se hizo fue escribir las posiciones de memoria en las que vivirá nuestro periférico en binario.
-\begin{align}
-0x4000 \implies 16384 \implies 0100 0000 0000\\
-0x2000 \implies 8192(Memory)\\
-0x6000 \implies 24576 \implies 011000000000 
-\end{align}
+Para la lógica combinacional lo primero que se hizo fue escribir las posiciones de memoria en las que vivirá nuestro periférico en binario, teniendo en cuenta que la memoria es de 8k (8192) ocupará 0x2000 posiciones de memoria.
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+Address & Dispositivo & Binario Comienzo & Binario Fin \\ \hline
+0x4000 & RAM & 010000000000 & 011000000000 \\ \hline
+\end{tabular}
+\end{table}
 De aqui se arma la tabla de verdad de los últimos 3 bits mas significativos.
 \begin{table}[H]
 \centering
@@ -22,7 +25,9 @@ $a_{15}$ & $a_{14}$ & \multicolumn{1}{c|}{$a_{13}$} & CS \\ \hline
 1 & 1 & 0 & 0 \\
 1 & 1 & 1 & 0
 \end{tabular}
+\caption{Tabla de verdad.}
 \label{tab:truetab}
+
 \end{table}
 De aquí se puede solucionar el mapa de karnaugh para la siguiente configuración:
 \begin{figure}[H]
@@ -40,7 +45,7 @@ Se utilizó el decodificador 74LS139, conectando a los pines $a_{15}$ y $a_{14}$
   \label{fig:circdec}
 \end{figure}
 \subsection{Implementación por medio de una PAL}
-Se utilizó una PAL como decodificador de direcciones,como se observa en la tabla (\ref{tab:truetab}) es posible detectar el perisferico viendo únicamente los bits $a_{15}$ y $a_{14}$ asi se llega a la siguiente ecuación:
+Se utilizó una PAL como decodificador de direcciones, como se observa en la Tabla (\ref{tab:truetab}) es posible detectar el perisferico viendo únicamente los bits $a_{15}$ y $a_{14}$ asi se llega a la siguiente ecuación:
 \begin{align}
 x_1 = a_{15} \ \ \  \  \  \  \  \  \  \ x_2=a_{14} \\
 f1=CS \ \ \ f1= \bar{x_1} \  \&  \ x_2
