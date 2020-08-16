@@ -58,11 +58,11 @@
 	
 }
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %								DIBUJOS								%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%DIBUJO 1
 \begin{page}
 \begin{tikzpicture}[yscale=1]
 
@@ -73,6 +73,25 @@
 	\barra{5}{3.3 V LVTTL}{0.4}{0.8}{1.55}{2}{2.4}{3}	
 
 \end{tikzpicture}
+\end{page}
+
+%DIBUJO 3
+\begin{page}
+\begin{circuitikz}[american voltages]	
+		
+	\draw
+		(0,0) node[nigfete,solderdot, rotate = -90](fet){}
+		
+		(fet.S) -| node[pos=.5, circ](r1){} (-2,-1) node[ocirc, label=below:$3.3 \ v$ Signal](){}
+		(fet.D) -| node[pos=.5, circ](r2){} (2,-1) node[ocirc, label=below:$5 \ v$ Signal](){}
+		
+		(r1.center) to[R, label=$10 \ K$] ++ (0,2) node[circ](aux1){} -| (fet.G)
+		(aux1.center) -- ++ (-1,0) node[ocirc, label=above:$3.3 \ V$](){}
+		
+		(r2.center) to[R, label=$10 \ K$] ++ (0,2) -- ++ (1,0) node[ocirc, label=above:$5 \ V$](){}		
+	;
+
+\end{circuitikz}
 \end{page}
 
 
