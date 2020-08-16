@@ -73,7 +73,7 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 ## Core latex/pdflatex auxiliary files:
-.**/*.aux
+*.aux
 *.lof
 *.lot
 *.fls
