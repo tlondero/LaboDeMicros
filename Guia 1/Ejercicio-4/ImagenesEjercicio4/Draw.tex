@@ -58,57 +58,6 @@
 	
 }
 
-%Eje vertical que compara los niveles	(DISCONTINUO)
-\newcommand{\barraDis}[8] % #1 = Xpos #2 = name #3 = VOLL #4 = VOLH #5 = VILL #6 = VILH #7 = VTL #8 = VTH #9 = VIHL #10 = VIHH #
-{
-	\node [below] at (#1,-0.5) {#2};
-	
-	%Barras anchas
-	\draw[-][draw=red, line width=2mm] (#1,#7) -- (#1,#8);
-	\draw[-][draw=red, line width=2mm] (#1,0) -- (#1,#3);
-	
-	\draw[-][draw=gray, line width=2mm] (#1,#6) -- (#1,#7);
-	\draw[-][draw=gray, line width=2mm] (#1,#3) -- (#1,#4);	
-	
-	\draw[-][draw=lightgray, line width=2mm] (#1,#4) -- (#1,#6);	
-	
-	%Eje vertical limites
-	\draw[-][draw=black, very thick] (#1,0) -- (#1,#8);
-	\draw[-][draw=black, very thick] (-0.2 + #1,0) -- (0.2 + #1,0);
-	\draw[-][draw=black, very thick] (-0.2 + #1,#8) -- (0.2 + #1,#8);
-	
-	\node [left] at (-0.2 + #1,#8 + 0.2) {#8 V};
-	\node [right] at (0.2 + #1,#8 + 0.2) {$V_{CC}$};	
-	\node [left] at (-0.2 + #1,-0.2) {0 V};
-	\node [right] at (0.2 + #1,-0.2) {$GND$};
-	
-	%Punto medio
-	\draw[-][draw=black, very thick] (-0.1 + #1,#5) -- (0.1 + #1,#5);
-	\node [left] at (-0.1 + #1,#5) {#5 V};
-	\node [right] at (0.1 + #1,#5) {$V_t$};
-	
-	%VOH
-	\draw[-][draw=black, very thick] (-0.1 + #1,#7) -- (0.1 + #1,#7);
-	\node [left, color = gray] at (-0.1 + #1,#7) {#7 V};
-	\node [right, color = gray] at (0.1 + #1,#7) {$V_{OH}$};
-	
-	%VIL
-	\draw[-][draw=black, very thick] (-0.1 + #1,#4) -- (0.1 + #1,#4);
-	\node [left, color = gray] at (-0.1 + #1,#4) {#4 V};
-	\node [right, color = gray] at (0.1 + #1,#4) {$V_{IL}$};
-	
-	%VIH
-	\draw[-][draw=black, very thick] (-0.1 + #1,#6) -- (0.1 + #1,#6);
-	\node [left, color = red] at (-0.1 + #1,#6) {#6 V};
-	\node [right, color = red] at (0.1 + #1,#6) {$V_{IH}$};
-	
-	%VOL
-	\draw[-][draw=black, very thick] (-0.1 + #1,#3) -- (0.1 + #1,#3);
-	\node [left, color = red] at (-0.1 + #1,#3) {#3 V};
-	\node [right, color = red] at (0.1 + #1,#3) {$V_{OL}$};	
-	
-}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %								DIBUJOS								%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -157,7 +106,7 @@
 	
 	\barra{8}{TTL}{0.35}{0.8}{1.5}{2}{3.3}{5}
 	
-	\barra{12}{LVTTL}{0.4}{0.8}{1.5}{2}{2.4}{3.6}	
+	\barra{12}{LVTTL}{0.4}{0.8}{1.5}{2}{2.4}{3.6}
 
 \end{tikzpicture}
 \end{page}
