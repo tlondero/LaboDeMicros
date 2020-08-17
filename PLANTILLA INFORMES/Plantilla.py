@@ -17,6 +17,7 @@ X_SCREEN = 630 #315
 
 TEXPATH = "./Ejercicio-N/Ejercicio-N.tex"
 PENDPATH = "./Ejercicio-N/ImagenesEjercicioN/pend.jpg"
+CIRCPATH = "./Ejercicio-N/ImagenesEjercicioN/Circuits.tex"
 INFORPATH = "./Informe"
 INFOTEXRPATH = "./Informe/Informe.tex"
 INFOHEADRPATH = "./Informe/Header.tex"
@@ -84,7 +85,6 @@ class cvGui():
 
             for i in range(len(self.names)):
                 cvui.printf(self.frame, 10 + X_SCREEN / 2, 160 + 15*i, 0.4, 0xdd97fb, self.names[i])
-
 
             cvui.printf(self.frame, 5, 55, 0.4, 0xdd97fb, f'N Exercises:')
             cvui.counter(self.frame, 5, 70, self.numberFolder)
@@ -248,6 +248,15 @@ class cvGui():
 
             graphicspath = ''
 
+            os.mkdir(finalPath + "/Informe")
+            shutil.copyfile(INFOTEXRPATH, finalPath + "/Informe/Informe.tex")
+            shutil.copyfile(INFOHEADRPATH, finalPath + "/Informe/Header.tex")
+            shutil.copyfile(INFOCARPATH, finalPath + "/Informe/Caratula.tex")
+            shutil.copyfile(INFOCARPATH, finalPath + "/Informe/Header-Circuits.tex")
+
+            with open(finalPath + '/Informe/Informe.tex', 'r') as file:
+                dataTex = file.readlines()
+
             for f in range(numberOfExs):
                 n = str(f + 1)
 
@@ -262,38 +271,42 @@ class cvGui():
 
                 shutil.copyfile(TEXPATH, exFolderPath + texName)            #Copio y renombro .tex
                 shutil.copyfile(PENDPATH, imgFolderPath + "/pend.jpg")      #Copio img
-                shutil.copyfile(PENDPATH, imgFolderPath + "/Circuits.tex")  # Copio img
+                shutil.copyfile(CIRCPATH, imgFolderPath + "/Circuits.tex")  # Copio img
 
-            os.mkdir(finalPath + "/Informe")
-            shutil.copyfile(INFOTEXRPATH, finalPath + "/Informe/Informe.tex")
-            shutil.copyfile(INFOHEADRPATH, finalPath + "/Informe/Header.tex")
-            shutil.copyfile(INFOCARPATH, finalPath + "/Informe/Caratula.tex")
-            shutil.copyfile(INFOCARPATH, finalPath + "/Informe/Header-Circuits.tex")
+                dataTex.append('%\section{Ejercicio ' + n + '}\n')
+                dataTex.append('%	\label{Ejercicio-' + n + '}\n')
+                dataTex.append('%	\input{../Ejercicio-' + n + '/Ejercicio-' + n + '.tex}\n')
+                dataTex.append('\n')
+
+
+            dataTex.append('\n\end{document}')
+
+            with open(finalPath + '/Informe/Informe.tex', 'w') as file:
+                file.writelines(dataTex)
 
             with open(finalPath + '/Informe/Header.tex', 'r') as file:
-                data = file.readlines()
+                dataHead = file.readlines()
 
-            data[37] = '\graphicspath{' + graphicspath + '}\n'
+            dataHead[37] = '\graphicspath{' + graphicspath + '}\n'
             if not self.subjectName == '':
-                data[41] = '\lhead{' + self.subjectName + '}\n'
-
+                dataHead[41] = '\lhead{' + self.subjectName + '}\n'
 
             with open(finalPath + '/Informe/Header.tex', 'w') as file:
-                file.writelines(data)
+                file.writelines(dataHead)
 
             with open(finalPath + '/Informe/Caratula.tex', 'r') as file:
-                data = file.readlines()
+                dataCar = file.readlines()
 
-            data[8] = '{ \Huge \bfseries Trabajo práctico N$^{\circ}$' + str(self.tp[0]) + '}\\[0.4cm] \n'
-            data[14] = '\emph{Grupo' + str(self.group[0]) + '}\ \ \n'
-            data[38] = 'Presentado: & ' + str(self.day[0]) + '/' + str(self.month[0]) + '/' + str(self.year[0]) + '\\ \n'
+            dataCar[8] = '{ \Huge \bfseries Trabajo práctico N$^{\circ}$' + str(self.tp[0]) + '}\\[0.4cm] \n'
+            dataCar[14] = '\emph{Grupo' + str(self.group[0]) + '}\ \ \n'
+            dataCar[38] = 'Presentado: & ' + str(self.day[0]) + '/' + str(self.month[0]) + '/' + str(self.year[0]) + '\\ \n'
 
             if not len(self.names) == 0:
                 for i in range(len(self.names)):
-                    data[27 + i] = self.names[i] + '\\ \n'
+                    dataCar[27 + i] = self.names[i] + '\\ \n'
 
             with open(finalPath + '/Informe/Caratula.tex', 'w') as file:
-                file.writelines(data)
+                file.writelines(dataCar)
 
             return True
         else:
