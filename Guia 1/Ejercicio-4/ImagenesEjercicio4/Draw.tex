@@ -1,0 +1,115 @@
+\input{Header-Draw.tex}
+\input{fillarea.tex}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%							COMANDOS								%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Eje vertical que compara los niveles 	(CONTINUO)
+\newcommand{\barra}[8] % #1 = Xpos #2 = name #3 = VOL #4 = VIL #5 = Vt #6 = VIH #7 = VOH #8 = VCC
+{
+	\node [below] at (#1,-0.5) {#2};
+	
+	%Barras anchas
+	\draw[-][draw=red, line width=2mm] (#1,#7) -- (#1,#8);
+	\draw[-][draw=red, line width=2mm] (#1,0) -- (#1,#3);
+	
+	\draw[-][draw=gray, line width=2mm] (#1,#6) -- (#1,#7);
+	\draw[-][draw=gray, line width=2mm] (#1,#3) -- (#1,#4);	
+	
+	\draw[-][draw=lightgray, line width=2mm] (#1,#4) -- (#1,#6);	
+	
+	%Eje vertical limites
+	\draw[-][draw=black, very thick] (#1,0) -- (#1,#8);
+	\draw[-][draw=black, very thick] (-0.2 + #1,0) -- (0.2 + #1,0);
+	\draw[-][draw=black, very thick] (-0.2 + #1,#8) -- (0.2 + #1,#8);
+	
+	\node [left] at (-0.2 + #1,#8 + 0.2) {#8 V};
+	\node [right] at (0.2 + #1,#8 + 0.2) {$V_{CC}$};	
+	\node [left] at (-0.2 + #1,-0.2) {0 V};
+	\node [right] at (0.2 + #1,-0.2) {$GND$};
+	
+	%Punto medio
+	\draw[-][draw=black, very thick] (-0.1 + #1,#5) -- (0.1 + #1,#5);
+	\node [left] at (-0.1 + #1,#5) {#5 V};
+	\node [right] at (0.1 + #1,#5) {$V_t$};
+	
+	%VOH
+	\draw[-][draw=black, very thick] (-0.1 + #1,#7) -- (0.1 + #1,#7);
+	\node [left, color = gray] at (-0.1 + #1,#7) {#7 V};
+	\node [right, color = gray] at (0.1 + #1,#7) {$V_{OH}$};
+	
+	%VIL
+	\draw[-][draw=black, very thick] (-0.1 + #1,#4) -- (0.1 + #1,#4);
+	\node [left, color = gray] at (-0.1 + #1,#4) {#4 V};
+	\node [right, color = gray] at (0.1 + #1,#4) {$V_{IL}$};
+	
+	%VIH
+	\draw[-][draw=black, very thick] (-0.1 + #1,#6) -- (0.1 + #1,#6);
+	\node [left, color = red] at (-0.1 + #1,#6) {#6 V};
+	\node [right, color = red] at (0.1 + #1,#6) {$V_{IH}$};
+	
+	%VOL
+	\draw[-][draw=black, very thick] (-0.1 + #1,#3) -- (0.1 + #1,#3);
+	\node [left, color = red] at (-0.1 + #1,#3) {#3 V};
+	\node [right, color = red] at (0.1 + #1,#3) {$V_{OL}$};	
+	
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%								DIBUJOS								%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%DIBUJO 1
+\begin{page}
+\begin{tikzpicture}[yscale=1]
+
+	%#1 = Xpos #2 = name #3 = VOL #4 = VIL #5 = Vt #6 = VIH #7 = VOH #8 = VCC
+	
+	\barra{0}{5 V TTL}{0.4}{0.8}{1.55}{2}{2.4}{5}
+	
+	\barra{5}{3.3 V LVTTL}{0.4}{0.8}{1.55}{2}{2.4}{3.3}	
+
+\end{tikzpicture}
+\end{page}
+
+%DIBUJO 2
+\begin{page}
+\begin{circuitikz}[american voltages]	
+		
+	\draw
+		(0,0) node[nigfete,solderdot, rotate = -90, label=below:2N7000](fet){}
+		
+		(fet.S) -| node[pos=.5, circ](r1){} (-2,-1) node[ocirc, label=below:$3.3 \ v$ Signal](){}
+		(fet.D) -| node[pos=.5, circ](r2){} (2,-1) node[ocirc, label=below:$5 \ v$ Signal](){}
+		
+		(r1.center) to[R, label=$10 \ K$] ++ (0,2) node[circ](aux1){} -| (fet.G)
+		(aux1.center) -- ++ (-1,0) node[ocirc, label=above:$3.3 \ V$](){}
+		
+		(r2.center) to[R, label=$10 \ K$] ++ (0,2) -- ++ (1,0) node[ocirc, label=above:$5 \ V$](){}		
+	;
+
+\end{circuitikz}
+\end{page}
+
+%DIBUJO 3
+\begin{page}
+\begin{tikzpicture}[yscale=1]
+
+	%#1 = Xpos #2 = name #3 = VOL #4 = VIL #5 = Vt #6 = VIH #7 = VOH #8 = VCC
+	
+	\barra{0}{CMOS}{0.2}{1.3}{2.5}{3.7}{4.7}{5}
+	
+	\barra{4}{TTL/CMOS}{0.2}{0.8}{1.5}{2}{4.7}{5}
+	
+	\barra{8}{TTL}{0.35}{0.8}{1.5}{2}{3.3}{5}
+	
+	\barra{12}{LVTTL}{0.4}{0.8}{1.5}{2}{2.4}{3.6}
+
+\end{tikzpicture}
+\end{page}
+
+
+\end{document}

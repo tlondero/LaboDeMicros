@@ -1,6 +1,55 @@
-\input{../Informe/Header.tex}
+\subsection{Implementación por lógica discreta}
+Para la lógica combinacional lo primero que se hizo fue escribir las posiciones de memoria en las que vivirá nuestro periférico en binario, teniendo en cuenta que la memoria es de 8k (8192) ocupará 0x2000 posiciones de memoria.
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\hline
+\textbf{Address} & \textbf{Dispositivo} & \textbf{Binario Comienzo} & \textbf{Binario Fin} \\ \hline
+0x4000 & RAM & 010000000000 & 011000000000 \\ \hline
+\end{tabular}
+\caption{Parámetros de la memoria RAM.}
+\end{table}
+De aqui se arma la tabla de verdad de los últimos 3 bits mas significativos.
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\hline
+$\mathbf{a_{15}}$ & $\mathbf{a_{14}}$ & $\mathbf{a_{13}}$ & \textbf{CS} \\ \hline
+0 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 1 \\
+0 & 1 & 1 & 1 \\
+1 & 0 & 0 & 0 \\
+1 & 0 & 1 & 0 \\
+1 & 1 & 0 & 0 \\
+1 & 1 & 1 & 0	\\ \hline
+\end{tabular}
+\caption{Tabla de verdad.}
+\label{tab:truetab}
 
-\begin{document}
+\end{table}
+De aquí se puede solucionar el mapa de karnaugh para la siguiente configuración:
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,page = 1]{ImagenesEjercicio1/Circuits.pdf}
+  \caption{Lógica Discreta}.
+  \label{fig:circLog}
+\end{figure}
+\subsection{Implementación por lógica de baja complejidad}
+Se utilizó el decodificador 74LS139, conectando a los pines $a_{15}$ y $a_{14}$ a las entradas B y A respectivamente, el CS será la salida $Y_1$ quedando de la siguiente manera
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth,page = 2]{ImagenesEjercicio1/Circuits.pdf}
+  \caption{Lógica de baja complejidad}.
+  \label{fig:circdec}
+\end{figure}
+\subsection{Implementación por medio de una PAL}
+Se utilizó una PAL como decodificador de direcciones, como se observa en la Tabla (\ref{tab:truetab}) es posible detectar el perisferico viendo únicamente los bits $a_{15}$ y $a_{14}$ asi se llega a la siguiente ecuación:
+\begin{align}
+x_1 = a_{15} \ \ \  \  \  \  \  \  \  \ x_2=a_{14} \\
+f1=CS \ \ \ f1= \bar{x_1} \  \&  \ x_2
+\end{align}
+
 \subsection{Análisis y construcción del diagrama de tiempos}
 Se construyó para el microprocesador M68HC11 el diagrama de tiempos para un ciclo de lectura/escritura, usando como ejemplo la posición de memoria \$2345, la cual está dentro de la hipotética región del mapa de memoria donde se aloja la memoria para la cual se diseñó el decodificador anteriormente.
 
@@ -27,54 +76,3 @@ En el caso de la lectura, el tiempo de setup para que el periférico coloque el 
 Para el caso de la escritura, el puerto C tiene un delay máximo para contener el dato a escribir de $t_{19} = 128 \ ns$ y un tiempo de hold de $t_{21} = 33 \ ns$ como mínimo, por lo cual el tiempo de escritura deberá ser como máximo de $t_{3} + t_{21} - t_{19} = 143 \ ns$.
 
 Finalmente, el address se mantendrá por un tiempo de $t_9$ tras el flanco descendente de la señal de enable, por lo que el tiempo válido de lectura de la dirección de memoria en un ciclo de $t_1 = 500ns$ será de $t_1 - t_{26} + t_{9} = 480 \ ns$.
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-%\begin{table}[H]
-%\centering
-%\begin{tabular}{cccc}
-%\hline
-%\textbf{A15} & \textbf{A14} & \textbf{A13} & \textbf{CS} \\
-%\hline
-%0            & 0            & 0            & 0           \\
-%0            & 0            & 1            & 0           \\
-%\textcolor{red}{0}           & \textcolor{red}{1}            %& \textcolor{red}{0}            & \textcolor{red}{1}           %\\
-%\textcolor{red}{0}            & \textcolor{red}{1}            %& \textcolor{red}{1}            & \textcolor{red}{1}           %\\
-%1            & 0            & 0            & 0           \\
-%1            & 0            & 1            & 0           \\
-%1            & 1            & 0            & 0           \\
-%1            & 1            & 1            & 0          \\
-%\hline
-%\end{tabular}
-%\end{table}
-
-\end{document}
