@@ -1,21 +1,20 @@
-\input{../Informe/Header.tex}
-
-\begin{document}
 \subsection{Implementación por lógica discreta}
 Para la lógica combinacional lo primero que se hizo fue escribir las posiciones de memoria en las que vivirá nuestro periférico en binario, teniendo en cuenta que la memoria es de 8k (8192) ocupará 0x2000 posiciones de memoria.
 \begin{table}[H]
 \centering
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{cccc}
 \hline
-Address & Dispositivo & Binario Comienzo & Binario Fin \\ \hline
+\textbf{Address} & \textbf{Dispositivo} & \textbf{Binario Comienzo} & \textbf{Binario Fin} \\ \hline
 0x4000 & RAM & 010000000000 & 011000000000 \\ \hline
 \end{tabular}
+\caption{Parámetros de la memoria RAM.}
 \end{table}
 De aqui se arma la tabla de verdad de los últimos 3 bits mas significativos.
 \begin{table}[H]
 \centering
 \begin{tabular}{cccc}
-$a_{15}$ & $a_{14}$ & \multicolumn{1}{c|}{$a_{13}$} & CS \\ \hline
+\hline
+$\mathbf{a_{15}}$ & $\mathbf{a_{14}}$ & $\mathbf{a_{13}}$ & \textbf{CS} \\ \hline
 0 & 0 & 0 & 0 \\
 0 & 0 & 1 & 0 \\
 0 & 1 & 0 & 1 \\
@@ -23,7 +22,7 @@ $a_{15}$ & $a_{14}$ & \multicolumn{1}{c|}{$a_{13}$} & CS \\ \hline
 1 & 0 & 0 & 0 \\
 1 & 0 & 1 & 0 \\
 1 & 1 & 0 & 0 \\
-1 & 1 & 1 & 0
+1 & 1 & 1 & 0	\\ \hline
 \end{tabular}
 \caption{Tabla de verdad.}
 \label{tab:truetab}
@@ -77,54 +76,3 @@ En el caso de la lectura, el tiempo de setup para que el periférico coloque el 
 Para el caso de la escritura, el puerto C tiene un delay máximo para contener el dato a escribir de $t_{19} = 128 \ ns$ y un tiempo de hold de $t_{21} = 33 \ ns$ como mínimo, por lo cual el tiempo de escritura deberá ser como máximo de $t_{3} + t_{21} - t_{19} = 143 \ ns$.
 
 Finalmente, el address se mantendrá por un tiempo de $t_9$ tras el flanco descendente de la señal de enable, por lo que el tiempo válido de lectura de la dirección de memoria en un ciclo de $t_1 = 500ns$ será de $t_1 - t_{26} + t_{9} = 480 \ ns$.
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-%\begin{table}[H]
-%\centering
-%\begin{tabular}{cccc}
-%\hline
-%\textbf{A15} & \textbf{A14} & \textbf{A13} & \textbf{CS} \\
-%\hline
-%0            & 0            & 0            & 0           \\
-%0            & 0            & 1            & 0           \\
-%\textcolor{red}{0}           & \textcolor{red}{1}            %& \textcolor{red}{0}            & \textcolor{red}{1}           %\\
-%\textcolor{red}{0}            & \textcolor{red}{1}            %& \textcolor{red}{1}            & \textcolor{red}{1}           %\\
-%1            & 0            & 0            & 0           \\
-%1            & 0            & 1            & 0           \\
-%1            & 1            & 0            & 0           \\
-%1            & 1            & 1            & 0          \\
-%\hline
-%\end{tabular}
-%\end{table}
-
-\end{document}

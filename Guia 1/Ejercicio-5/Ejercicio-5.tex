@@ -1,7 +1,3 @@
-\input{../Informe/Header.tex}
-
-\begin{document}
-
 Se quiere construir el diagrama de tiempos del MC68HC11 para el programa de la Tabla (\ref{prog}).
 
 \begin{table}[H]
@@ -50,5 +46,3 @@ Finalmente, se construye el diagrama de tiempos teniendo en cuenta el modo exten
 \end{figure}
 
 La señal de ADDR indica el valor del bus de address visto como la concatenación del puerto C latcheado y el puerto B. La señal de LIR es una señal activa baja de ayuda al momento de debuggear y marca el primer semiciclo negativo de cada ciclo de cada nueva instrucción. Esto es útil debido a que, como se puede ver en la Figura (\ref{diagtiempos_5}), la señal LIR tendrá un valor bajo cuando el puerto C retiene el OPCODE, el cual identifica qué instrucción ejecutará el M68HC11.
-
-\end{document}
