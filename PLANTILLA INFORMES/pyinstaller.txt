@@ -1,0 +1,1 @@
+pyinstaller --onefile --windowed -n MAGT -i chori.ico Plantilla.py

@@ -12,8 +12,8 @@ import time
 WINDOW_NAME = "Template Maker"
 MAXCHAR = 39
 
-Y_SCREEN = 235 #150
-X_SCREEN = 630 #315
+Y_SCREEN = 300 # 235
+X_SCREEN = 630
 
 TEXPATH = "./Ejercicio-N/Ejercicio-N.tex"
 PENDPATH = "./Ejercicio-N/ImagenesEjercicioN/pend.jpg"
@@ -70,13 +70,14 @@ class cvGui():
             cursor = cvui.mouse(WINDOW_NAME)
             click = cvui.mouse(cvui.CLICK)
 
-            writeOnName, self.folderName = self.textInput(5, 5, X_SCREEN/2 - 10, 40, "Folder Name:", char, self.folderName, cursor, click, writeOnName)
+            # (self, x, y, w, h, title, char, writeOn, cursor, click, writeOnBool):
+            writeOnName, self.folderName = self.textInput(5, 5, 305, 40, "Folder Name:", char, self.folderName, cursor, click, writeOnName)
 
-            writeOnSubject, self.subjectName = self.textInput(5 + X_SCREEN / 2, 5, X_SCREEN / 2 - 10, 40, "Subject Name:", char, self.subjectName, cursor, click, writeOnSubject)
+            writeOnSubject, self.subjectName = self.textInput(5 + X_SCREEN / 2, 5, 305, 40, "Subject Name:", char, self.subjectName, cursor, click, writeOnSubject)
 
-            writeOnProf, self.tempName = self.textInput(5 + X_SCREEN / 2, 105, X_SCREEN / 2 - 10, 40, "Professors:", char, self.tempName, cursor, click, writeOnProf)
-            cvui.rect(self.frame, 6 + X_SCREEN / 2, 155, X_SCREEN / 2 - 63, Y_SCREEN - 165, 0x8d9797, 0x3c4747)
-            cvui.rect(self.frame, X_SCREEN - 52, 155, 47, Y_SCREEN - 165, 0x8d9797, 0x293939)
+            writeOnProf, self.tempName = self.textInput(5 + X_SCREEN / 2, 105, 305, 40, "Professors:", char, self.tempName, cursor, click, writeOnProf)
+            cvui.rect(self.frame, 6 + X_SCREEN / 2, 155, X_SCREEN / 2 - 63, 235 - 165, 0x8d9797, 0x3c4747)
+            cvui.rect(self.frame, X_SCREEN - 52, 155, 47, 235 - 165, 0x8d9797, 0x293939)
             if cvui.button(self.frame, X_SCREEN - 49, 157, "+") and not self.tempName == '' and len(self.names) < 4:
                 self.names.append(self.tempName)
                 self.tempName = ''
@@ -85,6 +86,35 @@ class cvGui():
 
             for i in range(len(self.names)):
                 cvui.printf(self.frame, 10 + X_SCREEN / 2, 160 + 15*i, 0.4, 0xdd97fb, self.names[i])
+
+            xp = int((X_SCREEN - 20)/4)
+
+            cvui.window(self.frame, 5, 235, X_SCREEN - 10, Y_SCREEN - 235 - 5, "Premade:")
+            if cvui.button(self.frame, 10 + xp - 10*11, 260, "Lab. Micro."):
+                self.subjectName = '22.99 Laboratorio De Microprocesadores'
+                self.names.clear()
+                self.names.append('Jacoby, Daniel Andres')
+                self.names.append('Magliola, Nicolas')
+                self.names.append('Ismirlian, Diego Matias')
+                self.group[0] = 3
+
+            if cvui.button(self.frame, 10 + xp*2 - 10*7, 260, "Control"):
+                self.subjectName = '22.85 Sistemas de Control'
+                self.names.clear()
+                self.names.append('Nasini, Victor Gustavo')
+                self.names.append('Zujew, Cristian Alejo')
+
+            if cvui.button(self.frame, 10 + xp*3 - 10*9, 260, "Transinfo"):
+                self.subjectName = '22.61 Transmision de la Informacion'
+                self.names.clear()
+                self.names.append('Bertucci, Eduardo Adolfo')
+                self.names.append('Vila Krause, Luis Gustavo')
+
+            if cvui.button(self.frame, 10 + xp*4 - 10*11, 260, "Electromag."):
+                self.subjectName = '22.37 Electromagnetismo'
+                self.names.clear()
+                self.names.append('Munoz, Claudio Marcelo')
+                self.names.append('Dobrusin, Pablo')
 
             cvui.printf(self.frame, 5, 55, 0.4, 0xdd97fb, f'N Exercises:')
             cvui.counter(self.frame, 5, 70, self.numberFolder)
@@ -136,7 +166,7 @@ class cvGui():
                 self.tp[0] = 1
                 cvui.printf(self.frame, 5 + X_SCREEN * 5 / 6 + 41, 76, 0.4, 0x9C9C9C, '1')
 
-            if cvui.button(self.frame, 5, 120, "Load Folder Path") and not doOverw:
+            if cvui.button(self.frame, X_SCREEN/4 - 10*16/2, 110, "Load Folder Path") and not doOverw:
                 self.folderPath = self.getPath()
 
             cvui.window(self.frame, 5, 155, X_SCREEN/2 - 10, 40, "Folder Path Selected")
@@ -151,8 +181,7 @@ class cvGui():
                     stringCopy = "Wait While Copying..."
                     stringCopyColor = 0xdc1076
 
-            x = int(X_SCREEN / 4)
-            cvui.printf(self.frame, x, 210, 0.4, stringCopyColor, stringCopy)
+            cvui.printf(self.frame, 5, 205, 0.4, stringCopyColor, stringCopy)
 
             if self.startCopy:
                 self.startCopy = False
@@ -297,6 +326,7 @@ class cvGui():
             with open(finalPath + '/Informe/Caratula.tex', 'r') as file:
                 dataCar = file.readlines()
 
+            dataCar[4] = '\textsc{\Large $' + self.subjectName + '}\\[0.5cm] \n'
             dataCar[8] = '{ \Huge \bfseries Trabajo práctico N$^{\circ}$' + str(self.tp[0]) + '}\\[0.4cm] \n'
             dataCar[14] = '\emph{Grupo' + str(self.group[0]) + '}\ \ \n'
             dataCar[38] = 'Presentado: & ' + str(self.day[0]) + '/' + str(self.month[0]) + '/' + str(self.year[0]) + '\\ \n'
