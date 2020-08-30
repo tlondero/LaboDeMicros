@@ -45,6 +45,7 @@ void App_Init (void)
 {
 	gpioMode(PIN_LED_BLUE, OUTPUT);
 	gpioWrite(PIN_LED_BLUE, HIGH);
+
 	gpioMode(PIN_LED_RED, OUTPUT);
 	gpioWrite(PIN_LED_RED, HIGH);
 
@@ -56,7 +57,7 @@ void App_Init (void)
 	//Prender el led sobre la protoboard
 	gpioMode(PIN_PULSADOR, INPUT_PULLUP);
 	gpioMode(PIN_LED_AMA, OUTPUT);
-	gpioWrite(PIN_LED_AMA, HIGH);
+	//gpioWrite(PIN_LED_AMA, HIGH);
 
 	//BALIZA
 
@@ -74,8 +75,9 @@ void App_Run (void)
 
 	if ( current==HIGH && prev==LOW){
 		//delayLoop(40000UL); #Para
-		baliza_state != baliza_state;
+		baliza_state = !baliza_state;
 		gpioWrite(PIN_LED_RED, !baliza_state);
+		gpioWrite(PIN_LED_AMA, baliza_state);
 	}
 
 	if ( baliza_state == true ){
@@ -147,7 +149,7 @@ static void delayLoop(uint32_t veces)
 
 static void update_baliza(int periodo){
 
-	static int delay_acumulado;
+	static int delay_acumulado = 0;
 
 	if ( delay_acumulado < human2UL((int)(periodo/2)) ){
 		delayLoop(human2UL(1));
@@ -163,8 +165,8 @@ static void update_baliza(int periodo){
  * number: int
  * 			recibe un número expresado en milisengundos y devuelve su equivalente en UL
 */
-static unsigned long human2UL(int number){
-	unsigned long res = 14300*number;
+static unsigned long human2UL(int miliseconds){
+	unsigned long res = 14300*miliseconds;
 	return res;
 }
 /* Parametros:
@@ -172,8 +174,8 @@ static unsigned long human2UL(int number){
  * 			recibe un número expresado en UL y devuelve su equivalente en milisengundos
 */
 static int UL2human(unsigned long number){
-	int res = number/14300;
-	return res;
+	int milisec = number/14300;
+	return milisec;
 }
 
 
