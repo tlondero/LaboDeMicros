@@ -176,7 +176,7 @@ class cvGui():
                 cvui.printf(self.frame, 10, 180, 0.4, 0xdd97fb, self.folderPath[0:MAXCHAR + 2] + '...')
 
             if (not self.folderPath == '') and (not self.folderName == '') and (not self.subjectName == ''):
-                if cvui.button(self.frame, 5, 200, "Start Copy"):
+                if cvui.button(self.frame, 120, 200, "Start Copy"):
                     self.startCopy = True
                     stringCopy = "Wait While Copying..."
                     stringCopyColor = 0xdc1076
@@ -185,6 +185,10 @@ class cvGui():
 
             if self.startCopy:
                 self.startCopy = False
+
+                while self.folderName[-1] == ' ': #32:
+                    self.folderName = self.folderName[:-1]
+
                 finalPath = self.folderPath + '/' + self.folderName
 
                 coping = self.copyFolders(self.numberFolder[0], finalPath, True)
