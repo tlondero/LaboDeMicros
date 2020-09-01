@@ -19,8 +19,24 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
+// Alternatives
+
+typedef enum{
+	PORT_mAnalog,
+	PORT_mGPIO,
+	PORT_mAlt2,
+	PORT_mAlt3,
+	PORT_mAlt4,
+	PORT_mAlt5,
+	PORT_mAlt6,
+	PORT_mAlt7,
+} PORTMux_t;
+
+
+
 // Ports
 enum { PA, PB, PC, PD, PE };
+
 
 // Convert port and number into pin ID
 // Ex: PTB5  -> PORTNUM2PIN(PB,5)  -> 0x25
@@ -37,6 +53,10 @@ enum { PA, PB, PC, PD, PE };
 #define INPUT_PULLUP        2
 #define INPUT_PULLDOWN      3
 #endif // INPUT
+
+//Clock Modes
+#define CG_ON 1
+#define CG_OFF 0
 
 
 // Digital values
@@ -60,6 +80,13 @@ typedef uint8_t pin_t;
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
+
+/**
+ * @brief Configures clock gating mode
+ * @param pin the pin whose mode you wish to set (according PORTNUM2PIN)
+ * @param state CG_ON, CG_OFF.
+ */
+void gpioCG(pin_t pin, bool state);
 
 /**
  * @brief Configures the specified pin to behave either as an input or an output
