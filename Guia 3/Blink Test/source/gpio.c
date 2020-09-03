@@ -16,11 +16,12 @@ const static uint32_t SIM_SCGC5_PORT_MASKS[] = {SIM_SCGC5_PORTA_MASK, SIM_SCGC5_
 const static PORT_Type * PORT_SELECTORS[] = {PORTA, PORTB, PORTC, PORTD, PORTE};
 
 //GPIO arrays
-const static GPIO_Type * GPIO_SELECTORS[] = {PTA, PTB, PTC, PTD, PTE};
+const static GPIO_Type * GPIO_SELECTORS[] = {PTA, PTB, PTC, PTD, PTE}; //GPIO_BASE_PTRS
 
 //linea 10460
 
 void gpioCG(pin_t pin, uint8_t state){
+
 	//Enable Clock Gating
 	if (state == CG_ON)
 	{
@@ -44,20 +45,22 @@ void gpioMode (pin_t pin, uint8_t mode){
 	gpioCG(pin, CG_ON);
 
 	//PCR CONFIG
-	uint_8 port = PIN2PORT(pin);
+	uint8_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
 	PORT_Type*  port_pointer = PORT_SELECTORS[port];
 	GPIO_Type* gpio_pointer = GPIO_SELECTORS[port];
 
+	port_pointer->PCR[number] = 0x00;
 	// Establecemos el pin como GPIO
 	port_pointer->PCR[number] |= PORT_PCR_MUX(PORT_mGPIO);
+	port_pointer->PCR[number] |= PORT_PCR_IRQC(0);
 
 	if (mode == OUTPUT){
-		gpio_pointer->PDDR &= ~(1<<number);
+		gpio_pointer->PDDR |= (1<<number);
 	}
 	else{
 		// Set pin as INPUT
-		gpio_pointer->PDDR[number] |= (1<<number);
+		gpio_pointer->PDDR |= (1<<number);
 
 		switch (mode) {
 			case INPUT_PULLDOWN:
@@ -80,17 +83,18 @@ void gpioMode (pin_t pin, uint8_t mode){
  * @param val Desired value (HIGH or LOW)
  */
 void gpioWrite (pin_t pin, bool value){
-	uint_8 port = PIN2PORT(pin);
+	uint8_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
 	PORT_Type*  port_pointer = PORT_SELECTORS[port];
 	GPIO_Type* gpio_pointer = GPIO_SELECTORS[port];
 
 	if (value == HIGH){
-		gpio_pointer->PSOR |= (1<<number);
+		gpio_pointer->PDOR |= (1<<number);
 	}
 	else if(value == LOW){
-		gpio_pointer->PCOR |= (1<<number);
+		gpio_pointer->PDOR &= ~(1<<number);
 	}
+
 
 }
 

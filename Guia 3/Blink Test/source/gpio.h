@@ -86,7 +86,7 @@ typedef uint8_t pin_t;
  * @param pin the pin whose mode you wish to set (according PORTNUM2PIN)
  * @param state CG_ON, CG_OFF.
  */
-void gpioCG(pin_t pin, bool state);
+void gpioCG(pin_t pin, uint8_t state);
 
 /**
  * @brief Configures the specified pin to behave either as an input or an output

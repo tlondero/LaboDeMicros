@@ -43,35 +43,53 @@ static int UL2human(unsigned long numer);
 /* Función que se llama 1 vez, al comienzo del programa */
 void App_Init (void)
 {
-	gpioMode(PIN_LED_BLUE, OUTPUT);
-	gpioWrite(PIN_LED_BLUE, HIGH);
+	//gpioMode(PIN_LED_BLUE, OUTPUT);
+	//gpioWrite(PIN_LED_BLUE, HIGH);
 
 	gpioMode(PIN_LED_RED, OUTPUT);
 	gpioWrite(PIN_LED_RED, HIGH);
 
-	gpioMode(PIN_SW3, INPUT);
+	//gpioMode(PIN_SW3, INPUT);
 
 	//Con SW2
-	gpioMode(PIN_SW2, INPUT_PULLUP);
+	//gpioMode(PIN_SW2, INPUT_PULLUP);
 
 	//Prender el led sobre la protoboard
-	gpioMode(PIN_PULSADOR, INPUT_PULLUP);
-	gpioMode(PIN_LED_AMA, OUTPUT);
+	//gpioMode(PIN_PULSADOR, INPUT_PULLUP);
+	//gpioMode(PIN_LED_AMA, OUTPUT);
 	//gpioWrite(PIN_LED_AMA, HIGH);
 
 	//BALIZA
+
+	 int16_t i = 1;
+	 int8_t *p = (int8_t *) &i;
+/*
+	 if (p[0] == 1) {
+		 int es_little = 1;
+	 }
+    else{
+		  int no_es_little = 0 ;
+	   }
+*/
 
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
 void App_Run (void)
 {
+
+
+	gpioWrite(PIN_LED_RED, LOW);
+	delayLoop(4000000UL);
+	gpioWrite(PIN_LED_RED, HIGH);
+	delayLoop(4000000UL);
 	//Baliza
+	/*
 	static bool baliza_state = false;
 	int prev;
 	static int current = HIGH;
 	prev = current;
-	current = gpioRead(PIN_PULSADOR);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
+	current = gpioRead(PIN_SW3);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
 
 	if ( current==HIGH && prev==LOW){
 		//delayLoop(40000UL); #Para
@@ -83,7 +101,7 @@ void App_Run (void)
 	if ( baliza_state == true ){
 		update_baliza(2000);
 	}
-
+*/
 
 
 
