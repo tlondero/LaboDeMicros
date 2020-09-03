@@ -102,7 +102,21 @@ void gpioWrite (pin_t pin, bool value){
 
 
 
+void gpioToggle (pin_t pin){
+	uint32_t port = PIN2PORT(pin);
+	uint32_t number = PIN2NUM(pin);
+	GPIO_Type* gpio_pointer = GPIO_SELECTORS[port];
+	gpio_pointer->PTOR |= (1<<number);
+}
 
+bool gpioRead (pin_t pin){
+	uint32_t port = PIN2PORT(pin);
+	uint32_t number = PIN2NUM(pin);
+	GPIO_Type* gpio_pointer = GPIO_SELECTORS[port];
+	bool res =  gpio_pointer->PDIR & (1<<number);
+	return res;
+
+}
 
 
 
