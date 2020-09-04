@@ -16,6 +16,7 @@
 #include "core_cm4.h"
 
 #define FCLK	1000000000U // Hz
+
 bool SysTick_Init (void (*funcallback)(void)){
 		NVIC_EnableIRQ(SysTick_IRQn);
 		bool res = false;
