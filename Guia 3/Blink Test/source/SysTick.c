@@ -13,7 +13,8 @@
  */
 #include "SysTick.h"
 #include <stddef.h>
-#include "core_cm4.h"
+
+#include "MK64F12.h"
 
 #define FCLK	1000000000U // Hz
 
