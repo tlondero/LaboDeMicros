@@ -40,17 +40,14 @@ static void update_baliza(int period);
 static unsigned long human2UL(int number);
 static int UL2human(unsigned long numer);
 
+static void init_baliza(void);
+static void do_baliza(void);
+
 /* Función que se llama 1 vez, al comienzo del programa */
 void App_Init (void)
 {
-	//gpioMode(PIN_LED_BLUE, OUTPUT);
-	//gpioWrite(PIN_LED_BLUE, HIGH);
 
-	gpioMode(PIN_LED_RED, OUTPUT);
-	gpioWrite(PIN_LED_RED, HIGH);
-
-	//gpioMode(PIN_SW3, INPUT);
-
+	init_baliza();
 	//Con SW2
 	//gpioMode(PIN_SW2, INPUT_PULLUP);
 
@@ -61,47 +58,28 @@ void App_Init (void)
 
 	//BALIZA
 
-	 int16_t i = 1;
-	 int8_t *p = (int8_t *) &i;
-/*
-	 if (p[0] == 1) {
-		 int es_little = 1;
-	 }
-    else{
-		  int no_es_little = 0 ;
-	   }
-*/
-
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
+
 void App_Run (void)
 {
 
+/*
+	//gpioWrite(PIN_LED_RED, LOW);
+	gpioToggle(PIN_LED_RED);
+	bool led_red_state = gpioRead(PIN_LED_RED);
 
-	gpioWrite(PIN_LED_RED, LOW);
 	delayLoop(4000000UL);
-	gpioWrite(PIN_LED_RED, HIGH);
+	//gpioWrite(PIN_LED_RED, HIGH);
+	gpioToggle(PIN_LED_RED);
+	led_red_state = gpioRead(PIN_LED_RED);
 	delayLoop(4000000UL);
+	*/
+
 	//Baliza
-	/*
-	static bool baliza_state = false;
-	int prev;
-	static int current = HIGH;
-	prev = current;
-	current = gpioRead(PIN_SW3);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
+	do_baliza();
 
-	if ( current==HIGH && prev==LOW){
-		//delayLoop(40000UL); #Para
-		baliza_state = !baliza_state;
-		gpioWrite(PIN_LED_RED, !baliza_state);
-		gpioWrite(PIN_LED_AMA, baliza_state);
-	}
-
-	if ( baliza_state == true ){
-		update_baliza(2000);
-	}
-*/
 
 
 
@@ -159,6 +137,35 @@ static void guido_delay(double period){
 	do time(&end); while(difftime(end, start) <= wait);
 }*/
 
+static void init_baliza(void){
+	gpioMode(PIN_LED_BLUE, OUTPUT);
+	gpioWrite(PIN_LED_BLUE, HIGH);
+
+	gpioMode(PIN_LED_RED, OUTPUT);
+	gpioWrite(PIN_LED_RED, HIGH);
+
+	gpioMode(PIN_SW3, INPUT_PULLUP);
+}
+
+static void do_baliza(void){
+	static bool baliza_state = false;
+	int prev;
+	static int current = HIGH;
+	prev = current;
+	current = gpioRead(PIN_SW3);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
+
+	if ( current==HIGH && prev==LOW){
+		//delayLoop(40000UL); #Para
+		baliza_state = !baliza_state;
+		gpioWrite(PIN_LED_RED, !baliza_state);
+		gpioWrite(PIN_LED_BLUE, !baliza_state);
+	}
+
+	if ( baliza_state == true ){
+		update_baliza(2000);
+	}
+}
+
 //71500 UL = 5ms
 static void delayLoop(uint32_t veces)
 {
@@ -174,7 +181,7 @@ static void update_baliza(int periodo){
 		delay_acumulado += human2UL(1);
 	}
 	else{
-		gpioToggle(PIN_LED_AMA);
+		gpioToggle(PIN_LED_BLUE);
 		delay_acumulado = 0;
 	}
 }

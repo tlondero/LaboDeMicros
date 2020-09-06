@@ -60,7 +60,7 @@ void gpioMode (pin_t pin, uint8_t mode){
 	}
 	else{
 		// Set pin as INPUT
-		gpio_pointer->PDDR |= (1<<number);
+		gpio_pointer->PDDR &= ~(1<<number);
 
 		switch (mode) {
 			case INPUT_PULLDOWN:

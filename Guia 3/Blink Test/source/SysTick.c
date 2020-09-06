@@ -18,6 +18,9 @@
 
 #define FCLK	1000000000U // Hz
 
+typedef void (*systick_callback_t)(void);
+systick_callback_t callback;
+
 bool SysTick_Init (void (*funcallback)(void)){
 		NVIC_EnableIRQ(SysTick_IRQn);
 		bool res = false;
@@ -26,8 +29,26 @@ bool SysTick_Init (void (*funcallback)(void)){
 			SysTick->LOAD = FCLK/SYSTICK_ISR_FREQUENCY_HZ - 1; // load value
 			SysTick->VAL=0x00;
 			SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk| SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+			callback = funcallback;
 			res = true;
 		}
 	return res;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
