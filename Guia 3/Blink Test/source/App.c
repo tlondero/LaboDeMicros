@@ -12,6 +12,8 @@
 #include "gpio.h"
 #include "stdbool.h"
 #include <stdio.h>
+#include "SysTick.h"
+
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -37,17 +39,25 @@ static void delayLoop(uint32_t veces);
  ******************************************************************************/
 
 static void update_baliza(int period);
-static unsigned long human2UL(int number);
-static int UL2human(unsigned long numer);
+static unsigned long ms2UL(int number);
+static int UL2ms(unsigned long numer);
 
 static void init_baliza(void);
 static void do_baliza(void);
-
+static void do_baliza_systick(void);
 /* Función que se llama 1 vez, al comienzo del programa */
+extern flag_systick;
+
+
+void my_callback(void){
+	flag_systick = 1;
+	gpioToggle(PIN_LED_BLUE);
+	gpioToggle(PIN_LED_AMA_EXT);
+
+}
+
 void App_Init (void)
 {
-
-	init_baliza();
 	//Con SW2
 	//gpioMode(PIN_SW2, INPUT_PULLUP);
 
@@ -57,6 +67,10 @@ void App_Init (void)
 	//gpioWrite(PIN_LED_AMA, HIGH);
 
 	//BALIZA
+	init_baliza();
+	//Systick baliza
+	SysTick_Init(my_callback);
+
 
 }
 
@@ -78,7 +92,10 @@ void App_Run (void)
 	*/
 
 	//Baliza
-	do_baliza();
+	//do_baliza_systick();
+	if (flag_systick){
+		flag_systick = 0;
+	}
 
 
 
@@ -141,10 +158,16 @@ static void init_baliza(void){
 	gpioMode(PIN_LED_BLUE, OUTPUT);
 	gpioWrite(PIN_LED_BLUE, HIGH);
 
+
 	gpioMode(PIN_LED_RED, OUTPUT);
 	gpioWrite(PIN_LED_RED, HIGH);
 
 	gpioMode(PIN_SW3, INPUT_PULLUP);
+
+	//PIN_LED_AMA_EXT
+	gpioMode(PIN_LED_AMA_EXT, OUTPUT);
+	gpioWrite(PIN_LED_AMA_EXT, HIGH);
+
 }
 
 static void do_baliza(void){
@@ -166,6 +189,28 @@ static void do_baliza(void){
 	}
 }
 
+
+static void do_baliza_systick(void){
+	static bool baliza_state = false;
+	int prev;
+	static int current = HIGH;
+	prev = current;
+	current = gpioRead(PIN_SW3);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
+
+	if ( current==HIGH && prev==LOW ){
+		//delayLoop(40000UL); #Para
+		baliza_state = !baliza_state;
+		gpioWrite(PIN_LED_RED, !baliza_state);
+		gpioWrite(PIN_LED_BLUE, !baliza_state);
+		gpioWrite(PIN_LED_AMA_EXT, !baliza_state);
+	}
+
+	if ( (baliza_state == true) && flag_systick){
+		gpioToggle(PIN_LED_BLUE);
+		gpioToggle(PIN_LED_AMA_EXT);
+	}
+}
+
 //71500 UL = 5ms
 static void delayLoop(uint32_t veces)
 {
@@ -176,9 +221,9 @@ static void update_baliza(int periodo){
 
 	static int delay_acumulado = 0;
 
-	if ( delay_acumulado < human2UL((int)(periodo/2)) ){
-		delayLoop(human2UL(1));
-		delay_acumulado += human2UL(1);
+	if ( delay_acumulado < ms2UL((int)(periodo/2)) ){
+		delayLoop(ms2UL(1));
+		delay_acumulado += ms2UL(1);
 	}
 	else{
 		gpioToggle(PIN_LED_BLUE);
@@ -190,7 +235,7 @@ static void update_baliza(int periodo){
  * number: int
  * 			recibe un número expresado en milisengundos y devuelve su equivalente en UL
 */
-static unsigned long human2UL(int miliseconds){
+static unsigned long ms2UL(int miliseconds){
 	unsigned long res = 14300*miliseconds;
 	return res;
 }
@@ -198,7 +243,7 @@ static unsigned long human2UL(int miliseconds){
  * number: unsigned long
  * 			recibe un número expresado en UL y devuelve su equivalente en milisengundos
 */
-static int UL2human(unsigned long number){
+static int UL2ms(unsigned long number){
 	int milisec = number/14300;
 	return milisec;
 }
