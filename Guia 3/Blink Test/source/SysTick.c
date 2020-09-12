@@ -19,9 +19,13 @@
 #include "hardware.h"
 
 #define FCLK	__CORE_CLOCK__  // Hz
+#define SYSTICK_ISR_FREQUENCY_HZ 12500000U
+#define ISR_COUNT SYSTICK_ISR_FREQUENCY_HZ/100000U
+#define MS2COUNTS(periodo) periodo/ISR_COUNT
 
-typedef void (*systick_callback_t)(void);
-systick_callback_t callback;
+//typedef void (*systick_callback_t)(void);
+//systick_callback_t callback;
+
 int flag_systick;
 
 bool SysTick_Init (void (*funcallback)(void)){
@@ -29,20 +33,44 @@ bool SysTick_Init (void (*funcallback)(void)){
 		bool res = false;
 		if (funcallback != NULL) {
 			SysTick->CTRL = 0x00; 					//Enable sysT interrupt
-			uint32_t a = FCLK/SYSTICK_ISR_FREQUENCY_HZ - 1;
-
-			SysTick->LOAD = a - 1; // load value
+			SysTick->LOAD = SYSTICK_ISR_FREQUENCY_HZ - 1; //125 ms @1Mhz
 			SysTick->VAL=0x00;
 			SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk| SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
-			callback = funcallback;
+			callbacks = funcallback;
+
+			//Convert period from milisenconds to counts
+			while(callbacks[i] != NULL){
+				callbacks[i].periodo = MS2COUNTS(callbacks[i].periodo);
+			}
+
 			res = true;
 		}
 	return res;
 
 }
 
+static uint32_t count_veces = 0;
 __ISR__ SysTick_Handler(void){
-	callback();
+	int i = 0;
+	while(callbacks[i] != NULL)
+	{
+		if(count_veces%callbacks[i].periodo){
+
+		}
+
+	}
+
+
+	if (count_veces == 8)
+		{
+		callback();
+		count_veces = 0;
+		}
+	else{
+		count_veces++;
+	}
+
+
 }
 
 

@@ -2,7 +2,7 @@
 /***************************************************************************//**
   @file     SysTick.h
   @brief    SysTick driver
-  @author   Nicolás Magliola
+  @author   MAGT
  ******************************************************************************/
 
 #ifndef _SYSTICK_H_
@@ -14,16 +14,30 @@
 
 #include <stdbool.h>
 
-
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define SYSTICK_ISR_FREQUENCY_HZ 1U
+#define SYSTICK_ISR_FREQUENCY_HZ 1000U
+#define BLINK_FREQ_HZ 2U
+#if SYSTICK_ISR_FREQUENCY_HZ % (2*BLINK_FREQ_HZ) != 0
+#warning BLINK cannot implement this exact frequency.Using floor(SYSTICK_ISR_FREQUENCY_HZ/BLINK_FREQ_HZ/2) instead.
+#endif
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
+typedef struct {
+	void *isr_callback(void);
+	uint32_t periodo; //En ms, dentro de SysTickInit son convertidas a count.
+	bool enable;	//enable flag
+}CallbackInterrupt;
+
+/*******************************************************************************
+ * CALLBACKS STORAGE
+ ******************************************************************************/
+#define MAX_CALLBACKS = 100
+CallbackInterrupt *callbacks;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -32,6 +46,7 @@
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
+
 
 /**
  * @brief Initialize SysTic driver

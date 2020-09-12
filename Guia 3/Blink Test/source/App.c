@@ -46,16 +46,32 @@ static void init_baliza(void);
 static void do_baliza(void);
 static void do_baliza_systick(void);
 /* Función que se llama 1 vez, al comienzo del programa */
-extern flag_systick;
-
+//extern flag_systick;
+static bool baliza_state = false;
 
 void my_callback(void){
-	flag_systick = 1;
 	gpioToggle(PIN_LED_BLUE);
 	gpioToggle(PIN_LED_AMA_EXT);
-
 }
 
+	/*static uint32_t counter = 0;
+
+	// use counter for dividing systick frequency
+	if(baliza_state){
+		if (counter == SYSTICK_ISR_FREQUENCY_HZ/BLINK_FREQ_HZ/2) {
+			// toggle pin twice per period
+			gpioToggle(PIN_LED_BLUE);
+			gpioToggle(PIN_LED_AMA_EXT);
+			counter = 0;
+		}
+		else {
+			counter++;
+		}
+	}/*
+	//flag_systick = 1;
+
+}
+*/
 void App_Init (void)
 {
 	//Con SW2
@@ -69,7 +85,7 @@ void App_Init (void)
 	//BALIZA
 	init_baliza();
 	//Systick baliza
-	SysTick_Init(my_callback);
+	SysTick_Init(do_baliza);
 
 
 }
@@ -93,9 +109,10 @@ void App_Run (void)
 
 	//Baliza
 	//do_baliza_systick();
+	/*
 	if (flag_systick){
 		flag_systick = 0;
-	}
+	*/
 
 
 
@@ -170,8 +187,23 @@ static void init_baliza(void){
 
 }
 
+static void check_status_baliza(void){
+	int prev;
+	static int current = HIGH;
+	prev = current;
+	current = gpioRead(PIN_SW3);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
+
+	if ( current==HIGH && prev==LOW){
+		//delayLoop(40000UL); #Para
+		baliza_state = !baliza_state;
+		gpioWrite(PIN_LED_RED, !baliza_state);
+		gpioWrite(PIN_LED_BLUE, !baliza_state);
+	}
+
+}
+
 static void do_baliza(void){
-	static bool baliza_state = false;
+
 	int prev;
 	static int current = HIGH;
 	prev = current;
@@ -191,7 +223,7 @@ static void do_baliza(void){
 
 
 static void do_baliza_systick(void){
-	static bool baliza_state = false;
+	//static bool baliza_state = false;
 	int prev;
 	static int current = HIGH;
 	prev = current;
@@ -204,11 +236,12 @@ static void do_baliza_systick(void){
 		gpioWrite(PIN_LED_BLUE, !baliza_state);
 		gpioWrite(PIN_LED_AMA_EXT, !baliza_state);
 	}
-
+	/*
 	if ( (baliza_state == true) && flag_systick){
 		gpioToggle(PIN_LED_BLUE);
 		gpioToggle(PIN_LED_AMA_EXT);
 	}
+	*/
 }
 
 //71500 UL = 5ms
