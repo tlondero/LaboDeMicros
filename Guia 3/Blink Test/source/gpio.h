@@ -33,6 +33,15 @@ typedef enum{
 } PORTMux_t;
 
 
+// IRQ modes
+enum {
+    GPIO_IRQ_MODE_DISABLE,
+    GPIO_IRQ_MODE_RISING_EDGE,
+    GPIO_IRQ_MODE_FALLING_EDGE,
+    GPIO_IRQ_MODE_BOTH_EDGES,
+
+    GPIO_IRQ_CANT_MODES
+};
 
 // Ports
 enum { PA, PB, PC, PD, PE };

@@ -16,17 +16,22 @@
 
 #include "MK64F12.h"
 
-#define FCLK	1000000000U // Hz
+#include "hardware.h"
+
+#define FCLK	__CORE_CLOCK__  // Hz
 
 typedef void (*systick_callback_t)(void);
 systick_callback_t callback;
+int flag_systick;
 
 bool SysTick_Init (void (*funcallback)(void)){
 		NVIC_EnableIRQ(SysTick_IRQn);
 		bool res = false;
 		if (funcallback != NULL) {
 			SysTick->CTRL = 0x00; 					//Enable sysT interrupt
-			SysTick->LOAD = FCLK/SYSTICK_ISR_FREQUENCY_HZ - 1; // load value
+			uint32_t a = FCLK/SYSTICK_ISR_FREQUENCY_HZ - 1;
+
+			SysTick->LOAD = a - 1; // load value
 			SysTick->VAL=0x00;
 			SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk| SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 			callback = funcallback;
@@ -34,6 +39,10 @@ bool SysTick_Init (void (*funcallback)(void)){
 		}
 	return res;
 
+}
+
+__ISR__ SysTick_Handler(void){
+	callback();
 }
 
 
