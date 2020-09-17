@@ -8,12 +8,14 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include "board.h"
-#include "gpio.h"
+//#include <header/ejercicios_headers/BalizaSwitchSysTick/balizaSwitchSysTick.h>
+//#include "header/ejercicios_headers/Baliza/baliza.h"
+//#include "header/ejercicios_headers/BalizaSysTick/balizast.h"
+#include "header/board.h"
+#include "header/gpio.h"
 #include "stdbool.h"
 #include <stdio.h>
-#include "SysTick.h"
-
+#include "header/SysTick.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -26,52 +28,37 @@
 
 static void delayLoop(uint32_t veces);
 
-//static void guido_delay(double period);
-
 /*******************************************************************************
  *******************************************************************************
                         GLOBAL FUNCTION DEFINITIONS
  *******************************************************************************
+ *******************************************************************************
  ******************************************************************************/
+
+
+/*******************************************************************************
+ * INTERRUPCIONES
+ ******************************************************************************/
+
+static CallbackInterrupt BlinkIRQ;
+static CallbackInterrupt SwitchCheckIRQ;
+static CallbackInterrupt BalizaSystick;
+static CallbackInterrupt  BlankInterrupt;
+
+
 
 /*******************************************************************************
  * BALIZA
  ******************************************************************************/
 
-static void update_baliza(int period);
+//static void update_baliza(int period);
 static unsigned long ms2UL(int number);
 static int UL2ms(unsigned long numer);
 
-static void init_baliza(void);
-static void do_baliza(void);
-static void do_baliza_systick(void);
-/* Función que se llama 1 vez, al comienzo del programa */
-//extern flag_systick;
-static bool baliza_state = false;
-
-void my_callback(void){
-	gpioToggle(PIN_LED_BLUE);
+void toggle_led_ama(void){
 	gpioToggle(PIN_LED_AMA_EXT);
 }
 
-	/*static uint32_t counter = 0;
-
-	// use counter for dividing systick frequency
-	if(baliza_state){
-		if (counter == SYSTICK_ISR_FREQUENCY_HZ/BLINK_FREQ_HZ/2) {
-			// toggle pin twice per period
-			gpioToggle(PIN_LED_BLUE);
-			gpioToggle(PIN_LED_AMA_EXT);
-			counter = 0;
-		}
-		else {
-			counter++;
-		}
-	}/*
-	//flag_systick = 1;
-
-}
-*/
 void App_Init (void)
 {
 	//Con SW2
@@ -82,11 +69,57 @@ void App_Init (void)
 	//gpioMode(PIN_LED_AMA, OUTPUT);
 	//gpioWrite(PIN_LED_AMA, HIGH);
 
-	//BALIZA
-	init_baliza();
-	//Systick baliza
-	SysTick_Init(do_baliza);
+	//BALIZA SIN INTERRUPCIONES
+	//SE ENCIENDE LA BALIZA CUANDO PRESIONAMOS EL BOTON
 
+	//Descomentar para correr
+	//init_baliza;
+
+	//*********************************************//
+
+	// Systick baliza (Actualiza y cheque el boton
+	// en el momento de la interrupción
+
+	/*init_baliza();
+	BalizaSystick.enable = true;
+	BalizaSystick.periodo = 1000;
+	BalizaSystick.stick_callback = do_baliza_systick;
+	CallbackInterrupt *irqs[] = {&BalizaSystick};
+	SysTick_Init(irqs,1);
+	*/
+
+	//*********************************************//
+	// Systick baliza y pulsador
+	// Se utiliza la interrupción periodica para
+	// chequear el pulsador y togglear la baliza
+	// utilizando un contador que contabiliza
+	// la cantidad de veces que se ha disparado la interrupción.
+	// Se utiliza como base de tiempo
+	/*
+	init_baliza_3();
+	BlinkIRQ.enable = true;
+	BlinkIRQ.periodo = 1000;
+	BlinkIRQ.stick_callback = toggle_baliza_3;
+
+	SwitchCheckIRQ.enable = true;
+	SwitchCheckIRQ.periodo = 125;
+	SwitchCheckIRQ.stick_callback = do_baliza_systick_3;
+
+	BlankInterrupt.stick_callback = NULL;
+	CallbackInterrupt *irqs[] = {&BlinkIRQ, &SwitchCheckIRQ, &BlankInterrupt};
+	SysTick_Init(irqs,2);
+	*/
+
+	//Interrupciones de pines
+	gpioMode(PIN_LED_AMA_EXT, OUTPUT);
+	gpioWrite(PIN_LED_AMA_EXT,HIGH);
+	//gpioMode(PIN_SW3, INPUT);
+	//gpioIRQ(PIN_SW3, GPIO_IRQ_MODE_RISING_EDGE, toggle_led_ama);
+	gpioMode(PIN_B2, INPUT);
+	gpioIRQ(PIN_B2, GPIO_IRQ_MODE_BOTH_EDGES, toggle_led_ama);
+
+	gpioMode(PIN_B3, INPUT);
+	gpioIRQ(PIN_B3, GPIO_IRQ_MODE_BOTH_EDGES, toggle_led_ama);
 
 }
 
@@ -94,194 +127,18 @@ void App_Init (void)
 
 void App_Run (void)
 {
+	//1-Do baliza sin interrupciones
+	//do_baliza();
 
-/*
-	//gpioWrite(PIN_LED_RED, LOW);
-	gpioToggle(PIN_LED_RED);
-	bool led_red_state = gpioRead(PIN_LED_RED);
+	//2-Do baliza con interrupciones
+	//no code
 
-	delayLoop(4000000UL);
-	//gpioWrite(PIN_LED_RED, HIGH);
-	gpioToggle(PIN_LED_RED);
-	led_red_state = gpioRead(PIN_LED_RED);
-	delayLoop(4000000UL);
-	*/
-
-	//Baliza
-	//do_baliza_systick();
-	/*
-	if (flag_systick){
-		flag_systick = 0;
-	*/
+	//3-Do baliza y chequeo del pulsador con interrupciones
+	//no code
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	//Pul2Switch
-	//Prende y apaga el led azul usando SW3 como switch
-
-	/*static int current = HIGH;
-	int prev;
-	prev = current;
-	current = gpioRead(PIN_PULSADOR);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
-
-	if ( current==HIGH && prev==LOW){
-		delayLoop(40000UL);
-		gpioToggle(PIN_LED_AMA);					//gpioToggle(PIN_LED_BLUE);
-		//gpioWrite(PIN_LED_AMA, HIGH);
-	}
-	int check =  gpioRead(PIN_LED_AMA);
-	*/
-
-	//printf("hola");
-
-
-    //delayLoop(4000000UL);
-	//guido_delay(2);
-    //gpioToggle(PIN_LED_RED);
-    //guido_delay();
-    //gpioToggle(PIN_LED_BLUE);
 }
 
 
-/*******************************************************************************
- *******************************************************************************
-                        LOCAL FUNCTION DEFINITIONS
- *******************************************************************************
- ******************************************************************************/
-/*
-static void guido_delay(double period){
-	double wait = period / 2.0;
-	time_t start, end;
-	time(&start);
-	do time(&end); while(difftime(end, start) <= wait);
-}*/
-
-static void init_baliza(void){
-	gpioMode(PIN_LED_BLUE, OUTPUT);
-	gpioWrite(PIN_LED_BLUE, HIGH);
-
-
-	gpioMode(PIN_LED_RED, OUTPUT);
-	gpioWrite(PIN_LED_RED, HIGH);
-
-	gpioMode(PIN_SW3, INPUT_PULLUP);
-
-	//PIN_LED_AMA_EXT
-	gpioMode(PIN_LED_AMA_EXT, OUTPUT);
-	gpioWrite(PIN_LED_AMA_EXT, HIGH);
-
-}
-
-static void check_status_baliza(void){
-	int prev;
-	static int current = HIGH;
-	prev = current;
-	current = gpioRead(PIN_SW3);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
-
-	if ( current==HIGH && prev==LOW){
-		//delayLoop(40000UL); #Para
-		baliza_state = !baliza_state;
-		gpioWrite(PIN_LED_RED, !baliza_state);
-		gpioWrite(PIN_LED_BLUE, !baliza_state);
-	}
-
-}
-
-static void do_baliza(void){
-
-	int prev;
-	static int current = HIGH;
-	prev = current;
-	current = gpioRead(PIN_SW3);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
-
-	if ( current==HIGH && prev==LOW){
-		//delayLoop(40000UL); #Para
-		baliza_state = !baliza_state;
-		gpioWrite(PIN_LED_RED, !baliza_state);
-		gpioWrite(PIN_LED_BLUE, !baliza_state);
-	}
-
-	if ( baliza_state == true ){
-		update_baliza(2000);
-	}
-}
-
-
-static void do_baliza_systick(void){
-	//static bool baliza_state = false;
-	int prev;
-	static int current = HIGH;
-	prev = current;
-	current = gpioRead(PIN_SW3);//gpioRead(PIN_SW2);//gpioRead(PIN_SW3);
-
-	if ( current==HIGH && prev==LOW ){
-		//delayLoop(40000UL); #Para
-		baliza_state = !baliza_state;
-		gpioWrite(PIN_LED_RED, !baliza_state);
-		gpioWrite(PIN_LED_BLUE, !baliza_state);
-		gpioWrite(PIN_LED_AMA_EXT, !baliza_state);
-	}
-	/*
-	if ( (baliza_state == true) && flag_systick){
-		gpioToggle(PIN_LED_BLUE);
-		gpioToggle(PIN_LED_AMA_EXT);
-	}
-	*/
-}
-
-//71500 UL = 5ms
-static void delayLoop(uint32_t veces)
-{
-    while (veces--);
-}
-
-static void update_baliza(int periodo){
-
-	static int delay_acumulado = 0;
-
-	if ( delay_acumulado < ms2UL((int)(periodo/2)) ){
-		delayLoop(ms2UL(1));
-		delay_acumulado += ms2UL(1);
-	}
-	else{
-		gpioToggle(PIN_LED_BLUE);
-		delay_acumulado = 0;
-	}
-}
-
-/* Parametros:
- * number: int
- * 			recibe un número expresado en milisengundos y devuelve su equivalente en UL
-*/
-static unsigned long ms2UL(int miliseconds){
-	unsigned long res = 14300*miliseconds;
-	return res;
-}
-/* Parametros:
- * number: unsigned long
- * 			recibe un número expresado en UL y devuelve su equivalente en milisengundos
-*/
-static int UL2ms(unsigned long number){
-	int milisec = number/14300;
-	return milisec;
-}
-
-
-
-/*******************************************************************************
- ******************************************************************************/
