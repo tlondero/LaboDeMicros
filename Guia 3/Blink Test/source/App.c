@@ -115,7 +115,7 @@ void App_Init (void)
 	gpioWrite(PIN_LED_AMA_EXT,HIGH);
 	//gpioMode(PIN_SW3, INPUT);
 	//gpioIRQ(PIN_SW3, GPIO_IRQ_MODE_RISING_EDGE, toggle_led_ama);
-	gpioMode(PIN_B2, INPUT);
+	gpioMode(PIN_B2, INPUT_PULLDOWN);
 	gpioIRQ(PIN_B2, GPIO_IRQ_MODE_BOTH_EDGES, toggle_led_ama);
 
 	gpioMode(PIN_B3, INPUT);

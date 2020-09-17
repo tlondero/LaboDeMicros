@@ -126,6 +126,7 @@ bool gpioIRQ (pin_t pin, uint8_t irqMode, pinIrqFun_t irqFun){
 	}
 	port_pin_interrupt[port][number] = irqFun;  //Me guardo el callback de ese pin
 	
+	port_pointer->PCR[number] &= ~PORT_PCR_IRQC_MASK;
 	port_pointer->PCR[number] |= PORT_PCR_IRQC(irqMode); //Seteo el tipo de interrupcion para ese pin
 	
 	///PENSAR: Esto de habilitar las irq del puerto en el nvic se tendria que hacer apenas se configura un pin
@@ -145,7 +146,8 @@ __ISR__ PORTA_IRQHandler(void){
 	uint32_t exit_cond = 0;
 	while(!exit_cond){
 		if(pin_irq_configured[PA][i] == 1){
-			if((PORTA->PCR[i] & PORT_PCR_ISF_MASK) == 1){
+			if((PORTA->PCR[i] & PORT_PCR_ISF_MASK) == PORT_PCR_ISF_MASK){
+				PORTA->PCR[i] |= PORT_PCR_ISF_MASK;
 				port_pin_interrupt[PA][i]();
 				exit_cond = 1;
 			}
@@ -179,7 +181,8 @@ __ISR__ PORTC_IRQHandler(void){
 	uint32_t exit_cond = 0;
 	while(!exit_cond){
 		if(pin_irq_configured[PC][i] == 1){
-			if((PORTC->PCR[i] & PORT_PCR_ISF_MASK) == 1){
+			if((PORTC->PCR[i] & PORT_PCR_ISF_MASK) == PORT_PCR_ISF_MASK){
+				PORTC->PCR[i] |= PORT_PCR_ISF_MASK;
 				port_pin_interrupt[PC][i]();
 				exit_cond = 1;
 			}
@@ -195,7 +198,8 @@ __ISR__ PORTD_IRQHandler(void){
 	uint32_t exit_cond = 0;
 	while(!exit_cond){
 		if(pin_irq_configured[PD][i] == 1){
-			if((PORTD->PCR[i] & PORT_PCR_ISF_MASK) == 1){
+			if((PORTD->PCR[i] & PORT_PCR_ISF_MASK) == PORT_PCR_ISF_MASK){
+				PORTD->PCR[i] |= PORT_PCR_ISF_MASK;
 				port_pin_interrupt[PD][i]();
 				exit_cond = 1;
 			}
@@ -211,7 +215,8 @@ __ISR__ PORTE_IRQHandler(void){
 	uint32_t exit_cond = 0;
 	while(!exit_cond){
 		if(pin_irq_configured[PE][i] == 1){
-			if((PORTE->PCR[i] & PORT_PCR_ISF_MASK) == 1){
+			if((PORTE->PCR[i] & PORT_PCR_ISF_MASK) == PORT_PCR_ISF_MASK){
+				PORTE->PCR[i] |= PORT_PCR_ISF_MASK;
 				port_pin_interrupt[PE][i]();
 				exit_cond = 1;
 			}
