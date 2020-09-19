@@ -14,17 +14,18 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
-typedef uint8_t Button_Event;
-typedef struct{
-	uint8_t ev_state;
-	uint8_t pin_state;
-	uint8_t prev_pin_state;
-	pin_t pin;
-	bool enable;
-	bool lkp;
-}Btn;
+
 
 #define MAX_BUTTONS 15
+#define BUTTON_REFRESH_PERIOD 100
+//THIS TRESHOLDS ARE NOT IN MS
+//THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD
+
+
+#define LKP_THRESHOLD 20
+#define TYPEMATIC_THRESHOLD 10
+#define TYPEMATIC_PERIOD 2
+
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
@@ -34,8 +35,17 @@ enum{NOT_EN,// The button you asked for wasnt enabled
 	PRESS,//Button was pressed
 	RELEASE,//button was released
 	LKP,// Long Key Press
+	TYPEMATIC //Typematic
 };
 
+typedef uint8_t Button_Event;
+typedef struct{
+	uint8_t ev_state;
+	uint8_t pin_state;
+	uint8_t prev_pin_state;
+	pin_t pin;
+	bool enable;
+}Btn;
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -50,12 +60,10 @@ enum{NOT_EN,// The button you asked for wasnt enabled
  * pin : kinetis pin for switch.
  * mode: mode of the switch, input, input pullup or input pulldown
  * LKP_or_Typemattic: true if you want LKP mode, 0 if you want TYPEMATTIC:
- * TYPEMATTIC-> recieve press event if you  keep the button pressed.
- * LKP-> get Long key pressed event if you keep pressing the button.
  * @return  the ID for the switch -1 if the you reached the max switches
  */
 
-int8_t initButton(pin_t pin ,uint8_t mode, bool LKP_or_Typemattic);
+int8_t initButton(pin_t pin ,uint8_t mode);
 /**
  * @brief  getter for the button events.
  *
@@ -67,4 +75,4 @@ Button_Event getButtonEvent(int8_t id);
  ******************************************************************************/
 
 #endif /* BUTTON_H_ */
-¬
+

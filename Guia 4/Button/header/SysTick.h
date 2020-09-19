@@ -19,7 +19,7 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-//#define SYSTICK_ISR_FREQUENCY_HZ 1000U
+#define SYSTICK_ISR_FREQUENCY_HZ 1000U
 #define BLINK_FREQ_HZ 2U
 //#if SYSTICK_ISR_FREQUENCY_HZ % (2*BLINK_FREQ_HZ) != 0
 //#warning BLINK cannot implement this exact frequency.Using floor(SYSTICK_ISR_FREQUENCY_HZ/BLINK_FREQ_HZ/2) instead.
@@ -57,7 +57,7 @@ typedef struct CallbackInterrupt{
  */
 //bool SysTick_Init (void (*funcallback)(void));
 
-bool SysTick_Init (CallbackInterrupt *irqs_callback[], int cantidad);
+bool SysTick_Init (void (*funcallback)(void));
 
 /*******************************************************************************
  ******************************************************************************/

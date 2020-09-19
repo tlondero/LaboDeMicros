@@ -16,7 +16,7 @@
 #include "stdbool.h"
 #include <stdio.h>
 #include "header/SysTick.h"
-
+#include "header/Button.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -55,71 +55,19 @@ static CallbackInterrupt  BlankInterrupt;
 static unsigned long ms2UL(int number);
 static int UL2ms(unsigned long numer);
 
-void toggle_led_ama(void){
-	gpioToggle(PIN_LED_AMA_EXT);
-}
 
+int8_t idButton;
 void App_Init (void)
 {
-	//Con SW2
-	//gpioMode(PIN_SW2, INPUT_PULLUP);
-
-	//Prender el led sobre la protoboard
-	//gpioMode(PIN_PULSADOR, INPUT_PULLUP);
-	//gpioMode(PIN_LED_AMA, OUTPUT);
-	//gpioWrite(PIN_LED_AMA, HIGH);
-
-	//BALIZA SIN INTERRUPCIONES
-	//SE ENCIENDE LA BALIZA CUANDO PRESIONAMOS EL BOTON
-
-	//Descomentar para correr
-	//init_baliza;
-
-	//*********************************************//
-
-	// Systick baliza (Actualiza y cheque el boton
-	// en el momento de la interrupción
-
-	/*init_baliza();
-	BalizaSystick.enable = true;
-	BalizaSystick.periodo = 1000;
-	BalizaSystick.stick_callback = do_baliza_systick;
-	CallbackInterrupt *irqs[] = {&BalizaSystick};
-	SysTick_Init(irqs,1);
-	*/
-
-	//*********************************************//
-	// Systick baliza y pulsador
-	// Se utiliza la interrupción periodica para
-	// chequear el pulsador y togglear la baliza
-	// utilizando un contador que contabiliza
-	// la cantidad de veces que se ha disparado la interrupción.
-	// Se utiliza como base de tiempo
-	/*
-	init_baliza_3();
-	BlinkIRQ.enable = true;
-	BlinkIRQ.periodo = 1000;
-	BlinkIRQ.stick_callback = toggle_baliza_3;
-
-	SwitchCheckIRQ.enable = true;
-	SwitchCheckIRQ.periodo = 125;
-	SwitchCheckIRQ.stick_callback = do_baliza_systick_3;
-
-	BlankInterrupt.stick_callback = NULL;
-	CallbackInterrupt *irqs[] = {&BlinkIRQ, &SwitchCheckIRQ, &BlankInterrupt};
-	SysTick_Init(irqs,2);
-	*/
 
 	//Interrupciones de pines
-	gpioMode(PIN_LED_AMA_EXT, OUTPUT);
-	gpioWrite(PIN_LED_AMA_EXT,HIGH);
-	//gpioMode(PIN_SW3, INPUT);
-	//gpioIRQ(PIN_SW3, GPIO_IRQ_MODE_RISING_EDGE, toggle_led_ama);
-	gpioMode(PIN_B2, INPUT_PULLDOWN);
-	gpioIRQ(PIN_B2, GPIO_IRQ_MODE_BOTH_EDGES, toggle_led_ama);
-
-	gpioMode(PIN_B3, INPUT);
-	gpioIRQ(PIN_B3, GPIO_IRQ_MODE_BOTH_EDGES, toggle_led_ama);
+	gpioMode(PIN_LED_BLUE, OUTPUT);
+	gpioWrite(PIN_LED_BLUE,HIGH);
+	gpioMode(PIN_LED_RED, OUTPUT);
+	gpioWrite(PIN_LED_RED,HIGH);
+	gpioMode(PIN_LED_GREEN, OUTPUT);
+	gpioWrite(PIN_LED_GREEN,HIGH);
+	idButton= initButton(PIN_SW3, INPUT);
 
 }
 
@@ -135,8 +83,23 @@ void App_Run (void)
 
 	//3-Do baliza y chequeo del pulsador con interrupciones
 	//no code
-
-
+	Button_Event ev = getButtonEvent(idButton);
+	switch (ev){
+	case  TYPEMATIC:
+	case LKP:
+		break;
+	case PRESS:
+		gpioWrite(PIN_LED_RED, HIGH);
+		gpioWrite(PIN_LED_BLUE, HIGH);
+		gpioWrite(PIN_LED_GREEN, LOW);
+	case RELEASE:
+		gpioWrite(PIN_LED_RED, LOW);
+		gpioWrite(PIN_LED_BLUE, HIGH);
+		gpioWrite(PIN_LED_GREEN, HIGH);
+		break;
+	default:
+		break;
+	}
 
 
 }
