@@ -22,9 +22,9 @@
 //THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD
 
 
-#define LKP_THRESHOLD 20
-#define TYPEMATIC_THRESHOLD 10
-#define TYPEMATIC_PERIOD 2
+#define LKP_THRESHOLD 50
+#define TYPEMATIC_THRESHOLD 15
+#define TYPEMATIC_PERIOD 3
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -35,7 +35,6 @@ enum{NOT_EN,// The button you asked for wasnt enabled
 	PRESS,//Button was pressed
 	RELEASE,//button was released
 	LKP,// Long Key Press
-	TYPEMATIC //Typematic
 };
 
 typedef uint8_t Button_Event;
@@ -45,6 +44,7 @@ typedef struct{
 	uint8_t prev_pin_state;
 	pin_t pin;
 	bool enable;
+	bool lkp; //TRUE is LKP FALSE is TYPEMATTIC
 }Btn;
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -70,6 +70,16 @@ int8_t initButton(pin_t pin ,uint8_t mode);
  * @return EVENT of the Button, check the enum section for the events.
  */
 Button_Event getButtonEvent(int8_t id);
+
+/**
+ * @brief  lets you choose working mode, LKP or Typematic.
+ *
+ * @param
+ * id: Id of the button.
+ * mode: True for LKP  or False for  Typematic
+ */
+
+void LKP_or_Typematic_mode(int8_t id, bool mode);
 
 /*******************************************************************************
  ******************************************************************************/

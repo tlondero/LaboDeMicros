@@ -8,7 +8,7 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include "header/timer.h"
+#include "timer.h"
 #include "header/SysTick.h"
 #include "header/board.h"
 
@@ -144,9 +144,10 @@ bool timerExpired(tim_id_t id)
 
 void timerDelay(ttick_t ticks)
 {
-    timerStart(TIMER_ID_INTERNAL, ticks, TIM_MODE_SINGLESHOT, NULL);
+    timerStart(TIMER_ID_INTERNAL, ticks, TIM_MODE_SINGLESHOT, timer_isr);
     while (!timerExpired(TIMER_ID_INTERNAL))
     {
+    	timers[TIMER_ID_INTERNAL].cnt-=1;
         // wait...
     }
 }

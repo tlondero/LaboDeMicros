@@ -16,6 +16,7 @@
 #include "stdbool.h"
 #include <stdio.h>
 #include "header/SysTick.h"
+#include "timer.h"
 #include "header/Button.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -26,7 +27,6 @@
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
 
-static void delayLoop(uint32_t veces);
 
 /*******************************************************************************
  *******************************************************************************
@@ -40,10 +40,6 @@ static void delayLoop(uint32_t veces);
  * INTERRUPCIONES
  ******************************************************************************/
 
-static CallbackInterrupt BlinkIRQ;
-static CallbackInterrupt SwitchCheckIRQ;
-static CallbackInterrupt BalizaSystick;
-static CallbackInterrupt  BlankInterrupt;
 
 
 
@@ -52,54 +48,56 @@ static CallbackInterrupt  BlankInterrupt;
  ******************************************************************************/
 
 //static void update_baliza(int period);
-static unsigned long ms2UL(int number);
-static int UL2ms(unsigned long numer);
 
 
-int8_t idButton;
+
+
+
+int8_t idButton1, idButton2;
 void App_Init (void)
 {
 
 	//Interrupciones de pines
+
 	gpioMode(PIN_LED_BLUE, OUTPUT);
 	gpioWrite(PIN_LED_BLUE,HIGH);
 	gpioMode(PIN_LED_RED, OUTPUT);
 	gpioWrite(PIN_LED_RED,HIGH);
 	gpioMode(PIN_LED_GREEN, OUTPUT);
 	gpioWrite(PIN_LED_GREEN,HIGH);
-	idButton= initButton(PIN_SW3, INPUT);
-
+	idButton1= initButton(PIN_SW2, INPUT_PULLUP);
 }
+
 
 /* Función que se llama constantemente en un ciclo infinito */
 
 void App_Run (void)
 {
-	//1-Do baliza sin interrupciones
-	//do_baliza();
+	static bool lastMode=true;
+	Button_Event evsw1 = getButtonEvent(idButton1);
+		switch (evsw1){
+		case LKP:
+			gpioWrite(PIN_LED_RED, HIGH);
+			gpioWrite(PIN_LED_BLUE, LOW);
+			gpioWrite(PIN_LED_GREEN, HIGH);
+			break;
+		case PRESS:
+			gpioWrite(PIN_LED_RED, HIGH); //PRESS VERDEE
+			gpioWrite(PIN_LED_BLUE, HIGH);
+			gpioWrite(PIN_LED_GREEN, LOW);
+			break;
 
-	//2-Do baliza con interrupciones
-	//no code
-
-	//3-Do baliza y chequeo del pulsador con interrupciones
-	//no code
-	Button_Event ev = getButtonEvent(idButton);
-	switch (ev){
-	case  TYPEMATIC:
-	case LKP:
-		break;
-	case PRESS:
-		gpioWrite(PIN_LED_RED, HIGH);
-		gpioWrite(PIN_LED_BLUE, HIGH);
-		gpioWrite(PIN_LED_GREEN, LOW);
-	case RELEASE:
-		gpioWrite(PIN_LED_RED, LOW);
-		gpioWrite(PIN_LED_BLUE, HIGH);
-		gpioWrite(PIN_LED_GREEN, HIGH);
-		break;
-	default:
-		break;
-	}
+		case RELEASE:
+			gpioWrite(PIN_LED_RED, LOW);  //ROJO RELEASE
+			gpioWrite(PIN_LED_BLUE, HIGH);
+			gpioWrite(PIN_LED_GREEN, HIGH);
+			break;
+		default:
+			gpioWrite(PIN_LED_RED, HIGH);
+			gpioWrite(PIN_LED_BLUE, HIGH);
+			gpioWrite(PIN_LED_GREEN, HIGH);
+			break;
+		}
 
 
 }
