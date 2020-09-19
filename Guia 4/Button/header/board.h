@@ -36,6 +36,7 @@
 #define PIN_SW2         PORTNUM2PIN(PC, 6)// PTC6???
 #define PIN_SW3         PORTNUM2PIN(PA,4)// PTA4
 
+
 #define SW_ACTIVE       LOW// ???
 #define SW_INPUT_TYPE   // ???
 
