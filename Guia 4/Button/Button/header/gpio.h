@@ -97,7 +97,7 @@ typedef void (*pinIrqFun_t)(void);
  * @brief Enables Interrupts in the desired port
  * @param
  */
-static void interrupt_init(uint32_t IRQn);
+
 
 
 /**

@@ -23,6 +23,7 @@ const static GPIO_Type * GPIO_SELECTORS[] = {PTA, PTB, PTC, PTD, PTE}; //GPIO_BA
 pinIrqFun_t port_pin_interrupt[5][32];
 uint32_t pin_irq_configured[5][32];
 
+static void interrupt_init(uint32_t IRQn);
 
 static void interrupt_init(uint32_t IRQn){
 
@@ -104,7 +105,6 @@ void gpioWrite (pin_t pin, bool value){
 	else if(value == LOW){
 		gpio_pointer->PDOR &= ~(1<<number);
 	}
-
 
 }
 
