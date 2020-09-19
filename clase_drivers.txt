@@ -1,0 +1,17 @@
+Cuatro secciones de codigo:
+	Inicializacion
+		Se llama una sola vez
+		Configura al periferico y variables propias
+	Servicios
+		Las funciones realmente útiles que presento a la capa de arriba
+		Ej: Configurar un led, setearle la velocidad, etc.
+		Se tiene que pensar como qué servicios necesita la capa de arriba,
+		     NO cómo debería de escribir el driver.
+	PISR: ISR periodicas
+		Para eventos lentos, es preferible polling
+		Si hay varias, conviene usar una interrupcion de periodo
+		     divisor comun para que no haya problemas
+	ISR
+		Para eventos rápidos
+		Se utilizan callbacks
+		
