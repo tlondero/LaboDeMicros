@@ -49,6 +49,11 @@ Button_Event getButtonEvent(int8_t id){
 	return ret;
 }
 
+
+void setIRQ_button(int8_t id, uint8_t IRQMode, void*(fcallback)(void)){
+	gpioIRQ(active_buttons[id].pin, IRQMode, fcallback);
+}
+
 void LKP_or_Typematic_mode(int8_t id, bool mode){
 	active_buttons[id].lkp = mode;
 }
