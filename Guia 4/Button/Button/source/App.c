@@ -92,10 +92,16 @@ void App_Run (void)
 			gpioWrite(PIN_LED_BLUE, HIGH);
 			gpioWrite(PIN_LED_GREEN, HIGH);
 			break;
+		case SKP:
+			gpioWrite(PIN_LED_RED, LOW);  //ROJO RELEASE
+			gpioWrite(PIN_LED_BLUE, LOW);
+			gpioWrite(PIN_LED_GREEN, LOW);
+			break;
 		default:
 			gpioWrite(PIN_LED_RED, HIGH);
 			gpioWrite(PIN_LED_BLUE, HIGH);
 			gpioWrite(PIN_LED_GREEN, HIGH);
+
 			break;
 		}
 

@@ -41,7 +41,12 @@ static int first=0;
 }
 
 Button_Event getButtonEvent(int8_t id){
-	return active_buttons[id].ev_state;
+	Button_Event ret = active_buttons[id].ev_state;
+	active_buttons[id].ev_state = NO_EV;
+#if VISIBLE_LEDS_EVENTS
+	active_buttons[id].ev_state = ret;
+#endif
+	return ret;
 }
 
 void LKP_or_Typematic_mode(int8_t id, bool mode){
@@ -70,15 +75,17 @@ void check_buttons(void){
 				}
 			}
 			else{
-				x1[i]=0;
 				if(active_buttons[i].pin_state == 0 ){
 					active_buttons[i].ev_state= PRESS;
-					timerDelay(50);
+					timerDelay(10);
 				}
 				else{
 					active_buttons[i].ev_state= RELEASE;
-					timerDelay(50);
+					timerDelay(10);
 				}
+				if((x1[i] > 0)&&(x1[i] < LKP_THRESHOLD))
+					active_buttons[i].ev_state= SKP;
+				x1[i]=0;
 
 			}
 			active_buttons[i].prev_pin_state = active_buttons[i].pin_state;

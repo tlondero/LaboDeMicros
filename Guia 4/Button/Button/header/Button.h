@@ -21,8 +21,10 @@
 //THIS TRESHOLDS ARE NOT IN MS
 //THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD
 
+#define VISIBLE_LEDS_EVENTS 0 //te va  a tirar repetido el evento pero lo vas a ver
 
 #define LKP_THRESHOLD 50
+
 #define TYPEMATIC_THRESHOLD 15
 #define TYPEMATIC_PERIOD 3
 
@@ -35,6 +37,7 @@ enum{NOT_EN,// The button you asked for wasnt enabled
 	PRESS,//Button was pressed
 	RELEASE,//button was released
 	LKP,// Long Key Press
+	SKP
 };
 
 typedef uint8_t Button_Event;

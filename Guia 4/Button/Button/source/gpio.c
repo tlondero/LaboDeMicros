@@ -106,7 +106,6 @@ void gpioWrite (pin_t pin, bool value){
 		gpio_pointer->PDOR &= ~(1<<number);
 	}
 
-
 }
 
 
