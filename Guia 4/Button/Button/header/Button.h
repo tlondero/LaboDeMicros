@@ -67,11 +67,25 @@ typedef struct{
  */
 
 int8_t initButton(pin_t pin ,uint8_t mode);
+
+/**
+ * @brief  setIRQ_button:
+ *
+ * @param
+ * id : .
+ * mode: mode of the switch, input, input pullup or input pulldown
+ * @return
+ */
+
+void setIRQ_button(int8_t id, uint8_t IRQMode, void*(fcallback)(void));
+
+
 /**
  * @brief  getter for the button events.
  *
  * @return EVENT of the Button, check the enum section for the events.
  */
+
 Button_Event getButtonEvent(int8_t id);
 
 /**
