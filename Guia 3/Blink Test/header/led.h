@@ -13,10 +13,10 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#include "gpio.h"
-//#include "timer.h"
-//#include "pwm.h"
+#include "header/led.h"
+//#include "header/timer.h"
+#include "header/pwm.h"
+#include "header/gpio.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -31,6 +31,12 @@
 #define SET_HIGH 1
 #define SET_LOW 0
 #define TOGGLE 2
+
+#define PIN_MODE
+#define TURNS_ON_WITH_1 0
+#define TURNS_ON_WITH_0	1
+
+#define LED_TIMEBASE 25
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
@@ -53,7 +59,7 @@ typedef struct {
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-void init_driver();
+void init_led_driver();
 /**
  * @brief Initialize one LED
  * @param pin the pin which governs the LED
@@ -66,7 +72,7 @@ int8_t init_led(pin_t pin, uint8_t pin_mode, int8_t led_id);
  * @param led_id the id given by get_id()
  */
 void destroy_led(int8_t led_id);
-int8_t get_id();
+int8_t get_led_id();
 /**
  * @brief configurate certain aspect of LED
  * @param led_id the id given by get_id()

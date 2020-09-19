@@ -7,9 +7,6 @@
 
 
 #include "header/led.h"
-//#include "header/timer.h"
-//#include "header/pwm.h"
-#include "header/gpio.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////DEBUG
 /////////////ELIMINAR ESTO UNA VEZ QUE TENGAMOS TIMER
@@ -45,23 +42,23 @@ static uint32_t led_timer;
  * @brief Get normalized state of a LED, where the normalized state 1 indicates the LED in ON
  *                and the normalized state 0 indicates the LED is OFF.
  * @param state the electrical state of the pin
- * @param pin_mode whether the pin is pullup or pulldown
+ * @param pin_mode whether the led is turned on with 1 or 0
  */
 bool get_normalized_state(bool state, uint8_t pin_mode);
 bool unnormalize_state(bool norm_state, uint8_t pin_mode);
-void timer_callback();
+static void timer_callback();
 /*******************************************************************************
  * FUNCTION DEFINITIONS WITH LOCAL SCOPE
  ******************************************************************************/
 bool get_normalized_state(bool state, uint8_t pin_mode){
-	if(pin_mode == INPUT_PULLUP){
+	if(pin_mode == TURNS_ON_WITH_0){
 		state = !state;
 	}
 	return state;
 }
 
 bool unnormalize_state(bool norm_state, uint8_t pin_mode){
-	if(pin_mode == INPUT_PULLUP){
+	if(pin_mode == TURNS_ON_WITH_0){
 		norm_state = !norm_state;
 	}
 	return norm_state;
@@ -72,21 +69,17 @@ void timer_callback(){
 /*******************************************************************************
  * FUNCTION DEFINITIONS WITH GLOBAL SCOPE
  ******************************************************************************/
-void init_driver(){
-	uint8_t i = 0;
-	INITIALIZED_LEDS[i] = 0;
-	LED_TIMERS[i] = 0;
-	timer_id = timerGetId();//pongo un timer singleshot con @time
+void init_led_driver(){
+	timer_id = timerGetId();
 	if(timer_id != TIMER_INVALID_ID){
-		timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(25), TIM_MODE_PERIODIC, timer_callback); //25ms es 40Hz, una burrada ya
+		timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(LED_TIMEBASE), TIM_MODE_PERIODIC, timer_callback);
 	}
 }
 
 int8_t init_led(pin_t pin, uint8_t pin_mode, int8_t led_id){
 
-	int8_t id = get_id();
+	int8_t id = get_led_id();
 	if(id != UNAVAILABLE_SPACE){
-		gpioMode(pin, pin_mode);
 		LEDS[id].brightness = 100;
 		LEDS[id].time = 0;
 		LEDS[id].period = 0;
@@ -108,7 +101,7 @@ void destroy_led(int8_t led_id){
 #endif
 }
 
-int8_t get_id(){
+int8_t get_led_id(){
 	uint8_t i;
 	uint8_t found_space = 0;
 	int8_t id = -1;
@@ -192,9 +185,7 @@ void configure_fade(int8_t led_id, uint16_t fade){
 }
 
 void set_value(int8_t led_id, uint8_t norm_state){
-	tim_id_t timer;
 	led_t led;
-	uint8_t cur_norm_state;
 #if (DEVELOPMENT_MODE == 1)
 	if(led_id >= 0 && led_id < MAX_LEDS){
 		if(INITIALIZED_LEDS[led_id]){
@@ -250,14 +241,14 @@ void poll_leds(){
 		if(INITIALIZED_LEDS[i]){ //si alguno esta inicializado
 			if(LED_TIMERS[i]){  //si alguno esta esperando
 				if(LEDS[i].flashing){
-					if(LEDS[i].time_start + (uint32_t)(LEDS[i].period/2) > led_timer){
+					if((float)(LEDS[i].time_start) +(((float)LEDS[i].period/2.0)/((float)LED_TIMEBASE)) > (float)(led_timer)){
 						cur_norm_state = get_normalized_state(gpioRead(LEDS[i].led_pin), LEDS[i].led_pin_mode);
 						gpioWrite(LEDS[i].led_pin, unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode));
 						LEDS[i].time_start = led_timer;
 					}
 				}
 				else{
-					if(LEDS[i].time_start + LEDS[i].time > led_timer){
+					if(((float)(LEDS[i].time_start)) + (((float)(LEDS[i].time))/((float)(LED_TIMEBASE))) > ((float)(led_timer))){
 						cur_norm_state = get_normalized_state(gpioRead(LEDS[i].led_pin), LEDS[i].led_pin_mode);
 						gpioWrite(LEDS[i].led_pin, unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode));
 						LED_TIMERS[i] = 0;
