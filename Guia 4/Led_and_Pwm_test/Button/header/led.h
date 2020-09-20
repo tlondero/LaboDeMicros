@@ -46,6 +46,7 @@ typedef struct {
 	uint32_t flashes;	//times the LED will flash in flashing mode. 0 means forever.
 	uint32_t fade;		//time the LED will take to fully change states on a fade in ms. 0 means no fade.
 	int8_t led_id; 	//ID of the initialized LED
+	int8_t pwm_id;
 	uint8_t led_pin;	//pin of the LED
 	uint8_t led_pin_mode;//pin mode of the LED
 	uint8_t brightness;	//brightness, values from 0 to 100 and has a 1:1 ratio with duty cycle
@@ -61,48 +62,48 @@ typedef struct {
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-void init_led_driver(void);
+void led_init_driver(void);
 /**
  * @brief Initialize one LED
  * @param pin the pin which governs the LED
  * @param pin_mode whether the pin has to be pulled up or down
  * @param led_id the id given by get_id()
  */
-int8_t init_led(pin_t pin, uint8_t pin_mode);
+int8_t led_init_led(pin_t pin, uint8_t pin_mode);
 /**
  * @brief take out LED from LED array
  * @param led_id the id given by get_id()
  */
-void destroy_led(int8_t led_id);
-int8_t get_led_id(void);
+void led_destroy_led(int8_t led_id);
+int8_t led_get_id(void);
 /**
  * @brief configurate certain aspect of LED
  * @param led_id the id given by get_id()
  * @param xxxxx the aspect to configure
  */
-void configure_brightness(int8_t led_id, uint8_t brightness);
-void configure_time(int8_t led_id, uint32_t time);
-void configure_period(int8_t led_id, uint32_t period);
-void configure_flashes(int8_t led_id, uint32_t flashes);
-void configure_fade(int8_t led_id, uint32_t fade);
-void configure_dt(int8_t led_id, uint8_t dt);
+void led_configure_brightness(int8_t led_id, uint8_t brightness);
+void led_configure_time(int8_t led_id, uint32_t time);
+void led_configure_period(int8_t led_id, uint32_t period);
+void led_configure_flashes(int8_t led_id, uint32_t flashes);
+void led_configure_fade(int8_t led_id, uint32_t fade);
+void led_configure_dt(int8_t led_id, uint8_t dt);
 /**
  * @brief Set LED to the normalized state specified for a given amount of @time with a given amount of @fade
  * 		  time = 0 would stay forever on that state and fade = 0 would be no fade.
  * @param norm_state normalized state of LED: 1 is ON, 0 is OFF.
  * @param led_id the id given by get_id()
  */
-void set_value(int8_t led_id, uint8_t norm_state);
+void led_set_state(int8_t led_id, uint8_t norm_state);
 /**
  * @brief Flash LED with a given @period with a given amount of @fade and @flashes amount of time
  * 		  fade = 0 would be no fade and flashes = 0 would make the LED flash forever
  * @param led_id the id given by get_id()
  */
-void flash(int8_t led_id);
+void led_flash(int8_t led_id);
 /**
  * @brief Polls all LEDS to see if one of them has to change.
  */
-void poll_leds(void);
+void led_poll(void);
 /*******************************************************************************
  ******************************************************************************/
 

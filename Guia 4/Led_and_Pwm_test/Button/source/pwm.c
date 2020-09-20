@@ -30,14 +30,14 @@ void timer_callback(void){
 /*******************************************************************************
  * FUNCTION DEFINITIONS WITH GLOBAL SCOPE
  ******************************************************************************/
-void init_pwm_driver(void){
+void pwm_init_driver(void){
 	timer_id = timerGetId();
 	if(timer_id != TIMER_INVALID_ID){
 		timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(PWM_TIMEBASE), TIM_MODE_PERIODIC, timer_callback); //base de tiempo hasta 1kHz
 	}
 }
 
-int8_t get_pwm_id(void){
+int8_t pwm_get_id(void){
 	uint8_t i;
 	uint8_t found_space = 0;
 	int8_t id = -1;
@@ -57,8 +57,8 @@ int8_t get_pwm_id(void){
 	return id;
 }
 
-int8_t init_pwm(pin_t pin){
-	int8_t id = get_pwm_id();
+int8_t pwm_init_signal(pin_t pin){
+	int8_t id = pwm_get_id();
 	if(id != UNAVAILABLE_SPACE){
 		PWMS[id].dt = 0;
 		PWMS[id].freq = 0;
@@ -69,7 +69,7 @@ int8_t init_pwm(pin_t pin){
 	return id;
 }
 
-void query_pwm(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state){
+void pwm_query(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state){
 	if(INITIALIZED_PWMS[pwm_id] == 1){
 		PWMS[pwm_id].freq = freq;
 		PWMS[pwm_id].dt = dt;
@@ -79,14 +79,14 @@ void query_pwm(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state)
 	}
 }
 
-void unquery_pwm(int8_t pwm_id, uint8_t final_state){
+void pwm_unquery(int8_t pwm_id, uint8_t final_state){
 	if(INITIALIZED_PWMS[pwm_id] == 1){
 		PWMS[pwm_id].queried = 0;
 		gpioWrite(PWMS[pwm_id].pin, final_state);
 	}
 }
 
-void poll_pwms(void){
+void pwm_poll(void){
 	uint8_t i;
 	for(i=0; i<MAX_PWMS; i++){
 		if(INITIALIZED_PWMS[i] == 1){
