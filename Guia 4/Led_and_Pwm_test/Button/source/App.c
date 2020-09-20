@@ -19,6 +19,7 @@
 #include "timer.h"
 #include "header/Button.h"
 #include "header/led.h"
+#include "header/pwm.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -54,12 +55,13 @@
 
 
 
-int8_t idButton1, idLed1;
+int8_t idButton1, idLed1, idPwm1;
 void App_Init (void)
 {
 
 	//Interrupciones de pines
 	init_led_driver();
+	init_pwm_driver();
 	gpioMode(PIN_LED_BLUE, OUTPUT);
 	gpioWrite(PIN_LED_BLUE,HIGH);
 	gpioMode(PIN_LED_RED, OUTPUT);
@@ -68,12 +70,16 @@ void App_Init (void)
 	gpioWrite(PIN_LED_GREEN,HIGH);
 	idButton1= initButton(PIN_SW2, INPUT_PULLUP);
 	idLed1 = init_led(PIN_LED_RED, TURNS_ON_WITH_0);
-	configure_time(idLed1, 30000);
+	configure_time(idLed1, 1000);
+	configure_period(idLed1, 3000);
+	configure_flashes(idLed1, 5);
+	configure_dt(idLed1, 20);
+	idPwm1 = init_pwm(PIN_LED_GREEN);
 }
 
 
 /* Función que se llama constantemente en un ciclo infinito */
-
+static uint8_t released = 1;
 void App_Run (void)
 {
 	/*
@@ -82,8 +88,17 @@ void App_Run (void)
 	 */
 	Button_Event evsw1 = getButtonEvent(idButton1);
 	if(evsw1 == PRESS){
-		set_value(idLed1, HIGH);
+		if(released){
+			released = 0;
+			query_pwm(idPwm1, 60, 1, LOW); //mientras mantengo presionado, con pwm prendo el verde dimmeado 1% a 60Hz
+			flash(idLed1); //flasheo 5 veces el rojo con dt 5%
+		}
 	}
+	if(evsw1 == RELEASE){ //VER POR QUE SI NO APRETO POR MAS DE 1 SEG EL BOTON, EL RELEASE NUNCA LO VE
+		released = 1;
+		unquery_pwm(idPwm1, HIGH);
+	}
+	poll_pwms();
 	poll_leds();
 }
 

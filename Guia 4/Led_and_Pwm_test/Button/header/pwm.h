@@ -62,12 +62,12 @@ int8_t init_pwm(pin_t pin);
  * @param freq the desired pwm frequency.
  * @param dt the desired pwm duty cycle.
  */
-void query(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state);
+void query_pwm(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state);
 /**
  * @brief Stops a pin from outputting a PWM signal.
  * @param pwm_id the id of the queried pwm.
  */
-void unquery(int8_t id, uint8_t final_state);
+void unquery_pwm(int8_t id, uint8_t final_state);
 /**
  * @brief polls whether some pin has to change state given
  * the queried pwms.

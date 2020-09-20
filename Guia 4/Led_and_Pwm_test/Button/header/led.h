@@ -35,7 +35,7 @@
 #define TURNS_ON_WITH_1 0
 #define TURNS_ON_WITH_0	1
 
-#define LED_TIMEBASE 25
+#define LED_TIMEBASE 50
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
@@ -50,6 +50,9 @@ typedef struct {
 	uint8_t led_pin_mode;//pin mode of the LED
 	uint8_t brightness;	//brightness, values from 0 to 100 and has a 1:1 ratio with duty cycle
 	uint8_t flashing;
+	uint8_t dt;
+	uint8_t state;
+	uint8_t curr_flashes;
 }led_t;
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -82,6 +85,7 @@ void configure_time(int8_t led_id, uint32_t time);
 void configure_period(int8_t led_id, uint32_t period);
 void configure_flashes(int8_t led_id, uint32_t flashes);
 void configure_fade(int8_t led_id, uint32_t fade);
+void configure_dt(int8_t led_id, uint8_t dt);
 /**
  * @brief Set LED to the normalized state specified for a given amount of @time with a given amount of @fade
  * 		  time = 0 would stay forever on that state and fade = 0 would be no fade.

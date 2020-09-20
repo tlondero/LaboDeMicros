@@ -69,7 +69,7 @@ int8_t init_pwm(pin_t pin){
 	return id;
 }
 
-void query(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state){
+void query_pwm(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state){
 	if(INITIALIZED_PWMS[pwm_id] == 1){
 		PWMS[pwm_id].freq = freq;
 		PWMS[pwm_id].dt = dt;
@@ -79,7 +79,7 @@ void query(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state){
 	}
 }
 
-void unquery(int8_t pwm_id, uint8_t final_state){
+void unquery_pwm(int8_t pwm_id, uint8_t final_state){
 	if(INITIALIZED_PWMS[pwm_id] == 1){
 		PWMS[pwm_id].queried = 0;
 		gpioWrite(PWMS[pwm_id].pin, final_state);
@@ -92,13 +92,13 @@ void poll_pwms(void){
 		if(INITIALIZED_PWMS[i] == 1){
 			if(PWMS[i].queried){
 				if(gpioRead(PWMS[i].pin)){
-					if(((float)timer) - (float)PWMS[i].last_updated > (((float)(PWMS[i].dt)/100.0)*((float)(PWMS[i].freq)*1000.0))/(float)(PWM_TIMEBASE) ){
+					if(((float)timer) - (float)PWMS[i].last_updated > (((float)(((1.0/((float)PWMS[i].freq)))*1000.0*(((float)(100-PWMS[i].dt))/100.0)))/((float)PWM_TIMEBASE)) ){
 						gpioToggle(PWMS[i].pin);
 						PWMS[i].last_updated = timer;
 					}
 				}
 				else{
-					if(((float)timer) - (float)PWMS[i].last_updated > (((float)((100-PWMS[i].dt))/100.0)*((float)(PWMS[i].freq)*1000.0))/(float)(PWM_TIMEBASE)){
+					if(((float)timer) - (float)PWMS[i].last_updated >(((float)(((1.0/((float)PWMS[i].freq)))*1000.0*(((float)(PWMS[i].dt))/100.0)))/((float)PWM_TIMEBASE))){
 						gpioToggle(PWMS[i].pin);
 						PWMS[i].last_updated = timer;
 					}
