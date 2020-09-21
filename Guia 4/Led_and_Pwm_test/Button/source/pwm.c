@@ -14,6 +14,7 @@ static uint8_t timer_id;
 static uint32_t timer;
 static uint8_t INITIALIZED_PWMS[MAX_PWMS];
 static pwm_t PWMS[MAX_PWMS];
+static uint8_t init;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE
@@ -31,9 +32,12 @@ void timer_callback(void){
  * FUNCTION DEFINITIONS WITH GLOBAL SCOPE
  ******************************************************************************/
 void pwm_init_driver(void){
-	timer_id = timerGetId();
-	if(timer_id != TIMER_INVALID_ID){
-		timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(PWM_TIMEBASE), TIM_MODE_PERIODIC, timer_callback); //base de tiempo hasta 1kHz
+	if(!init){
+		init = 1;
+		timer_id = timerGetId();
+		if(timer_id != TIMER_INVALID_ID){
+			timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(PWM_TIMEBASE), TIM_MODE_PERIODIC, timer_callback); //base de tiempo hasta 1kHz
+		}
 	}
 }
 
@@ -88,17 +92,26 @@ void pwm_unquery(int8_t pwm_id, uint8_t final_state){
 
 void pwm_poll(void){
 	uint8_t i;
+	uint32_t start, actual, wait;
 	for(i=0; i<MAX_PWMS; i++){
 		if(INITIALIZED_PWMS[i] == 1){
 			if(PWMS[i].queried){
 				if(gpioRead(PWMS[i].pin)){
-					if(((float)timer) - (float)PWMS[i].last_updated > (((float)(((1.0/((float)PWMS[i].freq)))*1000.0*(((float)(100-PWMS[i].dt))/100.0)))/((float)PWM_TIMEBASE)) ){
+					actual = ((float)timer);
+					start = (float)PWMS[i].last_updated;
+					wait = (((float)(((1.0/((float)PWMS[i].freq)))*1000.0*(((float)(100-PWMS[i].dt))/100.0)))/((float)PWM_TIMEBASE));
+					if(actual - start > wait ){
 						gpioToggle(PWMS[i].pin);
 						PWMS[i].last_updated = timer;
 					}
 				}
 				else{
-					if(((float)timer) - (float)PWMS[i].last_updated >(((float)(((1.0/((float)PWMS[i].freq)))*1000.0*(((float)(PWMS[i].dt))/100.0)))/((float)PWM_TIMEBASE))){
+
+					actual = ((float)timer);
+					start = (float)PWMS[i].last_updated;
+					wait = 	(((float)(((1.0/((float)PWMS[i].freq)))*1000.0*(((float)(PWMS[i].dt))/100.0)))/((float)PWM_TIMEBASE));
+					//wait = (((float)(((1.0/((float)PWMS[i].freq)))*1000.0*(((float)(PWMS[i].dt))/100.0)))/((float)PWM_TIMEBASE));
+					if(actual - start > wait){
 						gpioToggle(PWMS[i].pin);
 						PWMS[i].last_updated = timer;
 					}

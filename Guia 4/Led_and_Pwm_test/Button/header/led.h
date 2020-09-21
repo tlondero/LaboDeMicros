@@ -36,6 +36,7 @@
 #define TURNS_ON_WITH_0	1
 
 #define LED_TIMEBASE 50
+#define PWM_FREQ 60
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/

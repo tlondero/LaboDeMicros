@@ -16,6 +16,7 @@ static uint8_t INITIALIZED_LEDS[16];
 static uint8_t LED_TIMERS[16];
 static uint8_t timer_id;
 static uint32_t led_timer;
+static uint8_t init;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE
@@ -52,9 +53,13 @@ void timer_callback(void){
  * FUNCTION DEFINITIONS WITH GLOBAL SCOPE
  ******************************************************************************/
 void led_init_driver(void){
-	timer_id = timerGetId();
-	if(timer_id != TIMER_INVALID_ID){
-		timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(LED_TIMEBASE), TIM_MODE_PERIODIC, timer_callback);
+	if(!init){
+		init = 1;
+		pwm_init_driver();
+		timer_id = timerGetId();
+		if(timer_id != TIMER_INVALID_ID){
+			timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(LED_TIMEBASE), TIM_MODE_PERIODIC, timer_callback);
+		}
 	}
 }
 
@@ -68,7 +73,6 @@ int8_t led_init_led(pin_t pin, uint8_t pin_mode){
 		LEDS[id].led_id = id;
 		LEDS[id].led_pin = pin;
 		LEDS[id].led_pin_mode = pin_mode;
-		pwm_init_driver();
 		pwm_id = pwm_init_signal(pin);
 		if(pwm_id != UNAVAILABLE_SPACE){
 			LEDS[id].pwm_id = pwm_id;
@@ -157,11 +161,11 @@ void led_configure_flashes(int8_t led_id, uint32_t flashes){
 #if (DEVELOPMENT_MODE == 1)
 	if(led_id >= 0 && led_id < MAX_LEDS){
 		if(INITIALIZED_LEDS[led_id]){
-			LEDS[led_id].flashes = 2*flashes;
+			LEDS[led_id].flashes = flashes;
 		}
 	}
 #else
-	LEDS[led_id].flashes = 2*flashes;
+	LEDS[led_id].flashes = flashes;
 #endif
 }
 
@@ -193,13 +197,13 @@ void led_set_state(int8_t led_id, uint8_t norm_state){
 #if (DEVELOPMENT_MODE == 1)
 	if(led_id >= 0 && led_id < MAX_LEDS){
 		if(INITIALIZED_LEDS[led_id]){
-			if(unnormalize_state(norm_state, LEDS[led_id].led_pin_mode)){
-				pwm_query(LEDS[led_id].pwm_id, 70, LEDS[led_id].brightness, HIGH);
+			if(norm_state){
+				pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
 			}
 			else{
-				pwm_unquery(LEDS[led_id].pwm_id, LOW);
+				pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_pin_mode));
 			}
-			LEDS[led_id].state = unnormalize_state(norm_state, LEDS[led_id].led_pin_mode);
+			LEDS[led_id].state = norm_state;
 			if(LEDS[led_id].time){
 				LEDS[led_id].time_start = led_timer;	//si time != 0 entonces guardo cuando empieza a contar
 				LED_TIMERS[led_id] = 1;
@@ -210,13 +214,13 @@ void led_set_state(int8_t led_id, uint8_t norm_state){
 		}
 	}
 #else
-	if(unnormalize_state(norm_state, LEDS[led_id].led_pin_mode)){
-				pwm_query(LEDS[led_id].pwm_id, 70, LEDS[led_id].brightness, HIGH);
+	if(norm_state){
+				pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
 			}
 			else{
-				pwm_unquery(LEDS[led_id].pwm_id, LOW);
+				pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_pin_mode);
 			}
-			LEDS[led_id].state = unnormalize_state(norm_state, LEDS[led_id].led_pin_mode);
+			LEDS[led_id].state = norm_state;
 	if(LEDS[led_id].time){
 		LEDS[led_id].time_start = led_timer;	//si time != 0 entonces guardo cuando empieza a contar
 		LED_TIMERS[led_id] = 1;
@@ -236,14 +240,8 @@ void led_flash(int8_t led_id){
 			LEDS[led_id].flashing = 1;
 			LEDS[led_id].time_start = led_timer;
 			LED_TIMERS[led_id] = 1;
-			cur_norm_state = get_normalized_state(gpioRead(LEDS[led_id].led_pin), LEDS[led_id].led_pin_mode);
-			if(unnormalize_state(!cur_norm_state, LEDS[led_id].led_pin_mode)){
-				pwm_query(LEDS[led_id].pwm_id, 70, LEDS[led_id].brightness, HIGH);
-			}
-			else{
-				pwm_unquery(LEDS[led_id].pwm_id, LOW);
-			}
-			LEDS[led_id].state = unnormalize_state(!cur_norm_state, LEDS[led_id].led_pin_mode);
+			pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
+			LEDS[led_id].state = HIGH;
 			LEDS[led_id].curr_flashes += 1;
 		}
 	}
@@ -254,13 +252,13 @@ void led_flash(int8_t led_id){
 	LEDS[led_id].time_start = led_timer;
 	LED_TIMERS[led_id] = 1;
 	cur_norm_state = get_normalized_state(gpioRead(LEDS[led_id].led_pin), LEDS[led_id].led_pin_mode);
-	if(unnormalize_state(!cur_norm_state, LEDS[led_id].led_pin_mode)){
-		pwm_query(LEDS[led_id].pwm_id, 70, LEDS[led_id].brightness, HIGH);
+	if(!cur_norm_state){
+		pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
 	}
 	else{
-		pwm_unquery(LEDS[led_id].pwm_id, LOW);
+		pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_pin_mode);
 	}
-	LEDS[led_id].state = unnormalize_state(!cur_norm_state, LEDS[led_id].led_pin_mode);
+	LEDS[led_id].state = !cur_norm_state;
 	LEDS[led_id].curr_flashes += 1;
 #endif
 }
@@ -274,53 +272,21 @@ void led_poll(void){
 				if(LEDS[i].flashing){
 					if(LEDS[i].state == HIGH){
 						if( (float)(led_timer) - (float)(LEDS[i].time_start) > (((float)((((float)LEDS[i].period))*(((float)(100-LEDS[i].dt))/100.0)))/((float)LED_TIMEBASE))){
-							if(LEDS[i].flashes - LEDS[i].curr_flashes > 0){
-								cur_norm_state = get_normalized_state(gpioRead(LEDS[i].led_pin), LEDS[i].led_pin_mode);
-								if(unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode)){
-									pwm_query(LEDS[i].pwm_id, 70, LEDS[i].brightness, HIGH);
-								}
-								else{
-									pwm_unquery(LEDS[i].pwm_id, LOW);
-								}
-								LEDS[i].state = unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode);
-								LEDS[i].time_start = led_timer;
-								LEDS[i].curr_flashes += 1;
-							}
-							else{
-								LED_TIMERS[i] = 0;
-								if(unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode)){
-									pwm_query(LEDS[i].pwm_id, 70, LEDS[i].brightness, HIGH);
-								}
-								else{
-									pwm_unquery(LEDS[i].pwm_id, LOW);
-								}
-								LEDS[i].state = unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode);
-							}
+							pwm_unquery(LEDS[i].pwm_id, unnormalize_state(LOW, LEDS[i].led_pin_mode));
+							LEDS[i].state = LOW;
+							LEDS[i].time_start = led_timer;
 						}
 					}
 					else{
 						if( (float)(led_timer) - (float)(LEDS[i].time_start) > (((float)((((float)LEDS[i].period))*(((float)(LEDS[i].dt))/100.0)))/((float)LED_TIMEBASE))){
 							if(LEDS[i].flashes - LEDS[i].curr_flashes > 0){
-								cur_norm_state = get_normalized_state(gpioRead(LEDS[i].led_pin), LEDS[i].led_pin_mode);
-								if(unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode)){
-									pwm_query(LEDS[i].pwm_id, 70, LEDS[i].brightness, HIGH);
-								}
-								else{
-									pwm_unquery(LEDS[i].pwm_id, LOW);
-								}
-								LEDS[i].state = unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode);
+								pwm_query(LEDS[i].pwm_id, PWM_FREQ, LEDS[i].brightness, HIGH);
+								LEDS[i].state = HIGH;
 								LEDS[i].time_start = led_timer;
 								LEDS[i].curr_flashes += 1;
 							}
 							else{
 								LED_TIMERS[i] = 0;
-								if(unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode)){
-									pwm_query(LEDS[i].pwm_id, 70, LEDS[i].brightness, HIGH);
-								}
-								else{
-									pwm_unquery(LEDS[i].pwm_id, LOW);
-								}
-								LEDS[i].state = unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode);
 							}
 						}
 					}
@@ -328,13 +294,13 @@ void led_poll(void){
 				else{
 					if(((float)(led_timer)) - ((float)(LEDS[i].time_start)) > (((float)(LEDS[i].time))/((float)(LED_TIMEBASE)))){
 						cur_norm_state = get_normalized_state(gpioRead(LEDS[i].led_pin), LEDS[i].led_pin_mode);
-						if(unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode)){
-							pwm_query(LEDS[i].pwm_id, 70, LEDS[i].brightness, HIGH);
+						if(!cur_norm_state){
+							pwm_query(LEDS[i].pwm_id, PWM_FREQ, LEDS[i].brightness, HIGH);
 						}
 						else{
-							pwm_unquery(LEDS[i].pwm_id, LOW);
+							pwm_unquery(LEDS[i].pwm_id, unnormalize_state(LOW, LEDS[i].led_pin_mode));
 						}
-						LEDS[i].state = unnormalize_state(!cur_norm_state, LEDS[i].led_pin_mode);
+						LEDS[i].state = !cur_norm_state;
 						LED_TIMERS[i] = 0;
 					}
 				}
