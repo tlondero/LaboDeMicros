@@ -54,6 +54,7 @@
 
 
 int8_t idButton1, idButton2;
+void turn_on_led(void);
 void App_Init (void)
 {
 
@@ -66,16 +67,25 @@ void App_Init (void)
 	gpioMode(PIN_LED_GREEN, OUTPUT);
 	gpioWrite(PIN_LED_GREEN,HIGH);
 	idButton1= initButton(PIN_SW2, INPUT_PULLUP);
+	idButton2= initButton(PIN_SW3, INPUT_PULLUP);
+	setIRQ_button(idButton2, GPIO_IRQ_MODE_RISING_EDGE, turn_on_led);
 }
 
+ void turn_on_led(void){
+	gpioWrite(PIN_LED_RED, LOW);
+	gpioWrite(PIN_LED_BLUE, LOW);
+	gpioWrite(PIN_LED_GREEN, HIGH);
 
+ }
 /* Función que se llama constantemente en un ciclo infinito */
 
 void App_Run (void)
 {
-	static bool lastMode=true;
 	Button_Event evsw1 = getButtonEvent(idButton1);
-		switch (evsw1){
+
+
+
+	switch (evsw1.hold_evs){
 		case LKP:
 			gpioWrite(PIN_LED_RED, HIGH);
 			gpioWrite(PIN_LED_BLUE, LOW);
@@ -98,9 +108,6 @@ void App_Run (void)
 			gpioWrite(PIN_LED_GREEN, LOW);
 			break;
 		default:
-			gpioWrite(PIN_LED_RED, HIGH);
-			gpioWrite(PIN_LED_BLUE, HIGH);
-			gpioWrite(PIN_LED_GREEN, HIGH);
 
 			break;
 		}

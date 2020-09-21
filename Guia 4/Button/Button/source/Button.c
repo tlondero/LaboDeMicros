@@ -40,60 +40,58 @@ static int first=0;
 	else return -1;
 }
 
-Button_Event getButtonEvent(int8_t id){
-	Button_Event ret = active_buttons[id].ev_state;
-	active_buttons[id].ev_state = NO_EV;
-#if VISIBLE_LEDS_EVENTS
-	active_buttons[id].ev_state = ret;
-#endif
+Button_Event getButtonEvent (int8_t id){
+	static uint32_t x1[MAX_BUTTONS]={0};
+	Button_Event ret;
+	ret.hold_evs = NO_EV;
+	ret.inst_evs = NO_EV;
+
+
+	if(active_buttons[id].newinfo){
+	if(active_buttons[id].pin_state == active_buttons[id].prev_pin_state){
+		if(active_buttons[id].pin_state == 0 ){
+			x1[id]= x1[id]+1;
+			if(((x1[id] > TYPEMATIC_THRESHOLD) && (x1[id] % TYPEMATIC_PERIOD)) )
+				ret.inst_evs= PRESS; // Typematic equivalent
+			if((x1[id] > LKP_THRESHOLD) && (x1[id] < LKP_THRESHOLD+2) )
+				ret.hold_evs= LKP;
+		}
+		else{
+			x1[id]=0;
+			}
+	}
+	else{
+		if(active_buttons[id].pin_state == 0 ){
+			ret.inst_evs= PRESS;
+//			timerDelay(10);
+		}
+		else{
+			ret.inst_evs= RELEASE;
+		//	timerDelay(10);
+		}
+		if((x1[id] > 0)&&(x1[id] < LKP_THRESHOLD))
+			ret.hold_evs= SKP;
+		x1[id]=0;
+
+		}
+	}
+	active_buttons[id].prev_pin_state = active_buttons[id].pin_state;
+	active_buttons[id].newinfo= false;
 	return ret;
 }
 
 
-void setIRQ_button(int8_t id, uint8_t IRQMode, void*(fcallback)(void)){
+void setIRQ_button(int8_t id, uint8_t IRQMode, pinIrqFun_t fcallback){
 	gpioIRQ(active_buttons[id].pin, IRQMode, fcallback);
 }
 
-void LKP_or_Typematic_mode(int8_t id, bool mode){
-	active_buttons[id].lkp = mode;
-}
 
 void check_buttons(void){
-	static uint32_t x1[MAX_BUTTONS]={0};
 	int i;
 	for(i=0;i<MAX_BUTTONS;i++){
 		if(active_buttons[i].enable){
+			active_buttons[i].newinfo = true;
 			active_buttons[i].pin_state = gpioRead(active_buttons[i].pin);
-			if(active_buttons[i].pin_state == active_buttons[i].prev_pin_state){
-				if(active_buttons[i].pin_state == 0 ){
-					x1[i]= x1[i]+1;
-					if(((x1[i] > TYPEMATIC_THRESHOLD) && (x1[i] % TYPEMATIC_PERIOD)) )
-								active_buttons[i].ev_state= PRESS; // Typematic equivalent
-					else if((x1[i] > LKP_THRESHOLD) && (x1[i] < LKP_THRESHOLD+2) )
-												active_buttons[i].ev_state= LKP;
-					else
-								active_buttons[i].ev_state= NO_EV;
-				}
-				else{
-					x1[i]=0;
-					active_buttons[i].ev_state= NO_EV;
-				}
-			}
-			else{
-				if(active_buttons[i].pin_state == 0 ){
-					active_buttons[i].ev_state= PRESS;
-					timerDelay(10);
-				}
-				else{
-					active_buttons[i].ev_state= RELEASE;
-					timerDelay(10);
-				}
-				if((x1[i] > 0)&&(x1[i] < LKP_THRESHOLD))
-					active_buttons[i].ev_state= SKP;
-				x1[i]=0;
-
-			}
-			active_buttons[i].prev_pin_state = active_buttons[i].pin_state;
 		}
 
 	}
