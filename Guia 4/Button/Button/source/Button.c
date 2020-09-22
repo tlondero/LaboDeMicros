@@ -27,8 +27,8 @@ int8_t initButton(pin_t pin ,uint8_t mode){
 static int first=0;
 	if (active_buttons_cant++ < MAX_BUTTONS){
 		gpioMode(pin, mode);
-		tim_id_t Bt_timmer = timerGetId();
 		if(!first){
+			tim_id_t Bt_timmer = timerGetId();
 			timerStart(Bt_timmer,TIMER_MS2TICKS(BUTTON_REFRESH_PERIOD) ,TIM_MODE_PERIODIC , check_buttons );
 			first=1;
 			timerInit();
