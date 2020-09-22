@@ -1,5 +1,5 @@
 
-/***************************************************************************//**
+/***************************************************************************/ /**
   @file     SysTick.h
   @brief    SysTick driver
   @author   MAGT
@@ -19,14 +19,12 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-
 #define SYSTICK_ISR_FREQUENCY_HZ 1000U
-
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-
+typedef void (*systick_callback_t)(void);
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -40,8 +38,8 @@
  * @param funcallback Function to be call every SysTick
  * @return Initialization and registration succeed
  */
-bool SysTick_Init (void (*funcallback)(void));
 
+bool SysTick_Init(systick_callback_t callback);
 
 /*******************************************************************************
  ******************************************************************************/

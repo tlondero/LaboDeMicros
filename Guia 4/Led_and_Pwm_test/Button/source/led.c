@@ -46,7 +46,7 @@ bool unnormalize_state(bool norm_state, uint8_t pin_mode){
 	}
 	return norm_state;
 }
-void timer_callback(void){
+static void timer_callback(void){
 	led_timer++;
 }
 /*******************************************************************************
@@ -58,7 +58,7 @@ void led_init_driver(void){
 		pwm_init_driver();
 		timer_id = timerGetId();
 		if(timer_id != TIMER_INVALID_ID){
-			timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(LED_TIMEBASE), TIM_MODE_PERIODIC, timer_callback);
+			timerStart(timer_id, TIMER_MS2TICKS(LED_TIMEBASE), TIM_MODE_PERIODIC, timer_callback);
 		}
 	}
 }

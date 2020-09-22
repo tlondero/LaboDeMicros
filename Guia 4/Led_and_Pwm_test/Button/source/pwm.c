@@ -24,7 +24,7 @@ static void timer_callback(void);
 /*******************************************************************************
  * FUNCTION DEFINITIONS WITH LOCAL SCOPE
  ******************************************************************************/
-void timer_callback(void){
+static void timer_callback(void){
 	timer++;
 }
 

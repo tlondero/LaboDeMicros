@@ -56,18 +56,22 @@
 
 
 
-static int8_t idButton1, idLed1, idLed2, idLed3, idTimer1;
+static tim_id_t idButton1, idLed1, idLed2, idLed3, idTimer1, idDebug;
 static uint32_t timer=3;
 static uint32_t rainbow_start;
 static uint8_t rainbow;
 void callbacktimer(void);
-
+void debug_callbackb2(void);
 void App_Init (void)
 {
 
 	//Interrupciones de pines
 	timerInit();
 	led_init_driver();
+	gpioMode(PIN_B2, OUTPUT);
+	gpioWrite(PIN_B2, LOW);
+	idDebug = timerGetId();
+	timerStart(idDebug, 127, TIM_MODE_PERIODIC, debug_callbackb2);
 	gpioMode(PIN_LED_BLUE, OUTPUT);
 	gpioWrite(PIN_LED_BLUE,HIGH);
 	gpioMode(PIN_LED_RED, OUTPUT);
@@ -94,6 +98,9 @@ void App_Init (void)
 	timerStart(idTimer1, 250, TIM_MODE_PERIODIC, callbacktimer);
 }
 
+void debug_callbackb2(void){
+	gpioToggle(PIN_B2);
+}
 void callbacktimer(void){
 	timer++;
 	if(rainbow == 1){
@@ -119,6 +126,7 @@ void App_Run (void)
 	 * TIENE QUE PRENDER EL LED ROJO POR 1 SEG (esta configurado en configure_time(idLed1, 1000) en el app init
 	 * despues de tocar el SW2 (el que no esta al lado del boton) de la placa.
 	 */
+
 	Button_Event evsw1 = getButtonEvent(idButton1);
 	if(evsw1 == PRESS){
 		rainbow = 1;
