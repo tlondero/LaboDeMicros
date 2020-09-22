@@ -22,6 +22,7 @@ static void check_buttons(void);
 //
 
 //
+
 int8_t initButton(pin_t pin ,uint8_t mode){
 static int first=0;
 	if (active_buttons_cant++ < MAX_BUTTONS){
@@ -78,6 +79,7 @@ Button_Event getButtonEvent (int8_t id){
 	active_buttons[id].prev_pin_state = active_buttons[id].pin_state;
 	active_buttons[id].newinfo= false;
 	return ret;
+	// aca podria implementarse una cola de  eventos de ponele tamañpo 15 que vaya devolviendo a un evento y si esta vacío devuelva NO_EV
 }
 
 
