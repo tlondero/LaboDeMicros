@@ -104,6 +104,14 @@ bool timerExpired(tim_id_t id);
  */
 uint8_t isTimerPaused(tim_id_t id);
 
+/**
+ * @brief Verify if a timer has run timeout
+ * @param id ID of the timer to check for expiration
+ * @return 1 = timer expired
+ */
+void timerChangePeriod(tim_id_t id, ttick_t ticks);
+
+
 // Blocking services ////////////////////////////////////////////////
 
 /**

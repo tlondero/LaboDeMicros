@@ -186,7 +186,7 @@ void run_tests(void)
 {
 
 	//Testing blocking delay timer
-	//test_block(PIN_B2, 314, true); //Passing
+	test_block(PIN_B2, 314, false); //Passing
 
 	//Testing Single Shot
 	//test_singleshot(PIN_B2, 314); //Passing
@@ -198,7 +198,7 @@ void run_tests(void)
 	//test_pausa(PIN_B2, 314); //Passing
 
 	//Test Pausa y Resume
-	test_resume(500, 314); //Passing
+	//test_resume(500, 314); //Passing
 
 	//Test de Reset
 	//test_reset();

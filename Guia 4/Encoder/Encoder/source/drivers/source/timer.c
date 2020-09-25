@@ -8,8 +8,8 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include "headers/timer.h"
-#include "headers/SysTick.h"
+#include "../headers/timer.h"
+#include "../headers/SysTick.h"
 #include <stdbool.h>
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -47,8 +47,7 @@ typedef struct
     uint8_t mode : 1;    //TIM_MODE_SINGLESHOT and TIM_MODE_PERIODIC
     uint8_t running : 1; //TIMER_RUNNING and TIMER_STOPED
     uint8_t expired : 1; //TIMER_EXPIRED and TIMER_ALIVE
-    uint8_t pflag : 1;   //poling flag
-    uint8_t unused : 4;
+    uint8_t unused : 5;
 
 } timer_t;
 
@@ -124,7 +123,6 @@ void timerStart(tim_id_t id, ttick_t ticks, uint8_t mode, tim_callback_t callbac
         timers[id].callback = callback;
         timers[id].running = TIMER_RUNNING;
         timers[id].expired = TIMER_NOT_EXPIRED;
-        timers[id].pflag = TIMER_NOT_EXPIRED;
     }
 }
 
@@ -167,11 +165,13 @@ bool timerExpired(tim_id_t id)
     if ((id < timers_cant) && (id >= 0))
 #endif
     {
-        if (timers[id].cnt == 0){
-        	return true;
+        if (timers[id].cnt == 0)
+        {
+            return true;
         }
-        else{
-        	return false;
+        else
+        {
+            return false;
         }
     }
     // Verifico si expiró el timer
@@ -184,25 +184,26 @@ void timerDelay(ttick_t ticks)
     timerStart(TIMER_ID_DELAY, ticks, TIM_MODE_SINGLESHOT, NULL);
     while (!timerExpired(TIMER_ID_DELAY))
     {
-    	//timers[TIMER_ID_DELAY].cnt-=1;
+        //timers[TIMER_ID_DELAY].cnt-=1;
     }
 }
 
-
-uint8_t isTimerPaused(tim_id_t id){
+uint8_t isTimerPaused(tim_id_t id)
+{
 #if TIMER_DEVELOPMENT_MODE
     if ((id < timers_cant) && (id >= 0))
 #endif
     {
-    	if(timers[id].running == TIMER_RUNNING){
-    		return false;
-    	}
-    	else{
-    		return true;
-    	}
+        if (timers[id].running == TIMER_RUNNING)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
-
 
 /*******************************************************************************
  *******************************************************************************
@@ -211,16 +212,16 @@ uint8_t isTimerPaused(tim_id_t id){
  ******************************************************************************/
 static void timer_isr(void)
 {
-	for (index = TIMER_ID_DELAY; index < timers_cant; index++)
+    for (index = TIMER_ID_DELAY; index < timers_cant; index++)
     {
-        if ((timers[index].running == TIMER_RUNNING) && (timers[index].expired == TIMER_NOT_EXPIRED) && (timers[index].cnt > 0) )
+        if ((timers[index].running == TIMER_RUNNING) && (timers[index].expired == TIMER_NOT_EXPIRED) && (timers[index].cnt > 0))
         {
             timers[index].cnt -= 1;
             if (timers[index].cnt == END_OF_TIMER)
             { //end of timer --> perform callback
-            	if (timers[index].callback != NULL)
+                if (timers[index].callback != NULL)
                 {
-            		timers[index].callback();
+                    timers[index].callback();
                 }
 
                 timers[index].expired = TIMER_EXPIRED;
@@ -239,4 +240,7 @@ static void timer_isr(void)
     }
 }
 
+void timerChangePeriod(tim_id_t id, ttick_t ticks){
+	timers[id].period = ticks;
+}
 /******************************************************************************/
