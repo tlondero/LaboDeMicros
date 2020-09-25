@@ -200,6 +200,7 @@ void led_set_state(int8_t led_id, uint8_t norm_state){
 #if (DEVELOPMENT_MODEE == 1)
 	if(led_id >= 0 && led_id < MAX_LEDS){
 		if(INITIALIZED_LEDS[led_id]){			//si esta inicializado el led
+			LEDS[led_id].flashing = 0;
 			if(norm_state){
 				pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH); //si me piden prender el led, activo la pwm
 			}
