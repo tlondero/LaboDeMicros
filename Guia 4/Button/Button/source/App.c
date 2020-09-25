@@ -50,8 +50,10 @@
 //static void update_baliza(int period);
 
 
-
-
+void blockTime(void){
+	timerDelay(5000);
+}
+void ButtonTB(void);
 
 int8_t idButton1, idButton2;
 void turn_on_led(void);
@@ -66,30 +68,33 @@ void App_Init (void)
 	gpioWrite(PIN_LED_RED,HIGH);
 	gpioMode(PIN_LED_GREEN, OUTPUT);
 	gpioWrite(PIN_LED_GREEN,HIGH);
-	idButton1= initButton(PIN_SW2, INPUT_PULLUP);
-	idButton2= initButton(PIN_SW3, INPUT_PULLUP);
-	setIRQ_button(idButton2, GPIO_IRQ_MODE_RISING_EDGE, turn_on_led);
+	idButton1= ButtonInit(PIN_SW2, INPUT_PULLUP);
+	idButton2= ButtonInit(PIN_SW3, INPUT_PULLUP);
+	ButtonSetIRQ(idButton2, GPIO_IRQ_MODE_RISING_EDGE, blockTime);
 }
 
- void turn_on_led(void){
-	gpioWrite(PIN_LED_RED, LOW);
-	gpioWrite(PIN_LED_BLUE, LOW);
-	gpioWrite(PIN_LED_GREEN, HIGH);
 
- }
 /* Función que se llama constantemente en un ciclo infinito */
 
 void App_Run (void)
 {
-	Button_Event evsw1 = getButtonEvent(idButton1);
+ButtonTB();
+}
 
 
+void ButtonTB(void){
 
-	switch (evsw1.hold_evs){
+	const ButtonEvent * evsw1 = ButtonGetEvent(idButton1);
+
+	static int a=0;
+
+    while((*evsw1) != EOQ){
+	switch (*evsw1){
 		case LKP:
 			gpioWrite(PIN_LED_RED, HIGH);
 			gpioWrite(PIN_LED_BLUE, LOW);
 			gpioWrite(PIN_LED_GREEN, HIGH);
+			a++;
 			break;
 		case PRESS:
 			gpioWrite(PIN_LED_RED, HIGH); //PRESS VERDEE
@@ -101,6 +106,7 @@ void App_Run (void)
 			gpioWrite(PIN_LED_RED, LOW);  //ROJO RELEASE
 			gpioWrite(PIN_LED_BLUE, HIGH);
 			gpioWrite(PIN_LED_GREEN, HIGH);
+
 			break;
 		case SKP:
 			gpioWrite(PIN_LED_RED, LOW);  //ROJO RELEASE
@@ -111,8 +117,15 @@ void App_Run (void)
 
 			break;
 		}
+	evsw1++;
+    }
+    if(a==2){
+    	a=0;
+    }
+	gpioWrite(PIN_LED_RED, HIGH);
+	gpioWrite(PIN_LED_BLUE, HIGH);
+	gpioWrite(PIN_LED_GREEN, HIGH);
 
 
 }
-
 

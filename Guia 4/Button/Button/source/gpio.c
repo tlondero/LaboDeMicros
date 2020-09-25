@@ -134,7 +134,7 @@ bool gpioIRQ (pin_t pin, uint8_t irqMode, pinIrqFun_t irqFun){
 	///de cada pin de manera tal que no puede tomar interrupciones?)
 	
 	interrupt_init(IRQn);
-
+	return true;
 }
 
 
