@@ -135,6 +135,9 @@ void App_Run(void) {
 		if (++balizaColor == CANT_COLORS) {
 			balizaColor = RED;
 		}
+		if (balizaOn) {
+			toggleColor(balizaColor);
+		}
 	}
 
 	led_poll();
