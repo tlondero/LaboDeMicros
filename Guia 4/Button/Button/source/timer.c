@@ -147,7 +147,6 @@ void timerDelay(ttick_t ticks)
     timerStart(TIMER_ID_INTERNAL, ticks, TIM_MODE_SINGLESHOT, timer_isr);
     while (!timerExpired(TIMER_ID_INTERNAL))
     {
-    	timers[TIMER_ID_INTERNAL].cnt-=1;
         // wait...
     }
 }
@@ -166,6 +165,9 @@ static void timer_isr(void)
     // si hubo timeout!
     // 1) execute action: callback or set flag
     // 2) update state
+	if(timers[TIMER_ID_INTERNAL].running == 1){
+		timers[0].cnt = timers[0].cnt -1;
+	}
 	for(int k = TIMER_ID_INTERNAL+1; k < timers_cant; k++){
 		if(timers[k].running){
 
