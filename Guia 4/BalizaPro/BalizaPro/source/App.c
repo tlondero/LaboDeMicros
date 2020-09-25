@@ -23,11 +23,7 @@
  ******************************************************************************/
 
 enum {
-	//RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS
-	RED,
-	GREEN,
-	BLUE,
-	CANT_COLORS
+	RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS
 };
 
 /*******************************************************************************
@@ -156,17 +152,32 @@ void selectLedColor(uint8_t balizaColor) {
 	case (RED):
 		led_flash(idLedRed);
 		break;
+	case (ORANGE):
+		led_flash(idLedRed);
+		led_configure_brightness(idLedBlue, 2);
+		led_configure_brightness(idLedGreen, 2);
+		led_flash(idLedBlue);
+		led_flash(idLedGreen);
+		break;
+	case (YELLOW):
+		led_configure_brightness(idLedBlue, 20);
+		led_configure_brightness(idLedGreen, 20);
+		led_flash(idLedBlue);
+		led_flash(idLedGreen);
+		break;
 	case (GREEN):
 		led_flash(idLedGreen);
 		break;
 	case (BLUE):
 		led_flash(idLedBlue);
 		break;
+	case (PURPLE):
+		led_flash(idLedBlue);
+		led_flash(idLedRed);
+		break;
 	default:
 		break;
 	}
-
-	turnOffLeds();
 }
 
 void turnOffLeds(void) {
