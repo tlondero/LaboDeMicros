@@ -46,7 +46,7 @@ bool unnormalize_state(bool norm_state, uint8_t pin_mode){
 	}
 	return norm_state;
 }
-static void timer_callback(void){
+void timer_callback(void){
 	led_timer++;
 }
 /*******************************************************************************
@@ -59,7 +59,7 @@ void led_init_driver(void){
 		timerInit();
 		timer_id = timerGetId();	//genero una base de tiempo
 		if(timer_id != TIMER_INVALID_ID){
-			timerStart(timer_id, TIMER_MS2TICKS(LED_TIMEBASE), TIM_MODE_PERIODIC, timer_callback);
+			timerStart(timer_id, (uint32_t)TIMER_MS2TICKS(LED_TIMEBASE), TIM_MODE_PERIODIC, timer_callback);
 		}
 	}
 }
@@ -239,7 +239,8 @@ void led_flash(int8_t led_id){
 			LED_TIMERS[led_id] = 1;
 			pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);	//inicio la pwm
 			LEDS[led_id].state = HIGH;
-			LEDS[led_id].curr_flashes += 1;		//y ya registro el primer flash
+			if (LEDS[led_id].flashes != 0)
+				LEDS[led_id].curr_flashes += 1;		//y ya registro el primer flash
 		}
 	}
 
@@ -256,7 +257,8 @@ void led_flash(int8_t led_id){
 		pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_pin_mode));
 	}
 	LEDS[led_id].state = !cur_norm_state;
-	LEDS[led_id].curr_flashes += 1;
+	if (LEDS[led_id].flashes != 0)
+		LEDS[led_id].curr_flashes += 1;
 #endif
 }
 
@@ -276,11 +278,12 @@ void led_poll(void){
 					}
 					else{	//si esta apagado
 						if( (float)(led_timer) - (float)(LEDS[i].time_start) > (((float)((((float)LEDS[i].period))*(((float)(LEDS[i].dt))/100.0)))/((float)LED_TIMEBASE))){
-							if(LEDS[i].flashes - LEDS[i].curr_flashes > 0){ //si aun debo hacer mas flashes
+							if((LEDS[i].flashes == 0) || (LEDS[i].flashes - LEDS[i].curr_flashes > 0)){ //si aun debo hacer mas flashes
 								pwm_query(LEDS[i].pwm_id, PWM_FREQ, LEDS[i].brightness, HIGH); //si ya paso el tiempo, activo la pwm
 								LEDS[i].state = HIGH;
 								LEDS[i].time_start = led_timer; //vuelvo a tomar el tiempo
-								LEDS[i].curr_flashes += 1;	//registro otro flash
+								if (LEDS[i].flashes != 0)
+									LEDS[i].curr_flashes += 1;	//registro otro flash
 							}
 							else{
 								LED_TIMERS[i] = 0; //si ya no me quedan mas flashes, registro que el led ya no esta esperando para prenderse/apagarse

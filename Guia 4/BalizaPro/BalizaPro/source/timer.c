@@ -8,8 +8,8 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include "timer.h"
-#include "header\SysTick.h"
+#include "header/timer.h"
+#include "header/SysTick.h"
 #include <stdbool.h>
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -26,6 +26,7 @@
 #endif // TIMER_TICK_MS != (1000U/SYSTICK_ISR_FREQUENCY_HZ)
 
 #define TIMERS_MAX_CANT 16
+//#define TIMER_INVALID_ID 255
 
 #define TIMER_RUNNING 1
 #define TIMER_STOPED 0
@@ -167,7 +168,7 @@ bool timerExpired(tim_id_t id)
     if ((id < timers_cant) && (id >= 0))
 #endif
     {
-        if (timers[id].cnt == 0){
+        if (timers[id].expired == TIMER_EXPIRED){
         	return true;
         }
         else{
@@ -184,7 +185,7 @@ void timerDelay(ttick_t ticks)
     timerStart(TIMER_ID_DELAY, ticks, TIM_MODE_SINGLESHOT, NULL);
     while (!timerExpired(TIMER_ID_DELAY))
     {
-    	timers[TIMER_ID_DELAY].cnt-=1;
+        // wait...
     }
 }
 

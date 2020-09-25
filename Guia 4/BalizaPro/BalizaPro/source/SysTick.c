@@ -42,7 +42,7 @@ bool SysTick_Init(systick_callback_t callback)
 	if (callback != NULL)
 	{
 		SysTick->CTRL = 0x00; //Enable sysT interrupt
-		SysTick->LOAD =  SYSTICK_LOAD_INIT;//00100000L  - 1;
+		SysTick->LOAD = SYSTICK_LOAD_INIT; //00100000L  - 1;
 		SysTick->VAL = 0x00;
 		SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 		st_callback = callback;
