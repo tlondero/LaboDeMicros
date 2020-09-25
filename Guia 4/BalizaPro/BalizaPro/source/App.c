@@ -23,7 +23,11 @@
  ******************************************************************************/
 
 enum {
-	RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS
+	//RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS
+	RED,
+	GREEN,
+	BLUE,
+	CANT_COLORS
 };
 
 /*******************************************************************************
@@ -61,7 +65,9 @@ void timerCallback(void) {
 	timer++;
 }
 
-void toggleColor(uint8_t a);
+void selectLedColor(uint8_t a);
+
+void turnOffLeds(void);
 
 void App_Init(void) {
 	//Interrupciones de pines
@@ -69,15 +75,15 @@ void App_Init(void) {
 	timerInit();
 	led_init_driver();
 
-	idButton1 = initButton(PIN_SW2, INPUT_PULLUP);
-	idButton2 = initButton(PIN_SW3, INPUT_PULLUP);
-
 	gpioMode(PIN_LED_BLUE, OUTPUT);
 	gpioWrite(PIN_LED_BLUE, HIGH);
 	gpioMode(PIN_LED_RED, OUTPUT);
 	gpioWrite(PIN_LED_RED, HIGH);
 	gpioMode(PIN_LED_GREEN, OUTPUT);
 	gpioWrite(PIN_LED_GREEN, HIGH);
+
+	idButton1 = initButton(PIN_SW2, INPUT_PULLUP);
+	idButton2 = initButton(PIN_SW3, INPUT_PULLUP);
 
 	idTimer = timerGetId();
 
@@ -121,11 +127,9 @@ void App_Run(void) {
 
 	if (evsw1.inst_evs == PRESS) {
 		if (balizaOn) {
-			led_set_state(idLedRed, LOW);
-			led_set_state(idLedBlue, LOW);
-			led_set_state(idLedGreen, LOW);
+			turnOffLeds();
 		} else {
-			toggleColor(balizaColor);
+			selectLedColor(balizaColor);
 		}
 
 		balizaOn = !balizaOn;
@@ -136,7 +140,7 @@ void App_Run(void) {
 			balizaColor = RED;
 		}
 		if (balizaOn) {
-			toggleColor(balizaColor);
+			selectLedColor(balizaColor);
 		}
 	}
 
@@ -144,43 +148,30 @@ void App_Run(void) {
 	pwm_poll();
 }
 
-void toggleColor(uint8_t balizaColor) {
+void selectLedColor(uint8_t balizaColor) {
+
+	turnOffLeds();
+
 	switch (balizaColor) {
 	case (RED):
 		led_flash(idLedRed);
-		led_set_state(idLedBlue, LOW);
-		break;
-	case (ORANGE):
-		led_flash(idLedRed);
-
-		led_configure_brightness(idLedBlue, 2);
-		led_configure_brightness(idLedGreen, 2);
-
-		led_flash(idLedBlue);
-		led_flash(idLedGreen);
-		break;
-	case (YELLOW):
-		led_configure_brightness(idLedBlue, 20);
-		led_configure_brightness(idLedGreen, 20);
-		led_set_state(idLedRed, LOW);
-		led_flash(idLedBlue);
-		led_flash(idLedGreen);
 		break;
 	case (GREEN):
-		led_set_state(idLedBlue, LOW);
 		led_flash(idLedGreen);
 		break;
 	case (BLUE):
-		led_set_state(idLedGreen, LOW);
 		led_flash(idLedBlue);
-		break;
-	case (PURPLE):
-		led_flash(idLedBlue);
-		led_set_state(idLedGreen, LOW);
-		led_flash(idLedRed);
 		break;
 	default:
 		break;
 	}
+
+	turnOffLeds();
+}
+
+void turnOffLeds(void) {
+	led_set_state(idLedRed, LOW);
+	led_set_state(idLedBlue, LOW);
+	led_set_state(idLedGreen, LOW);
 }
 
