@@ -292,7 +292,8 @@ void led_poll(void){
 						}
 					}
 				}
-				else{ //si no esta en modo flash
+				else if (LEDS[i].time != 0)
+				{ //si no esta en modo flash
 					if(((float)(led_timer)) - ((float)(LEDS[i].time_start)) > (((float)(LEDS[i].time))/((float)(LED_TIMEBASE)))){ //si ya paso el tiempo
 						cur_norm_state = get_normalized_state(gpioRead(LEDS[i].led_pin), LEDS[i].led_pin_mode);
 						if(!cur_norm_state){

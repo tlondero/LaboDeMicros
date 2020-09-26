@@ -78,8 +78,8 @@ void App_Init(void) {
 	gpioMode(PIN_LED_GREEN, OUTPUT);
 	gpioWrite(PIN_LED_GREEN, HIGH);
 
-	idButton1 = initButton(PIN_SW2, INPUT_PULLUP);
-	idButton2 = initButton(PIN_SW3, INPUT_PULLUP);
+	idButton1 = ButtonInit(PIN_SW2, INPUT_PULLUP);
+	idButton2 = ButtonInit(PIN_SW3, INPUT_PULLUP);
 
 	idTimer = timerGetId();
 
@@ -118,26 +118,39 @@ void App_Run(void) {
 	static uint8_t balizaOn = 0;
 	static uint8_t balizaColor = RED;
 
-	Button_Event evsw1 = getButtonEvent(idButton1);
-	Button_Event evsw2 = getButtonEvent(idButton2);
+	const ButtonEvent *evsw1 = ButtonGetEvent(idButton1);
+	const ButtonEvent *evsw2 = ButtonGetEvent(idButton2);
 
-	if (evsw1.inst_evs == PRESS) {
-		if (balizaOn) {
-			turnOffLeds();
-		} else {
-			selectLedColor(balizaColor);
+	while ((*evsw1) != EOQ) {
+		switch (*evsw1) {
+		case PRESS:
+			if (balizaOn) {
+				turnOffLeds();
+			} else {
+				selectLedColor(balizaColor);
+			}
+			balizaOn = !balizaOn;
+			break;
+		default:
+			break;
 		}
-
-		balizaOn = !balizaOn;
+		evsw1++;
 	}
 
-	if (evsw2.inst_evs == PRESS) {
-		if (++balizaColor == CANT_COLORS) {
-			balizaColor = RED;
+	while ((*evsw2) != EOQ) {
+		switch (*evsw2) {
+		case PRESS:
+			if (++balizaColor == CANT_COLORS) {
+				balizaColor = RED;
+			}
+			if (balizaOn) {
+				selectLedColor(balizaColor);
+			}
+			break;
+		default:
+			break;
 		}
-		if (balizaOn) {
-			selectLedColor(balizaColor);
-		}
+		evsw2++;
 	}
 
 	led_poll();
@@ -147,6 +160,9 @@ void App_Run(void) {
 void selectLedColor(uint8_t balizaColor) {
 
 	turnOffLeds();
+	led_configure_brightness(idLedGreen, 20);
+	led_configure_brightness(idLedRed, 20);
+	led_configure_brightness(idLedBlue, 20);
 
 	switch (balizaColor) {
 	case (RED):
@@ -155,13 +171,15 @@ void selectLedColor(uint8_t balizaColor) {
 	case (ORANGE):
 		led_flash(idLedRed);
 		led_configure_brightness(idLedBlue, 2);
-		led_configure_brightness(idLedGreen, 2);
+		led_configure_brightness(idLedGreen, 20);
+		led_configure_brightness(idLedRed, 30);
 		led_flash(idLedBlue);
 		led_flash(idLedGreen);
 		break;
 	case (YELLOW):
-		led_configure_brightness(idLedBlue, 20);
-		led_configure_brightness(idLedGreen, 20);
+		led_configure_brightness(idLedRed, 30);
+		led_configure_brightness(idLedBlue, 10);
+		led_configure_brightness(idLedGreen, 30);
 		led_flash(idLedBlue);
 		led_flash(idLedGreen);
 		break;
