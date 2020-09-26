@@ -16,7 +16,7 @@
  ******************************************************************************/
 
 
-#define MAX_BUTTONS 15
+
 #define BUTTON_REFRESH_PERIOD 100
 //THIS TRESHOLDS ARE NOT IN MS
 //THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD
@@ -37,21 +37,13 @@ enum{
 	PRESS,//Button was pressed
 	RELEASE,//button was released
 	LKP,// Long Key Press
-	SKP
+	SKP, //Short key press  //Finisher of the ev queue
+	EOQ
 };
 
-typedef struct{
-	uint8_t inst_evs;//instant events such as PRESS and RELEASE
-	uint8_t hold_evs;// hold events like LKP and SKP
-} Button_Event ;
+typedef uint8_t ButtonEvent ;//instant events such as PRESS and RELEASE
 
-typedef struct{
-	uint8_t pin_state;
-	uint8_t prev_pin_state;
-	pin_t pin;
-	bool enable;
-	bool newinfo; //flag for the callback to announce new information
-}Btn;
+
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -60,7 +52,9 @@ typedef struct{
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 /**
- * @brief  initializes buttons.
+ * @brief  Initializes buttons:
+ * Starts initializing a timer, all the buttons share the one timer.
+ * Creates one button and retunrs the id.
  *
  * @param
  * pin : kinetis pin for switch.
@@ -68,14 +62,16 @@ typedef struct{
  * @return  the ID for the switch -1 if the you reached the max switches
  */
 
-int8_t initButton(pin_t pin ,uint8_t mode);
+int8_t ButtonInit(pin_t pin ,uint8_t mode);
 
 /**
- * @brief  setIRQ_button:
+ * @brief  ButtonSetIRQ: if you desire to use a dedicated interruption
+ * this function allows you to set the type of interruption and the callback
+ * to be called when the interruption occurs.
  *
  * @param
  * id : ID of the button.
- * mode: mode of the  Interruption,
+ * IRQmode: mode of the  Interruption,
  *
     GPIO_IRQ_MODE_DISABLE = 0,
 	GPIO_IRQ_MODE_LOW_STATE = 8,
@@ -83,18 +79,20 @@ int8_t initButton(pin_t pin ,uint8_t mode);
     GPIO_IRQ_MODE_RISING_EDGE = 9,
     GPIO_IRQ_MODE_FALLING_EDGE = 10,
     GPIO_IRQ_MODE_BOTH_EDGES = 11,
+    fcallback: Function to be called when the button is pressed
  */
 
-void setIRQ_button(int8_t id, uint8_t IRQMode,pinIrqFun_t fcallback);
+void ButtonSetIRQ(int8_t id, uint8_t IRQ_mode,pinIrqFun_t fcallback);
 
 
 /**
  * @brief  getter for the button events.
  *
- * @return EVENT of the Button in the Button_ev struct, check the enum section for the events.
+ * @return EVENT pointer of the Button, check the enum section for the events.
+ * The EOQ Refers to the tail of the ev queue
  */
 
-Button_Event getButtonEvent(int8_t id);
+const ButtonEvent * ButtonGetEvent(int8_t id);
 
 
 /*******************************************************************************
