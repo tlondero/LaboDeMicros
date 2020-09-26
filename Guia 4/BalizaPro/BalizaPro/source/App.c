@@ -171,15 +171,15 @@ void selectLedColor(uint8_t balizaColor) {
 	case (ORANGE):
 		led_flash(idLedRed);
 		led_configure_brightness(idLedBlue, 2);
-		led_configure_brightness(idLedGreen, 20);
-		led_configure_brightness(idLedRed, 30);
+		led_configure_brightness(idLedGreen, 15);
+		led_configure_brightness(idLedRed, 35);
 		led_flash(idLedBlue);
 		led_flash(idLedGreen);
 		break;
 	case (YELLOW):
+		led_configure_brightness(idLedBlue, 2);
+		led_configure_brightness(idLedGreen, 25);
 		led_configure_brightness(idLedRed, 30);
-		led_configure_brightness(idLedBlue, 10);
-		led_configure_brightness(idLedGreen, 30);
 		led_flash(idLedBlue);
 		led_flash(idLedGreen);
 		break;
