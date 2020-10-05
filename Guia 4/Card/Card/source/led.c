@@ -7,8 +7,7 @@
 
 
 #include "header/led.h"
-#include "header/pwm.h"
-#include "header/gpio.h"
+
 /*******************************************************************************
  * GLOBAL VARIABLES WITH LOCAL SCOPE
  ******************************************************************************/
@@ -26,23 +25,23 @@ static uint8_t init;
  * @brief Get normalized state of a LED, where the normalized state 1 indicates the LED in ON
  *                and the normalized state 0 indicates the LED is OFF.
  * @param state the electrical state of the pin
- * @param activation_mode whether the led is turned on with 1 or 0
+ * @param pin_mode whether the led is turned on with 1 or 0
  */
-bool get_normalized_state(bool state, uint8_t activation_mode);
-bool unnormalize_state(bool norm_state, uint8_t activation_mode);
+bool get_normalized_state(bool state, uint8_t pin_mode);
+bool unnormalize_state(bool norm_state, uint8_t pin_mode);
 static void timer_callback(void);
 /*******************************************************************************
  * FUNCTION DEFINITIONS WITH LOCAL SCOPE
  ******************************************************************************/
-bool get_normalized_state(bool state, uint8_t activation_mode){
-	if(activation_mode == TURNS_ON_WITH_0){
+bool get_normalized_state(bool state, uint8_t pin_mode){
+	if(pin_mode == TURNS_ON_WITH_0){
 		state = !state;
 	}
 	return state;
 }
 
-bool unnormalize_state(bool norm_state, uint8_t activation_mode){
-	if(activation_mode == TURNS_ON_WITH_0){
+bool unnormalize_state(bool norm_state, uint8_t pin_mode){
+	if(pin_mode == TURNS_ON_WITH_0){
 		norm_state = !norm_state;
 	}
 	return norm_state;
@@ -65,18 +64,16 @@ void led_init_driver(void){
 	}
 }
 
-int8_t led_init_led(pin_t pin, uint8_t activation_mode){
+int8_t led_init_led(pin_t pin, uint8_t pin_mode){
 
 	int8_t id = led_get_id();
-	gpioMode(pin, OUTPUT);
-	gpioWrite(pin,unnormalize_state(LOW,activation_mode));
 	int8_t pwm_id;
 	if(id != UNAVAILABLE_SPACE){		//valores iniciales importantes
 		LEDS[id].brightness = 100;
 		LEDS[id].dt = 50;
 		LEDS[id].led_id = id;
 		LEDS[id].led_pin = pin;
-		LEDS[id].led_activation_mode = activation_mode;
+		LEDS[id].led_pin_mode = pin_mode;
 		pwm_id = pwm_init_signal(pin);		//genero una pwm para el led
 		if(pwm_id != UNAVAILABLE_SPACE){
 			LEDS[id].pwm_id = pwm_id;
@@ -208,7 +205,7 @@ void led_set_state(int8_t led_id, uint8_t norm_state){
 				pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH); //si me piden prender el led, activo la pwm
 			}
 			else{
-				pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode)); //si me piden apagar, desactivo la pwm
+				pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_pin_mode)); //si me piden apagar, desactivo la pwm
 			}
 			LEDS[led_id].state = norm_state;	//guardo el estao
 			if(LEDS[led_id].time){
@@ -222,7 +219,7 @@ void led_set_state(int8_t led_id, uint8_t norm_state){
 		pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
 	}
 	else{
-		pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
+		pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_pin_mode));
 	}
 	LEDS[led_id].state = norm_state;
 	if(LEDS[led_id].time){
@@ -253,12 +250,12 @@ void led_flash(int8_t led_id){
 	LEDS[led_id].flashing = 1;
 	LEDS[led_id].time_start = led_timer;
 	LED_TIMERS[led_id] = 1;
-	cur_norm_state = get_normalized_state(gpioRead(LEDS[led_id].led_pin), LEDS[led_id].led_activation_mode);
+	cur_norm_state = get_normalized_state(gpioRead(LEDS[led_id].led_pin), LEDS[led_id].led_pin_mode);
 	if(!cur_norm_state){
 		pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
 	}
 	else{
-		pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
+		pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_pin_mode));
 	}
 	LEDS[led_id].state = !cur_norm_state;
 	if (LEDS[led_id].flashes != 0)
@@ -275,7 +272,7 @@ void led_poll(void){
 				if(LEDS[i].flashing){	//si esta en modo flash
 					if(LEDS[i].state == HIGH){	//si esta prendido
 						if( (float)(led_timer) - (float)(LEDS[i].time_start) > (((float)((((float)LEDS[i].period))*(((float)(100-LEDS[i].dt))/100.0)))/((float)LED_TIMEBASE))){
-							pwm_unquery(LEDS[i].pwm_id, unnormalize_state(LOW, LEDS[i].led_activation_mode)); //si ya paso el tiempo, apago la pwm
+							pwm_unquery(LEDS[i].pwm_id, unnormalize_state(LOW, LEDS[i].led_pin_mode)); //si ya paso el tiempo, apago la pwm
 							LEDS[i].state = LOW;
 							LEDS[i].time_start = led_timer; //vuelvo a tomar el tiempo
 						}
@@ -298,12 +295,12 @@ void led_poll(void){
 				else if (LEDS[i].time != 0)
 				{ //si no esta en modo flash
 					if(((float)(led_timer)) - ((float)(LEDS[i].time_start)) > (((float)(LEDS[i].time))/((float)(LED_TIMEBASE)))){ //si ya paso el tiempo
-						cur_norm_state = get_normalized_state(gpioRead(LEDS[i].led_pin), LEDS[i].led_activation_mode);
+						cur_norm_state = get_normalized_state(gpioRead(LEDS[i].led_pin), LEDS[i].led_pin_mode);
 						if(!cur_norm_state){
 							pwm_query(LEDS[i].pwm_id, PWM_FREQ, LEDS[i].brightness, HIGH); //si lo que habia hecho era apagarlo, lo vuelvo a prender un tiempo @time despues
 						}
 						else{
-							pwm_unquery(LEDS[i].pwm_id, unnormalize_state(LOW, LEDS[i].led_activation_mode)); //idem si lo que habia hecho fue prenderlo
+							pwm_unquery(LEDS[i].pwm_id, unnormalize_state(LOW, LEDS[i].led_pin_mode)); //idem si lo que habia hecho fue prenderlo
 						}
 						LEDS[i].state = !cur_norm_state;
 						LED_TIMERS[i] = 0; //y marco que ya no debe cambiar con el tiempo

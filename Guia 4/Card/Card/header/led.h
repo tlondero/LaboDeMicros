@@ -14,7 +14,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "timer.h"
-
+#include "header/pwm.h"
+#include "header/gpio.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -48,7 +49,7 @@ typedef struct {
 	int8_t led_id; 	//ID of the initialized LED
 	int8_t pwm_id;
 	uint8_t led_pin;	//pin of the LED
-	uint8_t led_activation_mode;//pin mode of the LED
+	uint8_t led_pin_mode;//pin mode of the LED
 	uint8_t brightness;	//brightness, values from 0 to 100 and has a 1:1 ratio with duty cycle
 	uint8_t flashing;
 	uint8_t dt;
@@ -67,10 +68,10 @@ void led_init_driver(void);
 /**
  * @brief Initialize one LED
  * @param pin the pin which governs the LED
- * @param activation_mode whether the pin has to be pulled up or down
+ * @param pin_mode whether the pin has to be pulled up or down
  * @param led_id the id given by get_id()
  */
-int8_t led_init_led(uint8_t pin, uint8_t activation_mode);
+int8_t led_init_led(pin_t pin, uint8_t pin_mode);
 /**
  * @brief take out LED from LED array
  * @param led_id the id given by get_id()
