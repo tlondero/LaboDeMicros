@@ -32,11 +32,11 @@
 #define PIN_B PORTNUM2PIN(PC, 16) //BLANCO
 #define PIN_C PORTNUM2PIN(PB, 19) //GRIS
 #define PIN_D PORTNUM2PIN(PC, 17) //VIOLETA
-#define PIN_E PORTNUM2PIN(PC, 5)  //AZUL
+#define PIN_E PORTNUM2PIN(PC, 1)  //AZUL
 #define PIN_F PORTNUM2PIN(PB, 9) //VERDE
 #define PIN_G PORTNUM2PIN(PC, 8)		//AMARILLO
 #define PIN_DOT PORTNUM2PIN(PA, 1) //NARANJA
-#define SEL_LINE_A PORTNUM2PIN(PC,11)			//MARRON (ESTA EN FRENTE)
+#define SEL_LINE_A PORTNUM2PIN(PC,0)			//MARRON (ESTA EN FRENTE)
 #define SEL_LINE_B PORTNUM2PIN(PA,2)           //ROJO
 
 
@@ -49,6 +49,10 @@ typedef struct
 	uint8_t pin_mode[SEVEN_SEGMENTS_PINS]; // PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
 } character_t;
 
+typedef struct{
+	char name;
+	uinit8_t animation_seq[];
+};
 //PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
 
 const static character_t characters[] = {
@@ -63,6 +67,9 @@ const static character_t characters[] = {
 		{'8', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},
 		{'9', {HIGH, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW}}
 };
+
+
+
 #define MAX_CHARACTERS sizeof(characters)/sizeof(character_t)
 /******************
 7-SEGMENT DISPLAY PIN NAMING CONVENTION
