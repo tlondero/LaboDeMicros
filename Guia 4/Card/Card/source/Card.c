@@ -11,7 +11,7 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ********************************************************************************/
-#define PAN_LENGHT (19)
+
 #define DATA_LENGHT (40)
 #define CHAR_LENGHT (5)
 #define CARD_KINETIS_PIN (0)
@@ -30,12 +30,17 @@ static uint8_t pan[PAN_LENGHT];
 static uint8_t data[DATA_LENGHT]; //?
 static bool enable;
 static bool error;
+//COUNTERS
+static uint8_t bit_counter = 0;
+static uint8_t character = 0;
+static uint8_t char_counter = 0;
+
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH FILE SCOPE DECLARATION
  ******************************************************************************/
 //Callback
 void cardCallback(void);
-//	printf("Hola papi");
+
 void enableCallback(void);
 void clockCallback(void);
 bool checkParity(void);
@@ -52,8 +57,6 @@ void cardInitDriver(void (*fun_callback)(void)) {
 	////////////////////////////////////////////////////////////////////////////////////
 	gpioIRQ(CARD_EN_PIN, GPIO_IRQ_MODE_BOTH_EDGES, enableCallback);
 	gpioIRQ(CARD_CLK_PIN, GPIO_IRQ_MODE_FALLING_EDGE, clockCallback);
-	//No le puse interrupcion a la data porque ni idea si debería, porque con el enable empieza
-	//toda la idea de la trama
 	////////////////////////////////////////////////////////////////////////////////////
 	NVIC_EnableIRQ(PORTC_IRQn);
 	//ESTO DEPENDE DE QUE PUERTO USEMOS
@@ -63,66 +66,79 @@ void cardInitDriver(void (*fun_callback)(void)) {
 
 uint8_t * cardGetPAN(void) {
 	uint8_t i = 0;
-	while ((data[i + 1] != FS) && (i < PAN_LENGHT)) {
-		pan[i] = data[i + 1] & LOW_NYBBLE_MASK;
-		i++;
+	if ((enable == 0) && (error == false)) {
+		while ((data[i + 1] != FS) && (i < PAN_LENGHT)) {
+			pan[i] = data[i + 1] & LOW_NYBBLE_MASK;
+			i++;
+		}
+		return &pan[0];
+	} else {
+		return NULL;
 	}
-	return &pan[0];
+
 }
 void enableCallback(void) {
-	enable = gpioRead(CARD_EN_PIN);
+	enable = !gpioRead(CARD_EN_PIN);
 	if (enable) {
-		//seguro habrá que hacer algo si estoy enable tipo configuracion
-	} else {
-		//y alguna otra cuando termine
-	}
+		bit_counter = 0;
+		character = 0;
+		char_counter = 0;
+		error = false;
+	} //seguro habrá que hacer algo si estoy enable tipo configuracion
+//	else{
+//
+//	}
+
 }
-void clockCallback(void) { // seguro en algun mometno debería buscar los SS, FS y ES
-	static uint8_t bit_counter = 0;
-	static uint8_t character = 0;
-	static uint8_t char_counter = 0;
-	bool my_data = gpioRead(CARD_DATA_PIN)
+void clockCallback(void) { // seguro en algun momeno debería buscar los SS, FS y ES
+
 	if (enable) {
+		bool my_data = gpioRead(CARD_DATA_PIN)
 		if (bit_counter < CHAR_LENGHT) {
-			character = character | (my_data << bit_counter);
+			character = character | (my_data << bit_counter++); //0 0 0 P b3 b2 b1 b0
 		} else {
 			bit_counter = 0;
 			data[char_counter++] = character;
 			character = 0;
-			if(data[0] != SS){
+			if (data[0] != SS) {
 				error = true; //CHEQUEAR
 			}
 		}
 		if (char_counter == DATA_LENGHT - 1) {
 			char_counter = 0;
 			if ((!checkParity())) {
+				error = true;
 				//si no da la paridad aca podes hace cosas
 			}
 		}
 	}
 }
-
-bool checkParity(void){
-	uint8_t i=0,j;
-	uint8_t char_parity=false;
-	uint8_t lrc_parity = false;
-	bool is_ok;
-	for(i=0;i< DATA_LENGHT-2 ; i++){//Stop before the LRC bit
-		for (j=0; j< CHAR_LENGHT ; j++){
-			char_parity ^=  ((data[i] & (1<<j))>>j);//we test the parity of the chars
-			lrc_parity ^=  ((data[i] & (1<<j))>>j);
+bool checkParity(void) {
+	uint8_t i = 0, j;
+	uint8_t char_parity = false;
+	uint8_t lrc_parity[CHAR_LENGHT] = { 0 };
+	bool is_ok = true;
+	for (i = 0; i < DATA_LENGHT; i++) {
+		for (j = 0; j < CHAR_LENGHT; j++) {
+			char_parity ^= ((data_test[i] & (1 << j)) >> j); //we test the parity of the chars
+			lrc_parity[j] ^= ((data_test[i] & (1 << j)) >> j);
 		}
-		if(char_parity == 0){ //if it wasnt ODD parity.
-			error=true;
+		if (char_parity == 0) { //if it wasnt ODD parity.
+			error = true;
+			is_ok &= false;
+			//////////////////////////////////
+			//cout << "Parity error detected in character " << (int)i << endl;
+			//////////////////////////////////
 		}
 		char_parity = false;
 	}
-	if (lrc_parity ==data[DATA_LENGHT-1]){//CHEQUEAR
-		//no me quedo del todo claro como es la pariddad del LRC
-		is_ok=true;
-	}
-	else {
-		is_ok=false;
-	}
+	for (i = 0; i < CHAR_LENGHT - 1; i++)
+		if (lrc_parity[i] != 1) {
+			is_ok &= false;
+			//////////////////////////////////
+			//	cout << "Parity error in the character "<< (int) i << " of the LCR check" << endl;
+			//////////////////////////////////
+		}
 	return is_ok;
 }
+
