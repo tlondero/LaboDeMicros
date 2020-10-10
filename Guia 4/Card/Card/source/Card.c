@@ -8,13 +8,13 @@
  ******************************************************************************/
 #include "header/Card.h"
 #include "header/gpio.h"
+#include "MK64F12.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ********************************************************************************/
 
 #define DATA_LENGHT (40)
 #define CHAR_LENGHT (5)
-#define CARD_KINETIS_PIN (0)
 #define FS 0b01101
 #define SS 0b01011
 #define ES 0b11111
@@ -51,17 +51,17 @@ bool checkParity(void);
 //	gpioIRQ(CARD_KINETIS_PIN, GPIO_IRQ_MODE_FALLING_EDGE, callback);
 //}
 void cardInitDriver(void (*fun_callback)(void)) {
-	gpioMode(CARD_EN_PIN, INPUT);
-	gpioMode(CARD_DATA_PIN, INPUT);
-	gpioMode(CARD_CLK_PIN, INPUT);
+	gpioMode(CARD_EN_PIN, INPUT_PULLUP);
+	gpioMode(CARD_DATA_PIN, INPUT_PULLUP);
+	gpioMode(CARD_CLK_PIN, INPUT_PULLUP);
 	////////////////////////////////////////////////////////////////////////////////////
 	gpioIRQ(CARD_EN_PIN, GPIO_IRQ_MODE_BOTH_EDGES, enableCallback);
 	gpioIRQ(CARD_CLK_PIN, GPIO_IRQ_MODE_FALLING_EDGE, clockCallback);
 	////////////////////////////////////////////////////////////////////////////////////
-	NVIC_EnableIRQ(PORTC_IRQn);
+	NVIC_EnableIRQ(PORTD_IRQn);
 	//ESTO DEPENDE DE QUE PUERTO USEMOS
 
-	cardCallback = fun_callback;
+//	cardCallback = fun_callback;
 }
 
 uint8_t * cardGetPAN(void) {
@@ -73,7 +73,7 @@ uint8_t * cardGetPAN(void) {
 		}
 		return &pan[0];
 	} else {
-		return NULL;
+		return 0;
 	}
 
 }
@@ -93,7 +93,7 @@ void enableCallback(void) {
 void clockCallback(void) { // seguro en algun momeno debería buscar los SS, FS y ES
 
 	if (enable) {
-		bool my_data = gpioRead(CARD_DATA_PIN)
+		bool my_data = gpioRead(CARD_DATA_PIN);
 		if (bit_counter < CHAR_LENGHT) {
 			character = character | (my_data << bit_counter++); //0 0 0 P b3 b2 b1 b0
 		} else {
@@ -120,8 +120,8 @@ bool checkParity(void) {
 	bool is_ok = true;
 	for (i = 0; i < DATA_LENGHT; i++) {
 		for (j = 0; j < CHAR_LENGHT; j++) {
-			char_parity ^= ((data_test[i] & (1 << j)) >> j); //we test the parity of the chars
-			lrc_parity[j] ^= ((data_test[i] & (1 << j)) >> j);
+			char_parity ^= ((data[i] & (1 << j)) >> j); //we test the parity of the chars
+			lrc_parity[j] ^= ((data[i] & (1 << j)) >> j);
 		}
 		if (char_parity == 0) { //if it wasnt ODD parity.
 			error = true;
