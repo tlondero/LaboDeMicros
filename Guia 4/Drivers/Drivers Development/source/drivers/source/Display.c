@@ -49,13 +49,10 @@ typedef struct
 	uint8_t pin_mode[SEVEN_SEGMENTS_PINS]; // PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
 } character_t;
 
-typedef struct{
-	char name;
-	uinit8_t animation_seq[];
-};
 //PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
 
 const static character_t characters[] = {
+
 		{'0', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW}},
 		{'1', {LOW, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW}},
 		{'2', {HIGH, HIGH, LOW, HIGH, HIGH, LOW, HIGH, LOW}},
