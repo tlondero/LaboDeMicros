@@ -5,6 +5,7 @@
  *      Author: MAGT
  */
 #include <stdbool.h>
+#include <stdint.h>
 #include "../headers/led.h"
 #include "../headers/Display.h"
 #include "../headers/gpio.h"
@@ -51,7 +52,7 @@ typedef struct
 
 typedef struct{
 	char name;
-	uinit8_t animation_seq[];
+	uint8_t animation_seq[];
 };
 //PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
 
