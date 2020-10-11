@@ -35,7 +35,6 @@ static void interrupt_init(uint32_t IRQn)
 
 void gpioCG(pin_t pin, uint8_t state)
 {
-
 	//Enable Clock Gating
 	if (state == CG_ON)
 	{
@@ -60,6 +59,7 @@ void gpioMode(pin_t pin, uint8_t mode)
 	gpioCG(pin, CG_ON);
 
 	//PCR CONFIG
+
 	uint8_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
 	PORT_Type *port_pointer = PORT_SELECTORS[port];
@@ -81,12 +81,13 @@ void gpioMode(pin_t pin, uint8_t mode)
 		switch (mode)
 		{
 		case INPUT_PULLDOWN:
-			port_pointer->PCR[number] |= PORT_PCR_PE(number); // PULL ENABLE
-			port_pointer->PCR[number] |= PORT_PCR_PS(0);	  //SET PULL DOWN
+			//TODOS: REVISAR SI ESTA BIEN USAR PORT_PCR_PE(number)
+			port_pointer->PCR[number] |= PORT_PCR_PE(1); // PULL ENABLE
+			port_pointer->PCR[number] |= PORT_PCR_PS(0); //SET PULL DOWN
 			break;
 		case INPUT_PULLUP:
-			port_pointer->PCR[number] |= PORT_PCR_PE(number); // PULL ENABLE
-			port_pointer->PCR[number] |= PORT_PCR_PS(1);	  //SET PULL DOWN
+			port_pointer->PCR[number] |= PORT_PCR_PE(1); // PULL ENABLE
+			port_pointer->PCR[number] |= PORT_PCR_PS(1); //SET PULL UP
 			break;
 		default:
 			break;
@@ -153,9 +154,10 @@ __ISR__ PORTA_IRQHandler(void)
 	uint32_t exit_cond = 0;
 	while (!exit_cond)
 	{
-		if (pin_irq_configured[PA][i] == 1)
+		if (pin_irq_configured[PA][i] == 1) //Are ISR enabled?
 		{
-			if ((PORTA->PCR[i] & PORT_PCR_ISF_MASK) == PORT_PCR_ISF_MASK)
+			//000000000000000001000000
+			if ((PORTA->PCR[i] & PORT_PCR_ISF_MASK) == PORT_PCR_ISF_MASK) 
 			{
 				PORTA->PCR[i] |= PORT_PCR_ISF_MASK;
 				port_pin_interrupt[PA][i]();
@@ -246,7 +248,7 @@ __ISR__ PORTE_IRQHandler(void)
 		{
 			if ((PORTE->PCR[i] & PORT_PCR_ISF_MASK) == PORT_PCR_ISF_MASK)
 			{
-				PORTE->PCR[i] |= PORT_PCR_ISF_MASK;
+				PORTE->PCR[i] |= PORT_PCR_ISF_MASK; // Drop status flag w1c
 				port_pin_interrupt[PE][i]();
 				exit_cond = 1;
 			}
