@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;Blink_GUIA3&apos;" deleteContents="false" description="Delete resource &apos;Blink_GUIA3&apos;" element1="/Blink_GUIA3" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1600384569647"/>
+</session>
