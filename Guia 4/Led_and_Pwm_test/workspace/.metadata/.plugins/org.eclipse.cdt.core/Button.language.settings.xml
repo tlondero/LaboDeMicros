@@ -21,6 +21,40 @@
 						<entry kind="macro" name="DEBUG" value=""/>
 						<entry kind="macro" name="__USE_CMSIS" value=""/>
 					</resource>
+					<resource project-relative-path="SDK/startup/hardware.c">
+						<entry kind="includePath" name="/${ProjName}/source">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/SDK/CMSIS">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/SDK/startup">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="macro" name="CPU_MK64FN1M0VLL12" value=""/>
+						<entry kind="macro" name="DEBUG" value=""/>
+						<entry kind="macro" name="__USE_CMSIS" value=""/>
+					</resource>
+					<resource project-relative-path="source/led.c">
+						<entry kind="includePath" name="/${ProjName}/source">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/SDK/CMSIS">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/SDK/startup">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="macro" name="CPU_MK64FN1M0VLL12" value=""/>
+						<entry kind="macro" name="DEBUG" value=""/>
+						<entry kind="macro" name="__USE_CMSIS" value=""/>
+					</resource>
 					<resource project-relative-path="SDK/startup/main.c">
 						<entry kind="includePath" name="/${ProjName}/source">
 							<flag value="VALUE_WORKSPACE_PATH"/>
@@ -72,6 +106,23 @@
 						<entry kind="macro" name="DEBUG" value=""/>
 						<entry kind="macro" name="__USE_CMSIS" value=""/>
 					</resource>
+					<resource project-relative-path="source/gpio.c">
+						<entry kind="includePath" name="/${ProjName}/source">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/SDK/CMSIS">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="includePath" name="/${ProjName}/SDK/startup">
+							<flag value="VALUE_WORKSPACE_PATH"/>
+						</entry>
+						<entry kind="macro" name="CPU_MK64FN1M0VLL12" value=""/>
+						<entry kind="macro" name="DEBUG" value=""/>
+						<entry kind="macro" name="__USE_CMSIS" value=""/>
+					</resource>
 					<resource project-relative-path="source/pwm.c">
 						<entry kind="includePath" name="/${ProjName}/source">
 							<flag value="VALUE_WORKSPACE_PATH"/>
@@ -89,7 +140,7 @@
 						<entry kind="macro" name="DEBUG" value=""/>
 						<entry kind="macro" name="__USE_CMSIS" value=""/>
 					</resource>
-					<resource project-relative-path="source/SysTick.c">
+					<resource project-relative-path="source/Button.c">
 						<entry kind="includePath" name="/${ProjName}/source">
 							<flag value="VALUE_WORKSPACE_PATH"/>
 						</entry>
@@ -106,7 +157,7 @@
 						<entry kind="macro" name="DEBUG" value=""/>
 						<entry kind="macro" name="__USE_CMSIS" value=""/>
 					</resource>
-					<resource project-relative-path="source/led_new.c">
+					<resource project-relative-path="source/SysTick.c">
 						<entry kind="includePath" name="/${ProjName}/source">
 							<flag value="VALUE_WORKSPACE_PATH"/>
 						</entry>
@@ -141,74 +192,6 @@
 						<entry kind="macro" name="__USE_CMSIS" value=""/>
 					</resource>
 					<resource project-relative-path="SDK/startup/startup_mk64f12.c">
-						<entry kind="includePath" name="/${ProjName}/source">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/SDK/CMSIS">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/SDK/startup">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="macro" name="CPU_MK64FN1M0VLL12" value=""/>
-						<entry kind="macro" name="DEBUG" value=""/>
-						<entry kind="macro" name="__USE_CMSIS" value=""/>
-					</resource>
-					<resource project-relative-path="SDK/startup/hardware.c">
-						<entry kind="includePath" name="/${ProjName}/source">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/SDK/CMSIS">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/SDK/startup">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="macro" name="CPU_MK64FN1M0VLL12" value=""/>
-						<entry kind="macro" name="DEBUG" value=""/>
-						<entry kind="macro" name="__USE_CMSIS" value=""/>
-					</resource>
-					<resource project-relative-path="source/led.c">
-						<entry kind="includePath" name="/${ProjName}/source">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/SDK/CMSIS">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/SDK/startup">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="macro" name="CPU_MK64FN1M0VLL12" value=""/>
-						<entry kind="macro" name="DEBUG" value=""/>
-						<entry kind="macro" name="__USE_CMSIS" value=""/>
-					</resource>
-					<resource project-relative-path="source/gpio.c">
-						<entry kind="includePath" name="/${ProjName}/source">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/SDK/CMSIS">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="includePath" name="/${ProjName}/SDK/startup">
-							<flag value="VALUE_WORKSPACE_PATH"/>
-						</entry>
-						<entry kind="macro" name="CPU_MK64FN1M0VLL12" value=""/>
-						<entry kind="macro" name="DEBUG" value=""/>
-						<entry kind="macro" name="__USE_CMSIS" value=""/>
-					</resource>
-					<resource project-relative-path="source/Button.c">
 						<entry kind="includePath" name="/${ProjName}/source">
 							<flag value="VALUE_WORKSPACE_PATH"/>
 						</entry>
