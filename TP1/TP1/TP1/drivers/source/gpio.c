@@ -81,11 +81,11 @@ void gpioMode(pin_t pin, uint8_t mode)
 		switch (mode)
 		{
 		case INPUT_PULLDOWN:
-			port_pointer->PCR[number] |= PORT_PCR_PE(number); // PULL ENABLE
+			port_pointer->PCR[number] |= PORT_PCR_PE(1); // PULL ENABLE
 			port_pointer->PCR[number] |= PORT_PCR_PS(0);	  //SET PULL DOWN
 			break;
 		case INPUT_PULLUP:
-			port_pointer->PCR[number] |= PORT_PCR_PE(number); // PULL ENABLE
+			port_pointer->PCR[number] |= PORT_PCR_PE(1); // PULL ENABLE
 			port_pointer->PCR[number] |= PORT_PCR_PS(1);	  //SET PULL DOWN
 			break;
 		default:
