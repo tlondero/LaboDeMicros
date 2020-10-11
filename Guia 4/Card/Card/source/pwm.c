@@ -5,7 +5,7 @@
  *      Author: MAGT
  */
 
-#include "headers/pwm.h"
+#include "header/pwm.h"
 
 /*******************************************************************************
  * GLOBAL VARIABLES WITH LOCAL SCOPE

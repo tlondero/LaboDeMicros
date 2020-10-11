@@ -35,7 +35,7 @@ uint8_t * cardGetPAN(void);
 /**
  * @brief  cardInitDriver: Initializes all the drivers that the card driver uses.
  */
-void cardInitDriver(void);
+void cardInitDriver(void (*fun_callback)(void));
 
 
 
