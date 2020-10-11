@@ -94,23 +94,29 @@ void clockCallback(void) { // seguro en algun momeno debería buscar los SS, FS 
 
 	if (enable) {
 		bool my_data = gpioRead(CARD_DATA_PIN);
-		if (bit_counter < CHAR_LENGHT) {
+		if ((bit_counter < CHAR_LENGHT) &&  (char_counter < DATA_LENGHT -1)) {
 			character = character | (my_data << bit_counter++); //0 0 0 P b3 b2 b1 b0
-		} else {
-			bit_counter = 0;
-			data[char_counter++] = character;
-			character = 0;
-			if (data[0] != SS) {
-				error = true; //CHEQUEAR
-			}
+		} else if (data[0] != SS){
+			bit_counter--; // se encarga de buscar el start sentinel
+			character = character >> 1;
 		}
-		if (char_counter == DATA_LENGHT - 1) {
+		else if(char_counter < DATA_LENGHT -1) {
+			bit_counter = 0;
+			data[char_counter++] = character;//stores the characters in the data buffer
+			character = 0;
+		}
+		else if (data[char_counter-1] == ES) {
 			char_counter = 0;
 			if ((!checkParity())) {
 				error = true;
 				//si no da la paridad aca podes hace cosas
 			}
+
 		}
+		else{
+			error = true;// si todo salio mal  debe haber un error
+		}
+
 	}
 }
 bool checkParity(void) {
