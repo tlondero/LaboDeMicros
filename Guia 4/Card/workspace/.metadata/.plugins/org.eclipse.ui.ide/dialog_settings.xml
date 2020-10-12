@@ -31,11 +31,21 @@
 		<item value="org.eclipse.wst.xml_ui.feature:3.9.2.v201803221834"/>
 		<item value="org.eclipse.wst.xsl.feature:1.3.401.v201509231858"/>
 	</list>
+	<section name="CleanDialogSettings">
+		<item value="492" key="DIALOG_WIDTH"/>
+		<item value="true" key="BUILD_ALL"/>
+		<item value="false" key="TOGGLE_SELECTED"/>
+		<item value="457" key="DIALOG_HEIGHT"/>
+		<item value="437" key="DIALOG_X_ORIGIN"/>
+		<item value="60" key="DIALOG_Y_ORIGIN"/>
+		<item value="false" key="BUILD_NOW"/>
+	</section>
 	<section name="ExternalProjectImportWizard">
 		<item value="false" key="WizardProjectsImportPage.STORE_NESTED_PROJECTS"/>
 		<item value="false" key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID"/>
 		<item value="false" key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
+			<item value="C:\Users\Msrt\Documents\GitHub\LaboDeMicros\Guia 4\Card\Card"/>
 			<item value="C:\Users\Guido\Documents\GitHub\LaboDeMicros\Guia 4\Card\Card"/>
 		</list>
 		<list key="WizardProjectsImportPage.STORE_ARCHIVES">
