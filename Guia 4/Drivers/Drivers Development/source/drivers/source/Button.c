@@ -50,6 +50,7 @@ int8_t ButtonInit(pin_t pin, uint8_t mode) {
 	if (active_buttons_cant++ < MAX_BUTTONS) {
 		gpioMode(pin, mode); //Inits the gpio for the pin
 		if (!first) { //if is the first time intis the timer and the periodic interruption for polling
+			timerInit();
 			tim_id_t Bt_timmer = timerGetId();
 			timerStart(Bt_timmer, TIMER_MS2TICKS(BUTTON_REFRESH_PERIOD),
 					TIM_MODE_PERIODIC, ButtonsCheck);
