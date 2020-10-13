@@ -26,7 +26,7 @@
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
-enum channels {FTM_CH_0, FTM_CH_1, FTM_CH_2, FTM_CH_3, FTM_CH_4, FTM_CH_5, FTM_CH_6, FTM_CH_7};
+enum channels {FTM_CH_0, FTM_CH_1, FTM_CH_2, FTM_CH_3, FTM_CH_4, FTM_CH_5, FTM_CH_6, FTM_CH_7, CANT_CHANNELS};
 
 typedef enum
 {
@@ -68,7 +68,22 @@ typedef enum
 
 } FTM_Prescal_t;
 
+typedef struct{
+	FTMMode_t MODE;
 
+	FTM_Prescal_t PSC;
+	FTMEdge_t IC_EDGE;
+	FTMEffect_t OC_EFFECT;
+	FTMLogic_t EPWM_LOGIC;
+
+	uint16_t MODULO;
+	uint16_t CNT;
+	uint16_t CNTIN;
+	uint16_t CNV;
+
+	void (*CALLBACK)(void);
+
+}FTM_DATA;
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -76,10 +91,15 @@ typedef enum
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
+//Initializes a new FTM channel
+//ftmdata is the data for the initialization of each ftm mode
+uint8_t FTMInit(uint8_t pin, FTM_DATA data);
 
-//void FTMInit(FTM_modes_t mode);
+//Stops a FTM channel
+void FTMStopClock(uint8_t module);
 
-
+//Starts the FTM clock
+void FTMStartClock(uint8_t module);
 
 
 #endif /* FTM_H_ */

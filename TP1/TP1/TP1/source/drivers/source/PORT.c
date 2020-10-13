@@ -1,7 +1,6 @@
 
-#include "PORT.h"
+#include "drivers/headers/PORT.h"
 
-/*
 void PORT_Init (void)
 {
 	SIM->SCGC5 |= SIM_SCGC5_PORTA_MASK;
@@ -26,7 +25,6 @@ void PORT_Init (void)
 
 	 // TO DO
 }
-*/
 
 
 void PORT_SetPullResistorMode (PORT_t port, PORTBit_t bit, bool mode)

@@ -7,17 +7,9 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-
-//#include <header/ejercicios_headers/BalizaSwitchSysTick/balizaSwitchSysTick.h>
-//#include "header/ejercicios_headers/Baliza/baliza.h"
-//#include "header/ejercicios_headers/BalizaSysTick/balizast.h"
-#include "drivers/headers/board.h"
-#include "drivers/headers/led.h"
 #include "stdbool.h"
 #include <stdio.h>
-#include "drivers/headers/SysTick.h"
-#include "drivers/headers/timer.h"
-#include "drivers/headers/Button.h"
+#include "drivers/headers/FTM.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -39,83 +31,63 @@
 /*******************************************************************************
  * INTERRUPCIONES
  ******************************************************************************/
-
-
-
-
-/*******************************************************************************
- * BALIZA
- ******************************************************************************/
-
-//static void update_baliza(int period);
-
-
-//void blockTime(void){
-//	timerDelay(5000);
-//}
-//void ButtonTB(void);
-
-int8_t idButton1, idButton2;
-void turn_on_led(void);
-void App_Init (void)
-{
-	//Interrupciones de pines
-	led_init_driver();
+static uint8_t xd;
+void callback(void){
+	xd = 10;
 }
 
+void OC_TB_AppInit(void){
+	FTM_DATA data;
+			data.CNT = 0;
+			data.CNTIN = 0;
+			data.CNV = 10000;
+			data.MODE = FTM_mOutputCompare;
+			data.MODULO = 0xFFFF;
+			data.OC_EFFECT = FTM_eToggle;
+			data.PSC=FTM_PSC_x128;
+			data.CALLBACK = callback;
+			FTMInit(71, data); //ptc1
+			FTMStartClock(0);
+}
 
-/* Función que se llama constantemente en un ciclo infinito */
+//void IC_TB_AppInit(void){
+//	FTM_DATA data;
+//		data.CNT = 0;
+//		data.CNTIN = 0;
+//		data.CNV = 0;
+//		data.MODE = FTM_mInputCapture;
+//		data.MODULO = 0xFFFF;
+//		data.IC_EDGE = FTM_eRising;
+//		data.PSC=FTM_PSC_x128;
+//		data.CALLBACK = callback;
+//		FTMInit(71, data); //ptc1
+//		FTMStartClock(0);
+//}
+
+
+
+//void EPWM_TB_AppInit(void){
+//	FTM_DATA data;
+//			data.CNT = 0;
+//			data.CNTIN = 0;
+//			data.CNV = 9000;
+//			data.MODE = FTM_mPulseWidthModulation;
+//			data.MODULO = 10000;
+//			data.EPWM_LOGIC = FTM_lAssertedLow;
+//			data.PSC=FTM_PSC_x128;
+//			data.CALLBACK = callback;
+//			FTMInit(71, data); //ptc1
+//			FTMStartClock(0);
+//}
+
+void App_Init (void)
+{
+    PORT_Init();
+	OC_TB_AppInit();
+}
+
 
 void App_Run (void)
 {
-//ButtonTB();
+
 }
-
-
-//void ButtonTB(void){
-//
-//	const ButtonEvent * evsw1 = ButtonGetEvent(idButton1);
-//
-//	static int a=0;
-//
-//    while((*evsw1) != EOQ){
-//	switch (*evsw1){
-//		case LKP:
-//			gpioWrite(PIN_LED_RED, HIGH);
-//			gpioWrite(PIN_LED_BLUE, LOW);
-//			gpioWrite(PIN_LED_GREEN, HIGH);
-//			a++;
-//			break;
-//		case PRESS:
-//			gpioWrite(PIN_LED_RED, HIGH); //PRESS VERDEE
-//			gpioWrite(PIN_LED_BLUE, HIGH);
-//			gpioWrite(PIN_LED_GREEN, LOW);
-//			break;
-//
-//		case RELEASE:
-//			gpioWrite(PIN_LED_RED, LOW);  //ROJO RELEASE
-//			gpioWrite(PIN_LED_BLUE, HIGH);
-//			gpioWrite(PIN_LED_GREEN, HIGH);
-//
-//			break;
-//		case SKP:
-//			gpioWrite(PIN_LED_RED, LOW);  //ROJO RELEASE
-//			gpioWrite(PIN_LED_BLUE, LOW);
-//			gpioWrite(PIN_LED_GREEN, LOW);
-//			break;
-//		default:
-//
-//			break;
-//		}
-//	evsw1++;
-//    }
-//    if(a==2){
-//    	a=0;
-//    }
-//	gpioWrite(PIN_LED_RED, HIGH);
-//	gpioWrite(PIN_LED_BLUE, HIGH);
-//	gpioWrite(PIN_LED_GREEN, HIGH);
-//
-//
-//}
-//
