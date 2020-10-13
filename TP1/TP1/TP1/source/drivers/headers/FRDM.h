@@ -33,8 +33,6 @@
 
 enum { RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS };
 
-enum { BRIGHT, FADE, DT, FLASHTIME, PERIOD };
-
 enum {R, G, B, NONE};
 
 typedef uint8_t FRDMButton;
@@ -98,7 +96,11 @@ bool FRDMLedFlash(uint8_t port);
 /**
  * @brief Poll led and pwm
  */
-bool FRDMLedConfig(uint8_t led, uint8_t param, uint8_t value);
+bool FRDMLedBright(uint8_t led, uint8_t value);
+bool FRDMLedFade(uint8_t led, uint8_t value);
+bool FRDMLedDt(uint8_t led, uint8_t value);
+bool FRDMLedFlash(uint8_t led, uint8_t value);
+bool FRDMLedPeriod(uint8_t led, uint8_t value);
 
 /*******************************************************************************
  ******************************************************************************/

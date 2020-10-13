@@ -46,8 +46,8 @@
  * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
 
-static FRDMButton sw2; //= FRDMButtonInit(BUTTON_SW2);
-static FRDMButton sw3; //= FRDMButtonInit(BUTTON_SW3);
+static FRDMButton sw2;
+static FRDMButton sw3;
 
 static int8_t idLedRed;
 static int8_t idLedBlue;
@@ -77,8 +77,12 @@ int8_t getId(uint8_t led) {
 	return ledPort;
 }
 
-void FRDMLedInit() { //(uint8_t brightness, uint32_t fade, uint32_t dt, uint8_t flashes, uint32_t period) {
+void FRDMInit(void) {
+	//Button Init
+	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
+	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
 
+	//LED Init
 	gpioMode(PIN_LED_BLUE, OUTPUT);
 	gpioWrite(PIN_LED_BLUE, HIGH);
 	gpioMode(PIN_LED_RED, OUTPUT);
@@ -115,43 +119,65 @@ void FRDMLedInit() { //(uint8_t brightness, uint32_t fade, uint32_t dt, uint8_t 
 	led_configure_dt(idLedGreen, dt);
 	led_configure_flashes(idLedGreen, flashes);
 	led_configure_period(idLedGreen, period);
-
 }
 
-void FRDMInit(void) {
-	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
-	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
 
-	FRDMLedInit();
-}
-
-bool FRDMLedConfig(uint8_t led, uint8_t param, uint8_t value) {
+bool FRDMLedBright(uint8_t led, uint8_t value){
 	int8_t ledPort = getId(led);
-	if (ledPort != NONE) {
-		switch (param) {
-		case (BRIGHT):
-			led_configure_brightness(ledPort, value);
-			break;
-		case (FADE):
-			led_configure_fade(ledPort, value);
-			break;
-		case (DT):
-			led_configure_dt(ledPort, value);
-			break;
-		case (FLASHTIME):
-			led_configure_flashes(ledPort, value);
-			break;
-		case (PERIOD):
-			led_configure_period(ledPort, value);
-			break;
-		default:
-			break;
-		}
+	if (ledPort != NONE){
+		led_configure_brightness(ledPort, value);
 		return true;
-	} else {
+	}
+	else{
 		return false;
 	}
 }
+
+bool FRDMLedFade(uint8_t led, uint8_t value){
+	int8_t ledPort = getId(led);
+	if (ledPort != NONE){
+		led_configure_fade(ledPort, value);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+bool FRDMLedDt(uint8_t led, uint8_t value){
+	int8_t ledPort = getId(led);
+	if (ledPort != NONE){
+		led_configure_dt(ledPort, value);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+bool FRDMLedFlash(uint8_t led, uint8_t value){
+	int8_t ledPort = getId(led);
+	if (ledPort != NONE){
+		led_configure_flashes(ledPort, value);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+bool FRDMLedPeriod(uint8_t led, uint8_t value){
+	int8_t ledPort = getId(led);
+	if (ledPort != NONE){
+		led_configure_period(ledPort, value);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+
 
 bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback){
 	if ((button == BUTTON_SW2) || (button == BUTTON_SW3)){
