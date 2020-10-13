@@ -1,32 +1,32 @@
 /***************************************************************************//**
-  @file     App.c
-  @brief    Application functions
-  @author   Nicolás Magliola
+ @file     App.c
+ @brief    Application functions
+ @author   Nicolás Magliola
  ******************************************************************************/
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
+
 #include "stdbool.h"
 #include <stdio.h>
 #include "drivers/headers/FTM.h"
+#include "drivers/headers/FRDM.h"
+
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
-
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
 
-
 /*******************************************************************************
  *******************************************************************************
-                        GLOBAL FUNCTION DEFINITIONS
+ GLOBAL FUNCTION DEFINITIONS
  *******************************************************************************
  *******************************************************************************
  ******************************************************************************/
-
 
 /*******************************************************************************
  * INTERRUPCIONES
@@ -84,6 +84,7 @@ void App_Init (void)
 {
     PORT_Init();
 	OC_TB_AppInit();
+	//FRDMInit();
 }
 
 
@@ -91,3 +92,30 @@ void App_Run (void)
 {
 
 }
+
+//void App_Run(void) {
+//	int8_t bright = 20;
+//
+//	FRDMLedRGB(bright, 0, 0);
+//
+//	while (1) {
+//		FRDMButtonEv ev1 = FRDMButtonGetEv(BUTTON_SW2);
+//		FRDMButtonEv ev2 = FRDMButtonGetEv(BUTTON_SW3);
+//		if (ev1 == PRESS) {
+//			bright += 20;
+//			if (bright >= 100) {
+//				bright = 100;
+//			}
+//			FRDMLedRGB(bright, 0, 0);
+//		}
+//		if (ev2 == PRESS) {
+//			bright -= 20;
+//			if (bright <= 0) {
+//				bright = 0;
+//			}
+//			FRDMLedRGB(bright, 0, 0);
+//		}
+//
+//		FRDMLedPoll();
+//	}
+//}

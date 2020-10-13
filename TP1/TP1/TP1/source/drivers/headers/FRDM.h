@@ -1,11 +1,11 @@
-/***************************************************************************//**
-  @file     Display.h
-  @brief
+/***************************************************************************/ /**
+  @file     FRDM.h
+  @brief    
   @author   MAGT
  ******************************************************************************/
 
-#ifndef _DISPLAY_H_
-#define _DISPLAY_H_
+#ifndef _FRDM_H_
+#define _FRDM_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
@@ -13,71 +13,84 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <limits.h>
 
+#include "led.h"
+#include "Button.h"
+#include "gpio.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
- ******/
+ ******************************************************************************/
+
+#define		BUTTON_SW2		PORTNUM2PIN(PC,6)
+#define		BUTTON_SW3		PORTNUM2PIN(PA,4)
+
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-typedef struct{
-	uint8_t size;
-} Message_t; //uint8 is temporary
 
-typedef enum{RIGHT,LEFT} direction_t;
+enum { RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS };
+
+typedef uint8_t FRDMButton;
+typedef uint8_t FRDMButtonEv;
+
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
+
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
-
 /**
- * @brief dispInit: Initializes the display
- *
+ * @brief Inits FDRM Buttons
+ * @param Recieves which button is going to be used (SW2 or SW3)
  */
-void dispInit(void);
-
+FRDMButton FRDMButtonInit(uint8_t button);
 
 
 /**
- * @brief dispSendMsg: the idea should be to print the msg send by the user, the Message_t struct is under construction
- *
+ * @brief Returns the event of the button
+ * @param 
  */
-void dispSendMsg(Message_t msg);
-
-/**
- * @brief dispSendChar: sends to the selected 7 seg the character:
- * @param ch : character to be sent coded in ascii.
- * seven_seg_module: numer of seven segment, it ranges from 0 to 3
- *
- */
-void dispSendChar(char ch, uint8_t seven_seg_module);
+FRDMButtonEv FRDMButtonGetEv(uint8_t button);
 
 
 /**
- * @brief dispShift: shifts the msg in screen one row to the "direction"
- * @params direction:see the direction_t for the modes.
- */
-void dispShift(direction_t direction);
+ * @brief Init Led
+ */ 
+void FRDMLedInit(void);
+
 
 /**
- * @brief dispClearAll: Clears ALL the display, pretty self explanatory.
- *
- */
-void dispClearAll(void);
+ * @brief Turns on led
+ * @param Color
+ */ 
+void FRDMLedColor(uint8_t color);
+
 
 /**
- * @brief dispBrightness: Changes the brightness of all displays.
- * @params brightness: the brightness value to be set. Lives between 0<b<100
- *
+ * @brief Turn off leds
  */
-void dispBrightness(uint8_t brightness);
+void FRDMLedOff(void);
+
+
+/**
+ * @brief Poll led and pwm
+ */
+void FRDMLedPoll(void);
+
+
+/**
+ * @brief Poll led and pwm
+ */
+bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b);
+
 
 /*******************************************************************************
  ******************************************************************************/
 
-#endif // _DISPLAY_H_
+#endif // _FRDM_H_
