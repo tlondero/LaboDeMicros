@@ -66,8 +66,9 @@ void App_Init (void)
 	gpioWrite(PIN_LED_BLUE,HIGH);
 	gpioMode(PIN_LED_RED, OUTPUT);
 	gpioWrite(PIN_LED_RED,HIGH);
+	pin_t pinVerde= PIN_LED_GREEN;
 	gpioMode(PIN_LED_GREEN, OUTPUT);
-	gpioWrite(PIN_LED_GREEN,HIGH);
+	gpioWrite(PIN_LED_GREEN,LOW);
 	idButton1= ButtonInit(PIN_SW2, INPUT_PULLUP);
 	idButton2= ButtonInit(PIN_SW3, INPUT_PULLUP);
 	ButtonSetIRQ(idButton2, GPIO_IRQ_MODE_RISING_EDGE, blockTime);
