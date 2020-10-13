@@ -53,24 +53,28 @@ static int8_t idLedRed;
 static int8_t idLedBlue;
 static int8_t idLedGreen;
 
-static bool redSate = false;
-static bool greenSate = false;
-static bool blueSate = false;
-
 /*******************************************************************************
  *******************************************************************************
  GLOBAL FUNCTION DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
 
-FRDMButton FRDMInit(uint8_t button) {
-
-	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
-	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
-
-	FRDMLedInit();
-
-
+int8_t getId(uint8_t led) {
+	int8_t ledPort = NONE;
+	switch (led) {
+	case (R):
+		ledPort = idLedRed;
+		break;
+	case (G):
+		ledPort = idLedRed;
+		break;
+	case (B):
+		ledPort = idLedRed;
+		break;
+	default:
+		break;
+	}
+	return ledPort;
 }
 
 void FRDMLedInit() { //(uint8_t brightness, uint32_t fade, uint32_t dt, uint8_t flashes, uint32_t period) {
@@ -114,18 +118,71 @@ void FRDMLedInit() { //(uint8_t brightness, uint32_t fade, uint32_t dt, uint8_t 
 
 }
 
-FRDMButtonEv FRDMButtonGetEv(uint8_t button) {
+void FRDMInit(void) {
+	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
+	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
 
-	if (button == BUTTON_SW2){
-		return *ButtonGetEvent(sw2);
+	FRDMLedInit();
+}
+
+bool FRDMLedConfig(uint8_t led, uint8_t param, uint8_t value) {
+	int8_t ledPort = getId(led);
+	if (ledPort != NONE) {
+		switch (param) {
+		case (BRIGHT):
+			led_configure_brightness(ledPort, value);
+			break;
+		case (FADE):
+			led_configure_fade(ledPort, value);
+			break;
+		case (DT):
+			led_configure_dt(ledPort, value);
+			break;
+		case (FLASHTIME):
+			led_configure_flashes(ledPort, value);
+			break;
+		case (PERIOD):
+			led_configure_period(ledPort, value);
+			break;
+		default:
+			break;
+		}
+		return true;
+	} else {
+		return false;
 	}
-	else if (button == BUTTON_SW3){
-		return *ButtonGetEvent(sw3);
+}
+
+bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback){
+	if ((button == BUTTON_SW2) || (button == BUTTON_SW3)){
+		ButtonSetIRQ(button, IRQ_mode, fcallback);
+		return true;
 	}
 	else{
+		return false;
+	}
+}
+
+bool FRDMLedFlash(uint8_t led) {
+	int8_t ledPort = getId(led);
+	if (ledPort != NONE) {
+		led_flash(ledPort);
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+FRDMButtonEv FRDMButtonGetEv(uint8_t button) {
+	switch (button) {
+	case (BUTTON_SW2):
+		return *ButtonGetEvent(sw2);
+	case (BUTTON_SW3):
+		return *ButtonGetEvent(sw3);
+	default:
 		return NULL;
 	}
-
 }
 
 void FRDMLedColor(uint8_t color) {
@@ -200,10 +257,6 @@ bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void FRDMLedOff(void) {
-	redSate = false;
-	greenSate = false;
-	blueSate = false;
-
 	led_set_state(idLedRed, LOW);
 	led_set_state(idLedBlue, LOW);
 	led_set_state(idLedGreen, LOW);
