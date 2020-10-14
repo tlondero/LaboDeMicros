@@ -29,10 +29,11 @@
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 static uint8_t pan[PAN_LENGHT];
-static uint8_t data[DATA_LENGHT]; //?
+static uint8_t data[DATA_LENGHT]; //
 static bool enable;
 static bool error;
 static bool valid_data;
+
 static bool go = false;
 static bool es_rx = false;	//Flag que se enciende cuando se detecta ES
 static bool lrc_rx = false; //Flag que se enciende cuando se detecta LRC
@@ -42,7 +43,6 @@ static bool ss_rx = false;	//Flag que se enciende cuando se dectecta SS
 static uint8_t bit_counter = 0;
 static uint8_t character = 0;
 static uint8_t char_counter = 0;
-static int counter;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH FILE SCOPE DECLARATION
@@ -91,6 +91,7 @@ static int ya_entre = 0;
 void enableCallback(void) {
 	enable = !gpioRead(CARD_EN_PIN);
 
+#if DEVELOPMENT_MODE
 	if (ya_entre == 0) {
 		int i = 0;
 		for (i = 0; i < LEN(data); i++)
@@ -101,85 +102,88 @@ void enableCallback(void) {
 		int a = -1;
 		ya_entre = 0;
 	}
+#endif
 
 	bit_counter = 0;
 	character = 0;
 	char_counter = 0;
-	es_rx = false;
+	go = false; //Data stream start flag
+	es_rx = false; //
 	lrc_rx = false;
 	ss_rx = false;
 	error = false;
-	go = false;
 }
 
 void clockCallback(void) { // seguro en algun momeno debería buscar los SS, FS y ES
 	bool my_data = !gpioRead(CARD_DATA_PIN); // Read incoming bit_counter
 
-	//Start reading data only if
+	//Begin reading data stream.
 	if (my_data) {
 		go = true;
 	}
 	//Read new character
-	if ((bit_counter < CHAR_LENGHT) && (char_counter < DATA_LENGHT) && (lrc_rx == false) && (go == true)) {
+	if ((bit_counter < CHAR_LENGHT) && (char_counter < DATA_LENGHT)
+			&& (lrc_rx == false) && (go == true)) {
 		character = character | (my_data << bit_counter); //0 0 0 P b3 b2 b1 b0
 	}
+
 	//Si ya terminamos de contar
-	if (bit_counter == (CHAR_LENGHT - 1) && (lrc_rx == false)) {
+	if (bit_counter == (CHAR_LENGHT - 1) && (lrc_rx == false) && (go == true)) {
 		if ((character == SS) && (ss_rx == false)) {
 			ss_rx = true; //START SENTINEL RECEIVED
 		} else if ((character == ES) && (ss_rx == true)) {
 			es_rx = true; //END SENTINEL RECEIVED
 		} else if (es_rx == true) {
 			lrc_rx = true;
-			//Chequeamos si ya terminamos
-			if (data[char_counter - 2] == ES)
-			{
-				//char_counter = 0;
-				if (!checkParity())
-					error = true;
-				else
-					error = false;// all good
-			}
 		}
 		data[char_counter++] = character; //stores the characters in the data buffer
 		character = 0;
 		bit_counter = 0;
 	}
 	//Sino terminamos de contar
-	else if (go == true && (lrc_rx == false)) {
+	else if (go == true && lrc_rx == false) {
 		bit_counter++;
 	}
-}
 
+	if (lrc_rx == true) {
+		//Chequeamos si ya terminamos
+		// TODO: Mover a getPan
+		if (!checkParity())
+			error = true;
+		else
+			error = false;					// all good
+	}
+}
 
 bool checkParity(void) {
-uint8_t i = 0, j;
-uint8_t char_parity = false;
-uint8_t lrc_parity[CHAR_LENGHT] = { 0 };
-bool is_ok = true;
-for (i = 0; i < char_counter; i++) {
-	for (j = 0; j < CHAR_LENGHT; j++) {
-		char_parity ^= ((data[i] & (1 << j)) >> j); //we test the parity of the chars
-		lrc_parity[j] ^= ((data[i] & (1 << j)) >> j);
+	uint8_t i = 0, j;
+	uint8_t char_parity = false;
+	uint8_t lrc_parity[CHAR_LENGHT] = { 0 };
+	bool is_ok = true;
+	for (i = 0; i < char_counter; i++) {
+		for (j = 0; j < CHAR_LENGHT; j++) {
+			char_parity ^= ((data[i] & (1 << j)) >> j); //we test the parity of the chars
+			lrc_parity[j] ^= ((data[i] & (1 << j)) >> j);
+		}
+		if (char_parity == 0) { //if it wasnt ODD parity.
+			error = true;
+			is_ok = false;
+			/*************************
+			 cout << "Parity error detected in character " << (int)i << endl;
+			 *************************/
+		}
+		char_parity = false;
 	}
-	if (char_parity == 0) { //if it wasnt ODD parity.
-		error = true;
-		is_ok &= false;
-		/*************************
-		 cout << "Parity error detected in character " << (int)i << endl;
-		 *************************/
+	for (i = 0; i < CHAR_LENGHT - 1; i++)
+		if (lrc_parity[i] != 1) {
+			is_ok = false;
+			/*************************
+			 cout << "Parity error detected in character " << (int)i << endl;
+			 *************************/
+			error = true;
+		}
+	if (is_ok == true) {
+		valid_data = true;
 	}
-	char_parity = false;
-}
-for (i = 0; i < CHAR_LENGHT - 1; i++)
-	if (lrc_parity[i] != 1) {
-		is_ok &= false;
-		/*************************
-		 cout << "Parity error detected in character " << (int)i << endl;
-		 *************************/
-	}
-if (is_ok == true) {
-	valid_data = true;
-}
-return is_ok;
+	return is_ok;
 }
