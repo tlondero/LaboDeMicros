@@ -138,17 +138,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="app\fsm.cpp" />
+    <ClCompile Include="app\users.cpp" />
     <ClCompile Include="drivers\Card.cpp" />
     <ClCompile Include="drivers\FRDM.cpp" />
     <ClCompile Include="drivers\placaVerde.cpp" />
-    <ClCompile Include="fsm.cpp" />
+    <ClCompile Include="drivers\Timer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="app\fsm.h" />
+    <ClInclude Include="app\users.h" />
     <ClInclude Include="drivers\Card.h" />
     <ClInclude Include="drivers\FRDM.h" />
     <ClInclude Include="drivers\placaVerde.h" />
-    <ClInclude Include="fsm.h" />
+    <ClInclude Include="drivers\Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

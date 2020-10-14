@@ -53,6 +53,7 @@ void PVdispShift(direction_t direction);
  */
 void PVdispClear(void);
 
+
 /**
  * @brief dispBrightness: Changes the brightness of all displays.
  * @params brightness: the brightness value to be set. Lives between 0<b<100
@@ -60,12 +61,48 @@ void PVdispClear(void);
  */
 void PVdispBrightness(uint8_t brightness);
 
+void PVIncreaseBrightness(void);
+void PVDecreaseBrightness(void);
+/*******************************************************************************
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+ ******************************************************************************/
+typedef uint8_t event_t;
+
+typedef struct
+{
+    pin_t pin_A;
+    pin_t pin_B;
+    bool event_flag;
+    event_t event_queue[20];
+    uint8_t in_pointer;
+    uint8_t out_pointer;
+} encoder_state_t;
+
+typedef uint8_t encoder_id;
+/*******************************************************************************
+ * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
+ ******************************************************************************/
+#define HIGH 1
+#define LOW 0
+
+#define EVENT_AVB 1     //New event available
+#define EVENT_NOT_AVB 0 //Nothing new to retrieve
+
+#define LEFT_TURN 0
+#define RIGHT_TURN 1
+#define BUTTON_PRESS 2
+
+ //Add new encoder
+encoder_id PVencoder_register(void);
 //Init encoder driver
 void PVencoder_init(void);
 //Update encoders
-encoder_id PVencoder_register(void);
-//Set max and min
-int8_t PVencoder_pop_event(encoder_id id);
-//Set the current encoder position as a relative zero
-bool PVencoder_is_there_ev(encoder_id id);
-//Get the current count
+void PVencoder_update(void);
+//Reports if there is an event available
+bool PVencoder_event_avb(encoder_id id);
+//Adds a new a event to the queue
+void PVencoder_add_new_event(encoder_id id, event_t ev);
+//Pops the last event in the queue
+event_t PVencoder_pop_event(encoder_id id);
+
+void PVAnimation(bool activated);
