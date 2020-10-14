@@ -9,6 +9,8 @@
 #include "../headers/board.h"
 #include "MK64F12.h"
 #include "hardware.h"
+
+#define PORT_mGPIO 1
 //Clock gating masks
 const static uint32_t SIM_SCGC5_PORT_MASKS[] = {SIM_SCGC5_PORTA_MASK, SIM_SCGC5_PORTB_MASK, SIM_SCGC5_PORTC_MASK, SIM_SCGC5_PORTD_MASK, SIM_SCGC5_PORTE_MASK};
 

@@ -9,12 +9,28 @@
 #define MAX_ENCODERS 5
 #define NO_MORE_ENCODERS 255
 #define DEVELOPMENT_MODE 0
+#define HIGH 1
+#define LOW 0
 
 #define LEN(array) sizeof(array) / sizeof(array[0])
 
 #if DEVELOPMENT_MODE
 #define DEBUG_PIN PIN_B10
 #endif
+
+/*******************************************************************************
+ * STRUCTS AND TYPEDEFS
+ ******************************************************************************/
+typedef struct
+{
+  pin_t pin_A;
+  pin_t pin_B;
+  bool event_flag;
+  event_t event_queue[20];
+  uint8_t in_pointer;
+  uint8_t out_pointer;
+} encoder_state_t;
+
 /*******************************************************************************
  * STATIC VARIABLES
  ******************************************************************************/
@@ -22,11 +38,20 @@ static encoder_state_t encoders[MAX_ENCODERS];
 static uint16_t enconders_cant = 0;
 static tim_id_t encoder_timer_id;
 
+
+/*******************************************************************************
+ * FUNCTION DECLARATIONS
+ ******************************************************************************/
+//Adds a new a event to the queue
+void encoder_add_new_event(encoder_id id, event_t ev);
+//Update encoders
+void encoder_update(void);
+
 /*******************************************************************************
  * FUNCTION DEFINITIONS
  ******************************************************************************/
 
-//Add new encoder
+//Adds new encoder
 encoder_id encoder_register(pin_t pin_A, pin_t pin_B)
 {
 	encoder_id id;
@@ -41,9 +66,9 @@ encoder_id encoder_register(pin_t pin_A, pin_t pin_B)
 	encoders[id].in_pointer = 0;
 	encoders[id].out_pointer = 0;
 
-	gpioMode(pin_A, INPUT_PULLDOWN);
+	gpioMode(pin_A, INPUT_PULLUP);
 	gpioIRQ(pin_A, GPIO_IRQ_MODE_LOW_STATE, encoder_update);
-	gpioMode(pin_B, INPUT_PULLDOWN);
+	gpioMode(pin_B, INPUT_PULLUP);
 
 	return id;
 }
@@ -56,7 +81,7 @@ void encoder_init(void)
 		warm_up_rdy = true;
 		timerInit();
 		encoder_timer_id = timerGetId();
-		timerStart(encoder_timer_id, 60, TIM_MODE_SINGLESHOT, NULL); //
+		timerStart(encoder_timer_id, 60, TIM_MODE_SINGLESHOT, NULL); //Previene rebotes
 
 #if DEVELOPMENT_MODE
 		gpioMode(DEBUG_PIN, OUTPUT);
@@ -81,7 +106,7 @@ void encoder_update(void)
 			{
 				encoder_add_new_event(id, RIGHT_TURN);
 			}
-			else
+			else if(gpioRead(encoders[id].pin_B) == LOW)
 			{
 				encoder_add_new_event(id, LEFT_TURN);
 			}

@@ -85,7 +85,6 @@ __ISR__ FTM0_IRQHandler(void) {
 	uint32_t status;
 	uint8_t i;
 	uint8_t j;
-
 	status = FTM0->STATUS; //Capturo flags de interrupcion de todos los canales
 	FTM0->STATUS = 0;	//Limpio todos los flags
 
@@ -216,7 +215,7 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 			break;
 		}
 
-		FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | 0x0F;//LDOK enable all CH
+		FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | 0xFF;//LDOK enable all CH
 		UserPCR.PCR = false; // seteo en falso por default
 		UserPCR.FIELD.DSE = true; //Drive Streght Enable
 		UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer
@@ -227,7 +226,6 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 		FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
 		FTM_POINTERS[module]->CNT = data.CNT;							//CNT
 		FTM_POINTERS[module]->MOD = data.MODULO;						//MOD
-		FTMX_INIT[module] = 1;
 	}
 
 	/*
@@ -265,7 +263,8 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 								& ~(FTM_CnSC_ELSB_MASK | FTM_CnSC_ELSA_MASK))
 								| (FTM_CnSC_ELSB((data.EPWM_LOGIC >> 1) & 0X01)
 										| FTM_CnSC_ELSA((data.EPWM_LOGIC >> 0) & 0X01));
-		FTM_POINTERS[module]->CONTROLS[channel].CnV = FTM_CnV_VAL(data.CNV);
+		FTMSetCnV(id, data.CNV);
+		//FTM_POINTERS[module]->CONTROLS[channel].CnV = FTM_CnV_VAL(data.CNV);
 		break;
 	default:
 		break;
@@ -281,6 +280,11 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 	CALLBACK_EN[id] = data.useCallback;
 	CALLBACK[id] = data.CALLBACK;
 
+	if (FTMX_INIT[module] == 0) {
+		FTMStartClock(module);
+		FTMX_INIT[module] = 1;
+	}
+
 	return id;
 }
 
@@ -288,6 +292,6 @@ void FTMSetCnV(uint8_t id, uint16_t cnv){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnV = FTM_CnV_VAL(cnv);
 }
 
-void FTMSetPSC(uint8_t id, uint8_t PSC){
+void FTMSetPSC(uint8_t id, uint16_t PSC){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(PSC);
 }

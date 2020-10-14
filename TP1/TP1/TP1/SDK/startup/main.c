@@ -5,7 +5,6 @@
  ******************************************************************************/
 
 #include "hardware.h"
-#include "drivers/headers/PORT.h"
 
 void App_Init (void);
 void App_Run (void);

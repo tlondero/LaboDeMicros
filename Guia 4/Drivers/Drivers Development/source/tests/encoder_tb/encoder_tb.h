@@ -11,5 +11,5 @@
 #include "../drivers/headers/encoder.h"
 void encoder_test_init(void);
 void encoder_test_infinite_count_cc(void);
-
+void do_always(void);
 #endif /* ENCODER_TB_ENCODER_TB_H_ */
