@@ -106,4 +106,6 @@ void FTMSetCnV(uint8_t id, uint16_t cnv);
 
 void FTMSetPSC(uint8_t id, uint16_t PSC);
 
+void FTMSetMOD(uint8_t id, uint16_t MOD);
+
 #endif /* FTM_H_ */

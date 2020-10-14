@@ -52,6 +52,7 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 	double ftm_clk = (double) FTM_CLK;
 	FTM_DATA data;
 	if (id != PWM_NO_SPACE) {
+		INITIALIZED_PWMS[id] = 1;
 		PWMS[id].pin = pin;
 		PWMS[id].pwm_id = id;
 		PWMS[id].logic = initial_state;
@@ -70,7 +71,8 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 		 * Period = MOD - CNTIN + 1
 		 * CNTIN = 0 -> Period = MOD + 1
 		 */
-		data.MODULO = (uint16_t) ((period/PSC2DIV(data.PSC)) * ftm_clk - 1);
+		PWMS[id].period = period;
+		data.MODULO = (uint16_t) ((PWMS[id].period/PSC2DIV(data.PSC)) * ftm_clk - 1);
 		data.CNTIN = 0;
 
 		if (initial_state) {
@@ -79,14 +81,14 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 			 * DT = CNV - CNTIN
 			 * CNTIN = 0 -> DT = CNV
 			 */
-			data.CNV = (uint16_t) (round((period/PSC2DIV(data.PSC)) * dt * ftm_clk));
+			data.CNV = (uint16_t) (round((PWMS[id].period/PSC2DIV(data.PSC)) * dt * ftm_clk));
 		} else {
 			data.EPWM_LOGIC = FTM_lAssertedLow;
 			/*
 			 * DT = CNV - CNTIN
 			 * CNTIN = 0 -> DT = CNV
 			 */
-			data.CNV = (uint16_t) (round((period/PSC2DIV(data.PSC)) * (1 - dt)) * ftm_clk);
+			data.CNV = (uint16_t) (round((PWMS[id].period/PSC2DIV(data.PSC)) * (1 - dt)) * ftm_clk);
 		}
 		PWMS[id].cnv = data.CNV;
 		PWMS[id].ftm_id = FTMInit(pin, data);
@@ -100,10 +102,12 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 
 void PWMDestroySignal(uint8_t pwm_id, uint8_t final_state) {
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
-		if (PWMS[pwm_id].queried) {
-			PWMStopSignal(pwm_id, final_state);
+		if(INITIALIZED_PWMS[pwm_id] == 1){
+			if (PWMS[pwm_id].queried) {
+				PWMStopSignal(pwm_id, final_state);
+			}
+			INITIALIZED_PWMS[pwm_id] = 0;
 		}
-		INITIALIZED_PWMS[pwm_id] = 0;
 	}
 }
 
@@ -122,17 +126,18 @@ void PWMStopSignal(int8_t pwm_id, uint8_t final_state) {
 			PWMS[pwm_id].queried = 0;
 			if (PWMS[pwm_id].logic) {
 				if (final_state) {
-					FTMSetCnV(PWMS[pwm_id].ftm_id, 0xFFFF);
+					PWMS[pwm_id].cnv = 0xFFFF;
 				} else {
-					FTMSetCnV(PWMS[pwm_id].ftm_id, 0x0000);
+					PWMS[pwm_id].cnv = 0x0000;
 				}
 			} else {
 				if (final_state) {
-					FTMSetCnV(PWMS[pwm_id].ftm_id, 0x0000);
+					PWMS[pwm_id].cnv = 0x0000;
 				} else {
-					FTMSetCnV(PWMS[pwm_id].ftm_id, 0xFFFF);
+					PWMS[pwm_id].cnv = 0xFFFF;
 				}
 			}
+			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
 		}
 	}
 }
@@ -150,16 +155,16 @@ uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq){
 		 * CNTIN = 0 -> Period = MOD + 1
 		 */
 		PWMS[pwm_id].period = new_period;
-		FTMSetMOD((uint16_t)((PWMS[pwm_id].period/PSC2DIV(new_PSC)) * ftm_clk - 1));
+		FTMSetMOD(PWMS[pwm_id].ftm_id, (uint16_t)((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * ftm_clk - 1));
 		/*
 		 * DT = CNV - CNTIN
 		 * CNTIN = 0 -> DT = CNV
 		 */
 		if (PWMS[pwm_id].logic) {
-			PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(new_PSC)) * PWMS[pwm_id].dt * ftm_clk));
+			PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * PWMS[pwm_id].dt * ftm_clk));
 		}
 		else {
-			PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(new_PSC)) * (1.0-PWMS[pwm_id].dt) * ftm_clk));
+			PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * (1.0-PWMS[pwm_id].dt) * ftm_clk));
 		}
 		FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
 		return 1;

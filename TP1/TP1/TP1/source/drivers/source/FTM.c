@@ -75,7 +75,7 @@ static const uint8_t MODULE3_ID_END = 29;
 PCRstr UserPCR;
 static uint8_t FTMX_INIT[4];
 static void (*CALLBACK[FTM_PIN_CANT])(void);
-static CALLBACK_EN[FTM_PIN_CANT];
+static uint8_t CALLBACK_EN[FTM_PIN_CANT];
 static const uint32_t STATUS_CHF[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20,
 		0x40, 0x80 };
 static FTM_Type * const FTM_POINTERS[4] = { FTM0, FTM1, FTM2, FTM3 };
@@ -221,18 +221,17 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 		UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer
 		UserPCR.FIELD.IRQC = PORT_eDisabled; //desactivo las interrupciones
 		PORT_Configure2(port_ptr, num, UserPCR);
-		FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
-		FTM_POINTERS[module]->SC = (FTM_POINTERS[module]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(data.PSC);
-		FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
-		FTM_POINTERS[module]->CNT = data.CNT;							//CNT
-		FTM_POINTERS[module]->MOD = data.MODULO;						//MOD
 	}
 
 	/*
 	 * INICIALIZACION POR CANAL
 	 */
 
-
+	FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
+	FTM_POINTERS[module]->SC = (FTM_POINTERS[module]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(data.PSC);
+	FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
+	FTM_POINTERS[module]->CNT = data.CNT;							//CNT
+	FTM_POINTERS[module]->MOD = data.MODULO;						//MOD
 
 	//SET MSB:A EN OUTPUT COMPARE
 	FTM_POINTERS[module]->CONTROLS[channel].CnSC = (FTM_POINTERS[module]->CONTROLS[channel].CnSC
@@ -294,4 +293,8 @@ void FTMSetCnV(uint8_t id, uint16_t cnv){
 
 void FTMSetPSC(uint8_t id, uint16_t PSC){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(PSC);
+}
+
+void FTMSetMOD(uint8_t id, uint16_t MOD){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->MOD = MOD;
 }
