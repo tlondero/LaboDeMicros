@@ -189,17 +189,6 @@ bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback){
 	}
 }
 
-bool FRDMLedFlash(uint8_t led) {
-	int8_t ledPort = getId(led);
-	if (ledPort != NONE) {
-		led_flash(ledPort);
-		return true;
-	}
-	else{
-		return false;
-	}
-}
-
 FRDMButtonEv FRDMButtonGetEv(uint8_t button) {
 	switch (button) {
 	case (BUTTON_SW2):

@@ -87,10 +87,6 @@ void FRDMLedPoll(void);
  */
 bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b);
 
-/**
- * @brief Poll led and pwm
- */
-bool FRDMLedFlash(uint8_t port);
 
 
 /**

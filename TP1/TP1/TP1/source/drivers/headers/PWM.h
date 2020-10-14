@@ -17,9 +17,8 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
-#define MAX_PWMS 16
-#define UNAVAILABLE_SPACE -1
-#define DEVELOPMENT_MODE 1
+#define PWM_NO_SPACE -1
+#define PWM_BAD_OP 0
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
@@ -40,7 +39,7 @@
  * @initial_state the initial state of the signal.
  * @returns pwm_id the id of the initialized pwm.
  */
-int8_t PWMInitSignal(pin_t pin, double freq, double dt, uint8_t initial_state);
+int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state);
 /**
  * @brief Resumes a stopped PWM signal.
  * @param pwm_id pwm id given by init_pwm
@@ -62,26 +61,34 @@ void PWMDestroySignal(uint8_t pwm_id, uint8_t final_state);
  * @brief Sets a new frecuency
  * @param pwm_id the id of the pwm signal
  * @new_freq the new frecuency
+ * @returns BAD_OP when the operation could not be satisfied
+ * else returns 1.
  */
-void PWMSetFrequency(uint8_t pwm_id, double new_freq);
+uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq);
 /**
  * @brief Sets a new duty cycle
  * @param pwm_id the id of the pwm signal
  * @param new_dt the new duty cycle
+ * @returns BAD_OP when the operation could not be satisfied
+ * else returns 1.
  */
-void PWMSetDT(uint8_t pwm_id, double new_dt);
+uint8_t PWMSetDT(uint8_t pwm_id, double new_dt);
 /**
  * @brief increments the duty cycle of the signal by a certain quantity
  * @param pwm_id the id of the pwm signal
  * @param deltaDT the increment quantity
+ * @returns BAD_OP when the operation could not be satisfied
+ * else returns 1.
  */
-void PWMIncrementDT(uint8_t pwm_id, double deltaDT);	//TODO
+uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT);	//TODO
 /**
  * @brief decrements the duty cycle of the signal by a certain quantity
  * @param pwm_id the id of the pwm signal
- *  * @param deltaDT the decrement quantity
+ * @param deltaDT the decrement quantity
+ * @returns BAD_OP when the operation could not be satisfied
+ * else returns 1.
  */
-void PWMDecrementDT(uint8_t pwm_id, double deltaDT);	//TODO
+uint8_t PWMDecrementDT(uint8_t pwm_id, double deltaDT);	//TODO
 
 
 /*******************************************************************************
