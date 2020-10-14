@@ -33,6 +33,8 @@
 
 enum { RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS };
 
+enum {R, G, B, NONE};
+
 typedef uint8_t FRDMButton;
 typedef uint8_t FRDMButtonEv;
 
@@ -46,11 +48,9 @@ typedef uint8_t FRDMButtonEv;
  ******************************************************************************/
 
 /**
- * @brief Inits FDRM Buttons
- * @param Recieves which button is going to be used (SW2 or SW3)
+ * @brief Init Buttons and Leds
  */
-FRDMButton FRDMButtonInit(uint8_t button);
-
+void FRDMInit(void);
 
 /**
  * @brief Returns the event of the button
@@ -58,19 +58,17 @@ FRDMButton FRDMButtonInit(uint8_t button);
  */
 FRDMButtonEv FRDMButtonGetEv(uint8_t button);
 
-
-/**
- * @brief Init Led
- */ 
-void FRDMLedInit(void);
-
-
 /**
  * @brief Turns on led
  * @param Color
  */ 
 void FRDMLedColor(uint8_t color);
 
+/**
+ * @brief Turns on led
+ * @param Color
+ */
+bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback);
 
 /**
  * @brief Turn off leds
@@ -89,6 +87,20 @@ void FRDMLedPoll(void);
  */
 bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b);
 
+/**
+ * @brief Poll led and pwm
+ */
+bool FRDMLedFlash(uint8_t port);
+
+
+/**
+ * @brief Poll led and pwm
+ */
+bool FRDMLedBright(uint8_t led, uint8_t value);
+bool FRDMLedFade(uint8_t led, uint8_t value);
+bool FRDMLedDt(uint8_t led, uint8_t value);
+bool FRDMLedFlash(uint8_t led, uint8_t value);
+bool FRDMLedPeriod(uint8_t led, uint8_t value);
 
 /*******************************************************************************
  ******************************************************************************/
