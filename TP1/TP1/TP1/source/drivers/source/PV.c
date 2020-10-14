@@ -98,7 +98,10 @@ PVEv PVGetEv(void) {
 			return NO_PV_EV;
 		}
 	}
+}
 
+void PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) {
+	ButtonSetIRQ(button, IRQ_mode, fcallback);
 }
 
 void PVDisplayClear(void) {
@@ -118,7 +121,7 @@ bool PVDisplaySetBright(uint8_t br) {
 	return valid;
 }
 
-bool PVDisplayIncBright(void) {
+bool PVIncreaseBrightness(void) {
 	bool topValue = false;
 	brightness += 20;
 	if (brightness >= 100) {
@@ -129,7 +132,7 @@ bool PVDisplayIncBright(void) {
 	return topValue;
 }
 
-bool PVDisplayDecBright(void) {
+bool PVDecreaseBrightness(void) {
 	bool bottomValue = false;
 	brightness -= 20;
 	if (brightness <= 0) {
