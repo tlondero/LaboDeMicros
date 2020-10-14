@@ -12,49 +12,26 @@
 #include "gpio.h"
 
 /*******************************************************************************
- * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
- ******************************************************************************/
-#define HIGH 1
-#define LOW 0
-
-#define FINITE 1
-#define INFINITE 0
-
-#define CLOCKWISE 1
-#define COUNTER_CLOCKWISE 0
-
-/*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-typedef struct
-{
-  pin_t pin_A;
-  pin_t pin_B;
-  int16_t max;
-  int16_t min;
-  int16_t count;
-  uint8_t current_state_A : 1;
-  uint8_t finite_count : 1; // Allow Inifinte
-  uint8_t current_state_B : 1;
-  uint8_t prev_state_A : 1;
-  uint8_t prev_state_B : 1;
-  uint8_t clockwise : 1; //Increase counter in the clockwise direction
-  uint8_t unused : 1;
+typedef uint8_t event_t;
+typedef uint8_t encoder_id;
 
-} encoder_state_t;
+/*******************************************************************************
+ * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
+ ******************************************************************************/
+#define EVENT_AVB 1     //New event available
+#define EVENT_NOT_AVB 0 //Nothing new to retrieve
 
-typedef uint_fast8_t encoder_id;
+//EVENTS
+#define LEFT_TURN 0
+#define RIGHT_TURN 1
 
-//Init encoder driver
-void encoder_init(void);
-//Update encoders
-void encoder_update(void);
 //Add new encoder
 encoder_id encoder_register(pin_t pin_A, pin_t pin_B);
-//Set max and min
-void encoder_set_maxmin(encoder_id id, int16_t min, int16_t max);
-//Set the current encoder position as a relative zero
-void encoder_reset_cnt(encoder_id id);
-//Get the current count
-uint32_t encoder_get_count(encoder_id id);
-
+//Init encoder driver
+void encoder_init(void);
+//Reports if there is an event available
+bool encoder_event_avb(encoder_id id);
+//Pops the last event in the queue
+event_t encoder_pop_event(encoder_id id);
