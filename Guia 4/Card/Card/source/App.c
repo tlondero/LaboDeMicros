@@ -62,6 +62,7 @@ void App_Init (void)
 
 void App_Run (void)
 {
+
 	uint8_t *dato = cardGetPAN();
 	if(dato != NULL){
 		int i = 0;
