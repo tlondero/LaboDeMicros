@@ -53,9 +53,10 @@ void dispSendMsg(Message_t msg);
  * @brief dispSendChar: sends to the selected 7 seg the character:
  * @param ch : character to be sent coded in ascii.
  * seven_seg_module: numer of seven segment, it ranges from 0 to 3
+ * @return bool, false if any paramter was invalid
  *
  */
-void dispSendChar(char ch, uint8_t seven_seg_module);
+bool dispSendChar(char ch, uint8_t seven_seg_module);
 
 
 /**
@@ -65,10 +66,10 @@ void dispSendChar(char ch, uint8_t seven_seg_module);
 void dispShift(direction_t direction);
 
 /**
- * @brief dispClearAll: Clears ALL the display, pretty self explanatory.
+ * @brief dispClear: Clears the display, pretty self explanatory.
  *
  */
-void dispClearAll(void);
+void dispClear(void);
 
 /**
  * @brief dispBrightness: Changes the brightness of all displays.

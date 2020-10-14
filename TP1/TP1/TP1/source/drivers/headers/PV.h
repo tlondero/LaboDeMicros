@@ -1,11 +1,11 @@
-/***************************************************************************/ /**
-  @file     FRDM.h
-  @brief    
-  @author   MAGT
+/***************************************************************************//**
+ @file     PV.h
+ @brief
+ @author   MAGT
  ******************************************************************************/
 
-#ifndef _FRDM_H_
-#define _FRDM_H_
+#ifndef _PV_H_
+#define _PV_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
@@ -18,87 +18,68 @@
 
 #include "led.h"
 #include "Button.h"
-#include "gpio.h"
+#include "encoder.h"
+#include "Display.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define		BUTTON_SW2		PORTNUM2PIN(PC,6)
-#define		BUTTON_SW3		PORTNUM2PIN(PA,4)
+enum {
+	ENC_RIGHT, ENC_LEFT, BTN_PRESS, BTN_RELEASE, BTN_LKP, BTN_SKP, NO_PV_EV
+};
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
-enum { RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS };
+typedef uint8_t PVEv;
 
-enum {R, G, B, NO_LED};
-
-typedef uint8_t FRDMButton;
-typedef uint8_t FRDMButtonEv;
+typedef uint8_t PVButton;
+typedef encoder_id PVEncoder;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
 /**
- * @brief Init Buttons and Leds
+ * @brief Init Buttons, Leds, Encoder and Display
  */
-void FRDMInit(void);
-
-/**
- * @brief Returns the event of the button
- * @param 
- */
-FRDMButtonEv FRDMButtonGetEv(uint8_t button);
-
-/**
- * @brief Turns on led
- * @param Color
- */ 
-void FRDMLedColor(uint8_t color);
-
-/**
- * @brief Turns on led
- * @param Color
- */
-bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback);
-
-/**
- * @brief Turn off leds
- */
-void FRDMLedOff(void);
+void PVInit(void);
 
 
 /**
- * @brief Poll led and pwm
+ * @brief Get encoder or button event
  */
-void FRDMLedPoll(void);
+PVEv PVGetEv(void);
 
 
 /**
- * @brief Poll led and pwm
+ * @brief Clear display
  */
-bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b);
-
-
+void PVDisplayClear(void);
 
 /**
- * @brief Poll led and pwm
+ * @brief Set brightness
  */
-bool FRDMLedBright(uint8_t led, uint8_t value);
-bool FRDMLedFade(uint8_t led, uint8_t value);
-bool FRDMLedDt(uint8_t led, uint8_t value);
-bool FRDMLedFlash(uint8_t led, uint8_t value);
-bool FRDMLedPeriod(uint8_t led, uint8_t value);
+bool PVDisplaySetBright(uint8_t brightness);
+
+/**
+ * @brief Increase brightness
+ */
+bool PVDisplayIncBright(void);
+
+/**
+ * @brief Decrease brightness
+ */
+bool PVDisplayDecBright(void);
+
 
 /*******************************************************************************
  ******************************************************************************/
 
-#endif // _FRDM_H_
+#endif // _PV_H_

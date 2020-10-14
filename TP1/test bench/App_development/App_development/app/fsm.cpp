@@ -15,8 +15,13 @@
    * VARIABLE PROTOTYPES WITH FILE SCOPE
    ******************************************************************************/
 static tim_id_t inactivity_timer_id;
+static tim_id_t open_timer_id;
+
 static encoder_id my_encoder_id;
+
 static bool inactivity_triggered;
+static bool open_triggered;
+
 static state prev_state = IDDLE;
    /*******************************************************************************
 	* FUNCTION PROTOTYPES WITH FILE SCOPE
@@ -68,9 +73,12 @@ void inactivityCallback(void);
 
 state FSMInitState(void) {
     inactivity_timer_id = timerGetId();
+    open_timer_id = timerGetId();
     my_encoder_id = PVencoder_register();
     timerStart(inactivity_timer_id, TIMER_MS2TICKS(INACTIVITY_TRIGGER_TIME), TIM_MODE_SINGLESHOT, inactivityCallback);
     timerStop(inactivity_timer_id);
+    timerStart(open_timer_id, TIMER_MS2TICKS(OPEN_TRIGGER_TIME), TIM_MODE_SINGLESHOT, openCallback);
+    timerStop(open_timer_id);
     return IDDLE;
 }
 
@@ -119,7 +127,16 @@ state accessRoutine(void) {
     return updated_state;
 }
 state openRoutine(void) {
-    state updated_state = IDDLE;
+    state updated_state = OPEN;
+    if (prev_state != OPEN) {
+        timerReset(open_timer_id);
+        timerResume(open_timer_id);
+        PVAnimation(true);
+    }
+    if (open_triggered) {
+        PVAnimation(false);
+        updated_state = IDDLE;
+    }
     return updated_state;
 }
 state usersRoutine(void) {
@@ -131,14 +148,34 @@ state brightnessRoutine(void){
     //Si entré aca , el estado actual es brightness
     //por lo que si el estado previo es distinto de brightenss 
     //es la primera vez que entro, por lo que debo iniciar el timer de timout
+
+
+
+    //Aca debería mandar al display la palabra acorde a BRIGHTNESS para ver como cambia
+    PVdispSendChar(BRIGHTNESS_MSG[3], 3);
+    PVdispSendChar(BRIGHTNESS_MSG[2], 2);
+    PVdispSendChar(BRIGHTNESS_MSG[1], 1);
+    PVdispSendChar(BRIGHTNESS_MSG[0], 0);
+
+
+
     if (prev_state != BRIGHTNESS) {
         timerReset(inactivity_timer_id);
         timerResume(inactivity_timer_id);
     }
-    if (PVencoder_is_there_ev(my_encoder_id)) {
+    if (PVencoder_event_avb(my_encoder_id)) {
         timerReset(inactivity_timer_id);
         timerResume(inactivity_timer_id);
-        if(PVencoder_pop_event(my_encoder_id) == )
+        event_t ev = PVencoder_pop_event(my_encoder_id);
+        if (ev == LEFT_TURN) {
+            PVDecreaseBrightness();
+        }
+        else if (ev == RIGHT_TURN) {
+            PVIncreaseBrightness();
+        }
+        else if (ev == BUTTON_PRESS) {
+            updated_state = ACCESS;
+        }
     }
 
     if (inactivity_triggered) {
@@ -152,4 +189,8 @@ state brightnessRoutine(void){
  ******************************************************************************/
 void inactivityCallback(void) {
     inactivity_triggered = true;
+}
+
+void openCallback(void) {
+    open_triggered = true;
 }
