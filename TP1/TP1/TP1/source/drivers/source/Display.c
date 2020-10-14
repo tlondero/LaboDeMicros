@@ -17,14 +17,14 @@
  7-SEGMENT DISPLAY PIN NAMING CONVENTION
 
  | |||||||A||||||| |
- | |				| |
- |F|				|B|
- | |				| |
+ | |			 | |
+ |F|			 |B|
+ | |			 | |
  | |||||||G||||||| |
- | |				| |
- |E|				|C|
- | |				| |
- | |||||||D||||||| |   |DP|
+ | |			 | |
+ |E|			 |C|
+ | |			 | |
+ | |||||||D||||||| | |DP|
 
  ***********************/
 
@@ -41,7 +41,7 @@
 
 #define SEVEN_SEGMENTS_PINS 8
 const uint8_t PINES[SEVEN_SEGMENTS_PINS] = { PIN_A, PIN_B, PIN_C, PIN_D, PIN_E,
-		PIN_F, PIN_G, PIN_DOT };
+PIN_F, PIN_G, PIN_DOT };
 
 typedef struct {
 	char name;
@@ -51,16 +51,43 @@ typedef struct {
 //PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
 
 const static character_t characters[] = {
-
-{ '0', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW } }, { '1', { LOW, HIGH,
-		HIGH, LOW, LOW, LOW, LOW, LOW } }, { '2', { HIGH, HIGH, LOW, HIGH, HIGH,
-		LOW, HIGH, LOW } }, { '3',
-		{ HIGH, HIGH, HIGH, HIGH, LOW, LOW, HIGH, LOW } }, { '4', { LOW, HIGH,
-		HIGH, LOW, LOW, HIGH, HIGH, LOW } }, { '5', { HIGH, LOW, HIGH, HIGH,
-		LOW, HIGH, HIGH, LOW } }, { '6', { HIGH, LOW, HIGH, HIGH, HIGH, HIGH,
-		HIGH, LOW } }, { '7', { HIGH, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW } }, {
-		'8', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW } }, { '9', { HIGH,
-		HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW } } };
+		{'0', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+		{'1', { LOW, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW} },
+		{'2', { HIGH, HIGH, LOW, HIGH, HIGH, LOW, HIGH, LOW} },
+		{'3', { HIGH, HIGH, HIGH, HIGH, LOW, LOW, HIGH, LOW} },
+		{'4', { LOW, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
+		{'5', { HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+		{'6', { HIGH, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+		{'7', { HIGH, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW} },
+		{'8', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+		{'9', { HIGH, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+		{'A', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'B', {LOW, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH}},
+        {'C', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
+        {'D', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, HIGH, LOW} },
+        {'E', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, HIGH, LOW} },
+        {'F', {HIGH, LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'G', {HIGH, LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+        {'H', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'I', {LOW, LOW, LOW, LOW, HIGH, HIGH, LOW, LOW} },
+        {'J', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW, LOW} },
+        {'K', {LOW, LOW, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'L', {LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
+        {'M', {HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW, LOW} },
+        {'N', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW, LOW} },
+        {'O', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+        {'P', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'Q', {HIGH, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
+        {'R', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'S', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+        {'T', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+        {'U', {LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+        {'V', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, LOW, LOW} },
+        {'W', {LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW} },
+        {'X', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+        {'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} }
+};
 
 typedef struct {
 	bool enable;
@@ -68,23 +95,9 @@ typedef struct {
 } letter;
 
 static letter displays[4] = { { false, '0' }, { false, '0' }, { false, '0' }, {
-		false, '0' } };
+false, '0' } };
 
 #define MAX_CHARACTERS sizeof(characters)/sizeof(character_t)
-/******************
- 7-SEGMENT DISPLAY PIN NAMING CONVENTION
-
- | |||||||A||||||| |
- | |				| |
- |F|				|B|
- | |				| |
- | |||||||G||||||| |
- | |				| |
- |E|				|C|
- | |				| |
- | |||||||D||||||| |   |DP|
-
- ***********************/
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -128,7 +141,8 @@ void dispInit(void) {
 	gpioWrite(SEL_LINE_B, LOW);
 	timerInit();
 	timer_id = timerGetId();
-	timerStart(timer_id,TIMER_MS2TICKS(5),TIM_MODE_PERIODIC,multiplexDiplayCallback);
+	timerStart(timer_id, TIMER_MS2TICKS(5), TIM_MODE_PERIODIC,
+			multiplexDiplayCallback);
 	//Cada 15 ms se multiplexea el display ~ cada uno aprox 50fps
 
 }
@@ -194,17 +208,17 @@ void dispClearAll(void) {
 
 void dispSendChar(char ch, uint8_t seven_seg_module) {
 
-	if(seven_seg_module < 4){
+	if (seven_seg_module < 4) {
 		displays[seven_seg_module].enable = true;
-		displays[seven_seg_module].ch =  ch;
+		displays[seven_seg_module].ch = ch;
 	}
 }
 
 void multiplexDiplayCallback(void) {
-	uint8_t i=0;
-		if (displays[i%4].enable){
-			dispSelect(i%4);
-			dispSetChar(displays[(i++)%4].ch);
-		}
+	uint8_t i = 0;
+	if (displays[i % 4].enable) {
+		dispSelect(i % 4);
+		dispSetChar(displays[(i++) % 4].ch);
+	}
 
 }
