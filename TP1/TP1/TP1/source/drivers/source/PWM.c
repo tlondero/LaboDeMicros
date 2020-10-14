@@ -91,6 +91,7 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 			data.CNV = (uint16_t) (round((PWMS[id].period/PSC2DIV(data.PSC)) * (1 - dt)) * ftm_clk);
 		}
 		PWMS[id].cnv = data.CNV;
+		PWMS[id].dt = dt;
 		PWMS[id].ftm_id = FTMInit(pin, data);
 		if (PWMS[id].ftm_id == -1) {
 			INITIALIZED_PWMS[id] = 0;
