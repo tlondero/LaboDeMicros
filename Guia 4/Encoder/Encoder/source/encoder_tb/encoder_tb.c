@@ -21,12 +21,10 @@ static bool warm_up = false;
 static tim_id_t id_led;
 static encoder_id id_encoder;
 
-static uint32_t new_ticks = 0;
+static uint32_t new_ticks = 1;
 void blink_led(void){
 	gpioToggle(PIN_LED_RED);
 	gpioToggle(DEBUG_PIN);
-
-
 }
 
 void do_always(void){
@@ -39,7 +37,7 @@ void do_always(void){
 			if(new_ticks>1)
 				new_ticks--;
 		}
-		timerChangePeriod(id_led, new_ticks*50);
+		timerChangePeriod(id_led, new_ticks*15);
 	}
 
 }
@@ -56,7 +54,7 @@ void encoder_test_infinite_count_cc(void){
 		gpioWrite(DEBUG_PIN, LOW);
 		gpioWrite(PIN_LED_RED, LOW);
 		id_led = timerGetId();
-		timerStart(id_led, 1, TIM_MODE_PERIODIC, blink_led);
+		timerStart(id_led, 15, TIM_MODE_PERIODIC, blink_led);
 	}
 }
 
