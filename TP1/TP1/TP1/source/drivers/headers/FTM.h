@@ -20,7 +20,7 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
-
+#define FTM_CLK 50000000U
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -81,6 +81,7 @@ typedef struct{
 	uint16_t CNTIN;
 	uint16_t CNV;
 
+	uint8_t useCallback;
 	void (*CALLBACK)(void);
 
 }FTM_DATA;
@@ -101,5 +102,8 @@ void FTMStopClock(uint8_t module);
 //Starts the FTM clock
 void FTMStartClock(uint8_t module);
 
+void FTMSetCnV(uint8_t id, uint16_t cnv);
+
+void FTMSetPSC(uint8_t id, uint16_t PSC);
 
 #endif /* FTM_H_ */

@@ -75,6 +75,7 @@ static const uint8_t MODULE3_ID_END = 29;
 PCRstr UserPCR;
 static uint8_t FTMX_INIT[4];
 static void (*CALLBACK[FTM_PIN_CANT])(void);
+static CALLBACK_EN[FTM_PIN_CANT];
 static const uint32_t STATUS_CHF[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20,
 		0x40, 0x80 };
 static FTM_Type * const FTM_POINTERS[4] = { FTM0, FTM1, FTM2, FTM3 };
@@ -91,7 +92,7 @@ __ISR__ FTM0_IRQHandler(void) {
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 		if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 			for(j = MODULE0_ID_START; j < MODULE0_ID_END+1; j++){
-				if((FTM_PINOUT[j].MODULE == 0) && (FTM_PINOUT[j].CHANNEL == i)){
+				if((CALLBACK_EN[FTM_PINOUT[j].ID]) && (FTM_PINOUT[j].MODULE == 0) && (FTM_PINOUT[j].CHANNEL == i)){
 					CALLBACK[FTM_PINOUT[j].ID]();	//Llamo su callback guardado
 				}
 			}
@@ -110,7 +111,7 @@ __ISR__ FTM1_IRQHandler(void) {
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 				for(j = MODULE1_ID_START; j < MODULE1_ID_END+1; j++){
-					if((FTM_PINOUT[j].MODULE == 1) && (FTM_PINOUT[j].CHANNEL == i)){
+					if((CALLBACK_EN[FTM_PINOUT[j].ID]) && (FTM_PINOUT[j].MODULE == 1) && (FTM_PINOUT[j].CHANNEL == i)){
 						CALLBACK[FTM_PINOUT[j].ID]();	//Llamo su callback guardado
 					}
 				}
@@ -128,7 +129,7 @@ __ISR__ FTM2_IRQHandler(void) {
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 				for(j = MODULE2_ID_START; j < MODULE2_ID_END+1; j++){
-					if((FTM_PINOUT[j].MODULE == 2) && (FTM_PINOUT[j].CHANNEL == i)){
+					if((CALLBACK_EN[FTM_PINOUT[j].ID]) && (FTM_PINOUT[j].MODULE == 2) && (FTM_PINOUT[j].CHANNEL == i)){
 						CALLBACK[FTM_PINOUT[j].ID]();	//Llamo su callback guardado
 					}
 				}
@@ -146,7 +147,7 @@ __ISR__ FTM3_IRQHandler(void) {
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 				for(j = MODULE3_ID_START; j < MODULE3_ID_END+1; j++){
-					if((FTM_PINOUT[j].MODULE == 3) && (FTM_PINOUT[j].CHANNEL == i)){
+					if((CALLBACK_EN[FTM_PINOUT[j].ID]) && (FTM_PINOUT[j].MODULE == 3) && (FTM_PINOUT[j].CHANNEL == i)){
 						CALLBACK[FTM_PINOUT[j].ID]();	//Llamo su callback guardado
 					}
 				}
@@ -277,7 +278,16 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 	 * GUARDO EL CALLBACK PROVISTO
 	 */
 
+	CALLBACK_EN[id] = data.useCallback;
 	CALLBACK[id] = data.CALLBACK;
 
 	return id;
+}
+
+void FTMSetCnV(uint8_t id, uint16_t cnv){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnV = FTM_CnV_VAL(cnv);
+}
+
+void FTMSetPSC(uint8_t id, uint8_t PSC){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(PSC);
 }
