@@ -64,6 +64,11 @@ PVEv PVGetEv(void);
 void PVDisplayClear(void);
 
 /**
+ * @brief Sets button IQR
+ */
+void PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) ;
+
+/**
  * @brief Set brightness
  */
 bool PVDisplaySetBright(uint8_t brightness);
@@ -71,12 +76,12 @@ bool PVDisplaySetBright(uint8_t brightness);
 /**
  * @brief Increase brightness
  */
-bool PVDisplayIncBright(void);
+bool PVIncreaseBrightness(void);
 
 /**
  * @brief Decrease brightness
  */
-bool PVDisplayDecBright(void);
+bool PVDecreaseBrightness(void);
 
 
 /*******************************************************************************

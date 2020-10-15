@@ -52,12 +52,12 @@ uint8_t brightDown(uint8_t b) {
 }
 
 
-void PV_tb_Init (void) {
+void App_Init (void) {
 	FRDMInit();
 	PVInit();
 }
 
-void PV_tb_Run(void) {
+void App_Run(void) {
 
 	int8_t bright = 20;
 
