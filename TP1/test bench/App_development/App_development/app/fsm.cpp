@@ -318,7 +318,7 @@ uint32_t transformToNum(uint8_t* data, uint8_t count) {
     for (i = 0; i < count; i++) {
         aux = 0;
         for (j = 0; j < i; j++){
-            aux += data[i] * 10;
+            aux += data[count-1-i] * 10;
         }
         ret += aux;
     }

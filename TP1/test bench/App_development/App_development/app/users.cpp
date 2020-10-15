@@ -35,20 +35,26 @@ void initUsers(void) {
 void addUser(user_t new_user) {
     //tengo que ver si existe ese id y si tengo espacio en el buffer, si existe lo que hace es cambiarle la password, si no tengo espacio no hago nada
     uint8_t i = 0;
-    while ((new_user.id != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
-        // está medio mal, tenes que fijarte si encontrás el usuario y esta disponible y si no está busco un lugar dispobible nomas
+    while ((new_user.id != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
-    if ((new_user.id == users[i].id) || (users[i].available == false)) {
-        users[i] = new_user;
-        //si lo encontré le cambio la contraseña
-        // y lo desbloquea si estaba bloqueado
-        //por otor lado Si nunca fue ocupado se registra un nuevo usuario
+    if (new_user.id == users[i].id) {
+        users[i] = new_user;   //si lo encontré le cambio la contraseña
+    }
+    else {
+        i = 0;
+        while ((users[i].available != false) && (i < MAX_USERS)) {
+            i++;        //busco un usuario disponible (avalable = false)
+        }
+        if (users[i].available == false) {
+            users[i] = new_user;        //por otor lado Si nunca fue ocupado se registra un nuevo usuario
+        }
+
     }
 }
 void deleteUser(uint32_t userID) {
     uint8_t i = 0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if (users[i].id == userID) {
@@ -57,7 +63,7 @@ void deleteUser(uint32_t userID) {
 }
 void addStrike(uint32_t userID) {
     uint8_t i=0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if (users[i].id == userID) {
@@ -76,7 +82,7 @@ void clearStrikes(void) {
 bool getAdminStatus(uint32_t userID) {
     bool ret=false;
     uint8_t i = 0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if (users[i].id == userID) {
@@ -87,7 +93,7 @@ bool getAdminStatus(uint32_t userID) {
 bool getBlockedStatus(uint32_t userID) {
     bool ret = false;
     uint8_t i = 0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if (users[i].id == userID) {
@@ -99,7 +105,7 @@ bool getBlockedStatus(uint32_t userID) {
 bool checkExistance(uint32_t userID) {
     bool ret = false;
     uint8_t i = 0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if ((users[i].id == userID) && (users[i].available)) {
