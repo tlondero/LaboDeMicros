@@ -60,8 +60,8 @@ void PVInit(void) {
 
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
 
-	encoder_init();
-	idEncoder = encoder_register(PIN_C2,PIN_C7);
+	EncoderInit();
+	idEncoder = EncoderRegister(PIN_C2,PIN_C7);
 
 	dispInit();
 	brightness = 20;
@@ -73,8 +73,8 @@ void PVInit(void) {
 
 PVEv PVGetEv(void) {
 
-	if (encoder_event_avb(idEncoder)) {
-		event_t ev = encoder_pop_event(idEncoder);
+	if (EncoderEventAVB(idEncoder)) {
+		event_t ev = EncoderPopEvent(idEncoder);
 		switch (ev) {
 		case (RIGHT_TURN):
 			return ENC_RIGHT;
