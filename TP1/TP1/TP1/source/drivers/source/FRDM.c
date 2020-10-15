@@ -47,8 +47,8 @@
  * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
 
-static FRDMButton sw2;
-static FRDMButton sw3;
+static FRDMButton_t sw2;
+static FRDMButton_t sw3;
 
 static int8_t idLedRed;
 static int8_t idLedBlue;
@@ -177,7 +177,7 @@ bool FRDMLedPeriod(uint8_t led, uint8_t value) {
 	return valid;
 }
 
-bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
+bool FRDMButton_tIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 	if ((button == BUTTON_SW2) || (button == BUTTON_SW3)) {
 		uint8_t IRQ = BT_CANT_MODES;
 		bool correct_mode = true;
@@ -218,7 +218,7 @@ bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 	}
 }
 
-FRDMButtonEv FRDMButtonGetEv(uint8_t button) {
+FRDMButton_tEv FRDMButton_tGetEv(uint8_t button) {
 	switch (button) {
 	case (BUTTON_SW2):
 		return *ButtonGetEvent(sw2);

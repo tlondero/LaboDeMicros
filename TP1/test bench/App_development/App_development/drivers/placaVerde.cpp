@@ -78,9 +78,17 @@ void PVencoder_update(void ){
 
 void PVencoder_add_new_event(encoder_id id, event_t ev) {
 }
-void PVAnimation(bool activated) {
-	if(activated)
-		cout << "Animation is activated" << endl;
+void PVAnimation(uint8_t animation,bool activate) {
+	if(activate)
+		cout << "Animation"<< (int) animation << " was activated" << endl;
 	else
-		cout << "Animation is desactivated" << endl;
+		cout << "Animation" << (int)animation << " was desactivated" << endl;
+}
+
+void PVIncreaseBrightness(void) {
+	cout << "Brightness increased" << endl;
+}
+
+void PVDecreaseBrightness(void) {
+	cout << "Brightness decreased" << endl;
 }

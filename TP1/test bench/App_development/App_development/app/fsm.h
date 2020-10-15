@@ -14,7 +14,8 @@
    ******************************************************************************/
 #define INACTIVITY_TRIGGER_TIME (5000) //ms
 #define OPEN_TRIGGER_TIME (5000) //ms
-
+#define ID_LEN 8
+#define PIN_LEN 5
 const char BRIGHTNESS_MSG[4] = { 'B','R','G','H' };
 const char OPEN_MSG[4] = { 'O','P','E','N' };
 const char USER_MSG[4] = { 'U','S','E','R' };

@@ -25,18 +25,25 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-enum {
-	ENC_RIGHT, ENC_LEFT, BTN_PRESS, BTN_RELEASE, BTN_LKP, BTN_SKP, NO_PV_EV
-};
-
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
-typedef uint8_t PVEv;
+typedef enum {
+	ENC_RIGHT, ENC_LEFT, BTN_PRESS, BTN_RELEASE, BTN_LKP, BTN_SKP, NO_PV_EV
+} PVEv_t;
 
-typedef uint8_t PVButton;
-typedef encoder_id PVEncoder;
+typedef enum {
+	PV_DISABLE, PV_LSTATE, PV_HSTATE, PV_REDGE, PV_FEDGE, PV_BEDGES, PV_CANT_MODES
+} PVIRQMode_t;
+
+typedef enum { PV_RIGHT, PV_LEFT } PVDirection;
+
+typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION
+} PVAnimation_t;
+
+typedef uint8_t PVButton_t;
+typedef encoder_id PVEncoder_t;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -55,7 +62,7 @@ void PVInit(void);
 /**
  * @brief Get encoder or button event
  */
-PVEv PVGetEv(void);
+PVEv_t PVGetEv(void);
 
 
 /**
@@ -83,6 +90,25 @@ bool PVIncreaseBrightness(void);
  */
 bool PVDecreaseBrightness(void);
 
+/**
+ * @brief dispSendChar: sends to the selected 7 seg the character:
+ * @param ch : character to be sent coded in ascii.
+ * seven_seg_module: numer of seven segment, it ranges from 0 to 3
+ * @return bool, false if any paramter was invalid
+ *
+ */
+bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
+
+/**
+ * @brief dispShift: shifts the msg in screen one row to the "direction"
+ * @params direction:see the PVDirection for the modes.
+ */
+void PVDisplayShift(PVDirection_t direction);
+
+/**
+ * @brief 
+ */
+void PVAnimation(PVAnimation_t animation, bool activate);
 
 /*******************************************************************************
  ******************************************************************************/

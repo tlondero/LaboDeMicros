@@ -17,7 +17,7 @@
    /*******************************************************************************
     * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
     ******************************************************************************/
-//Usuarios default:
+//Usuarios default://          
 user_t defaults[DEFAULT_USERS] = { {15,12345,true, true,false,0},{1,01234,false, true,false,0},{2,01234,false, true,false,0},{3,01234,false, true,false,0},{4,01234,false, true,false,0} };
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -35,19 +35,26 @@ void initUsers(void) {
 void addUser(user_t new_user) {
     //tengo que ver si existe ese id y si tengo espacio en el buffer, si existe lo que hace es cambiarle la password, si no tengo espacio no hago nada
     uint8_t i = 0;
-    while ((new_user.id != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((new_user.id != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
-    if ((new_user.id == users[i].id) || (users[i].available == false)) {
-        users[i] = new_user;
-        //si lo encontré le cambio la contraseña
-        // y lo desbloquea si estaba bloqueado
-        //por otor lado Si nunca fue ocupado se registra un nuevo usuario
+    if (new_user.id == users[i].id) {
+        users[i] = new_user;   //si lo encontré le cambio la contraseña
+    }
+    else {
+        i = 0;
+        while ((users[i].available != false) && (i < MAX_USERS)) {
+            i++;        //busco un usuario disponible (avalable = false)
+        }
+        if (users[i].available == false) {
+            users[i] = new_user;        //por otor lado Si nunca fue ocupado se registra un nuevo usuario
+        }
+
     }
 }
 void deleteUser(uint32_t userID) {
     uint8_t i = 0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if (users[i].id == userID) {
@@ -56,7 +63,7 @@ void deleteUser(uint32_t userID) {
 }
 void addStrike(uint32_t userID) {
     uint8_t i=0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if (users[i].id == userID) {
@@ -75,7 +82,7 @@ void clearStrikes(void) {
 bool getAdminStatus(uint32_t userID) {
     bool ret=false;
     uint8_t i = 0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if (users[i].id == userID) {
@@ -86,11 +93,35 @@ bool getAdminStatus(uint32_t userID) {
 bool getBlockedStatus(uint32_t userID) {
     bool ret = false;
     uint8_t i = 0;
-    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
     if (users[i].id == userID) {
         ret = users[i].blocked;
+    }
+    return ret;
+}
+
+bool checkExistance(uint32_t user_ID) {
+    bool ret = false;
+    uint8_t i = 0;
+    while ((user_ID != users[i].id) && (i < MAX_USERS)) {
+        i++;
+    }
+    if ((users[i].id == user_ID) && (users[i].available)) {
+        ret = true;
+    }
+    return ret;
+}
+
+bool checkPassword(uint32_t user_ID, uint32_t user_pin) {
+    bool ret = false;
+    uint8_t i = 0;
+    while ((user_ID != users[i].id) && (i < MAX_USERS)) {
+        i++;
+    }
+    if ((users[i].id == user_ID) && (users[i].available) && (users[i].password == user_pin)) {        
+        ret = true;
     }
     return ret;
 }
