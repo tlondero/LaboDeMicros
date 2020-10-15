@@ -52,15 +52,16 @@ typedef struct {
 
 const static character_t characters[] = {
 
-{ '0', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW } }, { '1', { LOW, HIGH,
-		HIGH, LOW, LOW, LOW, LOW, LOW } }, { '2', { HIGH, HIGH, LOW, HIGH, HIGH,
-		LOW, HIGH, LOW } }, { '3',
-		{ HIGH, HIGH, HIGH, HIGH, LOW, LOW, HIGH, LOW } }, { '4', { LOW, HIGH,
-		HIGH, LOW, LOW, HIGH, HIGH, LOW } }, { '5', { HIGH, LOW, HIGH, HIGH,
-		LOW, HIGH, HIGH, LOW } }, { '6', { HIGH, LOW, HIGH, HIGH, HIGH, HIGH,
-		HIGH, LOW } }, { '7', { HIGH, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW } }, {
-		'8', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW } }, { '9', { HIGH,
-		HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW } } };
+{ '0', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW } },
+{ '1', { LOW, HIGH,HIGH, LOW, LOW, LOW, LOW, LOW } },
+{ '2', { HIGH, HIGH, LOW, HIGH, HIGH,LOW, HIGH, LOW } },
+{ '3',{ HIGH, HIGH, HIGH, HIGH, LOW, LOW, HIGH, LOW } },
+{ '4', { LOW, HIGH,HIGH, LOW, LOW, HIGH, HIGH, LOW } },
+{ '5', { HIGH, LOW, HIGH, HIGH,LOW, HIGH, HIGH, LOW } },
+{ '6', { HIGH, LOW, HIGH, HIGH, HIGH, HIGH,HIGH, LOW } },
+{ '7', { HIGH, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW } },
+{'8', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW } },
+{ '9', { HIGH, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW } } };
 
 typedef struct {
 	bool enable;
@@ -201,7 +202,7 @@ void dispSendChar(char ch, uint8_t seven_seg_module) {
 }
 
 void multiplexDiplayCallback(void) {
-	uint8_t i=0;
+	static uint8_t i=0;
 		if (displays[i%4].enable){
 			dispSelect(i%4);
 			dispSetChar(displays[(i++)%4].ch);

@@ -15,5 +15,5 @@
 void test_init_display(void);
 //numbers from 0 to 1 in a single display
 void test_display029(void);
-
+void test_multiplexing(void);
 #endif /* TESTS_DISPLAY_TB_DISPLAY_TB_H_ */
