@@ -13,7 +13,7 @@
 
 void encoder_test_init(void){
 
-	encoder_init();
+	EncoderInit();
 
 }
 
@@ -28,8 +28,8 @@ void blink_led(void){
 }
 
 void do_always(void){
-	if(encoder_event_avb(id_encoder) == EVENT_AVB){
-		event_t ev = encoder_pop_event(id_encoder);
+	if(EncoderEventAVB(id_encoder) == EVENT_AVB){
+		event_t ev = EncoderPopEvent(id_encoder);
 		if(ev == RIGHT_TURN){
 			new_ticks++;
 		}
@@ -45,7 +45,7 @@ void encoder_test_infinite_count_cc(void){
 
 	if(!warm_up){
 
-		id_encoder = encoder_register(PIN_C2,PIN_C7);//encoder_register(PIN_C3,PIN_C5);
+		id_encoder = EncoderRegister(PIN_C2,PIN_C7);//encoder_register(PIN_C3,PIN_C5);
 
 
 		warm_up = true;

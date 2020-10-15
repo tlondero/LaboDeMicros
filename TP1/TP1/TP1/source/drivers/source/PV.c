@@ -16,9 +16,9 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define	PV_BUTTON	PORTNUM2PIN(PC,6)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C3		PORTNUM2PIN(PC,3)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C5		PORTNUM2PIN(PC,5)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define	PV_BUTTON	PORTNUM2PIN(PC,0)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PIN_C2		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PIN_C7		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -60,11 +60,12 @@ void PVInit(void) {
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
 
 	encoder_init();
-	idEncoder = encoder_register(PIN_C3, PIN_C5);
+	idEncoder = encoder_register(PIN_C2,PIN_C7);
 
 	dispInit();
 	brightness = 20;
-	dispBrightness(brightness);
+	//TODO: implementar
+	//dispBrightness(brightness);
 
 	//led	
 }

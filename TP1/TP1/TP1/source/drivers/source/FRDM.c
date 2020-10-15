@@ -275,7 +275,7 @@ void FRDMLedOff(void) {
 
 void FRDMLedPoll(void) {
 	led_poll();
-	pwm_poll();
+	//pwm_poll();
 }
 
 /*******************************************************************************

@@ -28,10 +28,10 @@ typedef uint8_t encoder_id;
 #define RIGHT_TURN 1
 
 //Add new encoder
-encoder_id encoder_register(pin_t pin_A, pin_t pin_B);
+encoder_id EncoderRegister(pin_t pin_A, pin_t pin_B);
 //Init encoder driver
-void encoder_init(void);
+void EncoderInit(void);
 //Reports if there is an event available
-bool encoder_event_avb(encoder_id id);
+bool EncoderEventAVB(encoder_id id);
 //Pops the last event in the queue
-event_t encoder_pop_event(encoder_id id);
+event_t EncoderPopEvent(encoder_id id);
