@@ -84,3 +84,11 @@ void PVAnimation(uint8_t animation,bool activate) {
 	else
 		cout << "Animation" << (int)animation << " was desactivated" << endl;
 }
+
+void PVIncreaseBrightness(void) {
+	cout << "Brightness increased" << endl;
+}
+
+void PVDecreaseBrightness(void) {
+	cout << "Brightness decreased" << endl;
+}

@@ -9,25 +9,10 @@ typedef struct {
 	uint8_t size;
 } Message_t; //uint8 is temporary
 typedef enum { RIGHT, LEFT } direction_t;
-typedef struct
-{
-    pin_t pin_A;
-    pin_t pin_B;
-    int16_t max;
-    int16_t min;
-    int16_t count;
-    uint8_t current_state_A : 1;
-    uint8_t finite_count : 1; // Allow Inifinte
-    uint8_t current_state_B : 1;
-    uint8_t prev_state_A : 1;
-    uint8_t prev_state_B : 1;
-    uint8_t clockwise : 1; //Increase counter in the clockwise direction
-    uint8_t unused : 1;
 
-} encoder_state_t;
 
 typedef uint_fast8_t encoder_id;
-typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION
+typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION, INVALID_PIN_ANIMATION
 } animation_t;
 //Claramente no vamos a anecesitar una animacion de cada uno, pero por las dudas le metiel define
 /*******************************************************************************
@@ -109,3 +94,5 @@ event_t PVencoder_pop_event(encoder_id id);
 
 void PVAnimation(uint8_t animation, bool activate);
 //Le mete una animacion u otra dependiendo el valor de animation
+void PVIncreaseBrightness(void);
+void PVDecreaseBrightness(void);

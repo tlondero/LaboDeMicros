@@ -47,5 +47,5 @@ void led_poll(void) {
 }
 
 bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
-
+	return true;
 }
