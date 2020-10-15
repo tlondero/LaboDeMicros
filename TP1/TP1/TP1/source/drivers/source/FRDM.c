@@ -83,14 +83,6 @@ void FRDMInit(void) {
 	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
 	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
 
-	//LED Init
-	gpioMode(PIN_LED_BLUE, OUTPUT);
-	gpioWrite(PIN_LED_BLUE, HIGH);
-	gpioMode(PIN_LED_RED, OUTPUT);
-	gpioWrite(PIN_LED_RED, HIGH);
-	gpioMode(PIN_LED_GREEN, OUTPUT);
-	gpioWrite(PIN_LED_GREEN, HIGH);
-
 	led_init_driver();
 
 	idLedRed = led_init_led(PB, 22, TURNS_ON_WITH_0);
@@ -177,7 +169,7 @@ bool FRDMLedPeriod(uint8_t led, uint8_t value) {
 	return valid;
 }
 
-bool FRDMButton_tIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
+bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 	if ((button == BUTTON_SW2) || (button == BUTTON_SW3)) {
 		uint8_t IRQ = BT_CANT_MODES;
 		bool correct_mode = true;
@@ -218,7 +210,7 @@ bool FRDMButton_tIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 	}
 }
 
-FRDMButton_tEv FRDMButton_tGetEv(uint8_t button) {
+FRDMButtonEv_t FRDMButtonGetEv(uint8_t button) {
 	switch (button) {
 	case (BUTTON_SW2):
 		return *ButtonGetEvent(sw2);
@@ -308,7 +300,6 @@ void FRDMLedOff(void) {
 
 void FRDMLedPoll(void) {
 	led_poll();
-	//pwm_poll();
 }
 
 /*******************************************************************************

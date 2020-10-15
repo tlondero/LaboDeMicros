@@ -191,21 +191,21 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module){
 	
 }
 
-void PVDisplayShift(PVDirection direction){
+void PVDisplayShift(PVDirection_t direction){
 	
 	bool valid = true;
 	
 	if (direction == PV_RIGHT){
 		dispShift(RIGHT);
-	} else if direction == PV_LEFT) {
+	} else if (direction == PV_LEFT) {
 		dispShift(LEFT);
 	} else {
 		valid = false;
-	)
+	}
 	return valid;
 }
 
-void PVAnimation_t(PVAnimation_t animation, bool activate){
+void PVAnimation(PVAnimation_t animation, bool activate){
 	uint8_t tuvi = 1;
 }
 
