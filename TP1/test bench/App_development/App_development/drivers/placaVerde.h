@@ -27,7 +27,9 @@ typedef struct
 } encoder_state_t;
 
 typedef uint_fast8_t encoder_id;
-
+typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION
+} animation_t;
+//Claramente no vamos a anecesitar una animacion de cada uno, pero por las dudas le metiel define
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -105,4 +107,5 @@ void PVencoder_add_new_event(encoder_id id, event_t ev);
 //Pops the last event in the queue
 event_t PVencoder_pop_event(encoder_id id);
 
-void PVAnimation(bool activated);
+void PVAnimation(uint8_t animation, bool activate);
+//Le mete una animacion u otra dependiendo el valor de animation

@@ -45,3 +45,7 @@ void led_flash(int8_t led_id) {
 void led_poll(void) {
 	cout << "Polling Leds" << endl;
 }
+
+bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
+
+}

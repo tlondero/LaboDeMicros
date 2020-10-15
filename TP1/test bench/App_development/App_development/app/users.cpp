@@ -17,7 +17,7 @@
    /*******************************************************************************
     * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
     ******************************************************************************/
-//Usuarios default:
+//Usuarios default://          
 user_t defaults[DEFAULT_USERS] = { {15,12345,true, true,false,0},{1,01234,false, true,false,0},{2,01234,false, true,false,0},{3,01234,false, true,false,0},{4,01234,false, true,false,0} };
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -36,6 +36,7 @@ void addUser(user_t new_user) {
     //tengo que ver si existe ese id y si tengo espacio en el buffer, si existe lo que hace es cambiarle la password, si no tengo espacio no hago nada
     uint8_t i = 0;
     while ((new_user.id != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+        // está medio mal, tenes que fijarte si encontrás el usuario y esta disponible y si no está busco un lugar dispobible nomas
         i++;
     }
     if ((new_user.id == users[i].id) || (users[i].available == false)) {
@@ -91,6 +92,18 @@ bool getBlockedStatus(uint32_t userID) {
     }
     if (users[i].id == userID) {
         ret = users[i].blocked;
+    }
+    return ret;
+}
+
+bool checkExistance(uint32_t userID) {
+    bool ret = false;
+    uint8_t i = 0;
+    while ((userID != users[i].id) && (i < MAX_USERS) && (users[i].available)) {
+        i++;
+    }
+    if ((users[i].id == userID) && (users[i].available)) {
+        ret = true;
     }
     return ret;
 }

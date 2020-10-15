@@ -68,3 +68,7 @@ bool getAdminStatus(uint32_t userID);
 bool getBlockedStatus(uint32_t userID);
 
 
+/**
+* @brief checkExistance: returns true if the user ID specified exist.
+*/
+bool checkExistance(uint32_t userID);
