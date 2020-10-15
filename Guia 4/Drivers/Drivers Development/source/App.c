@@ -34,9 +34,8 @@ void App_Init (void)
     //gpioMode(PIN_LED_BLUE, OUTPUT);
     //test_display029();
     //test_multiplexing(); //passing
-	encoder_init();
 	dispInit();
-	enc_id = encoder_register(PIN_C2,PIN_C7);
+	enc_id = EncoderRegister(PIN_C2,PIN_C7);
 	dispSendChar('5', 0);
 
 }
@@ -47,8 +46,8 @@ static event_t ev = -1;
 void App_Run (void)
 {
 
-	if(encoder_event_avb(enc_id) == EVENT_AVB){
-		ev = encoder_pop_event(enc_id);
+	if(EncoderEventAVB(enc_id) == EVENT_AVB){
+		ev = EncoderPopEvent(enc_id);
 		if(ev == RIGHT_TURN && pos < 4)
 			pos++;
 		else if (ev == LEFT_TURN && pos > 0)

@@ -10,15 +10,16 @@
 
 #include "../headers/PV.h"
 #include "../headers/board.h"
+#include "../headers/gpio.h"
 #include <stdbool.h>
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define	PV_BUTTON	PORTNUM2PIN(PC,6)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C3		PORTNUM2PIN(PC,3)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C5		PORTNUM2PIN(PC,5)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define	PV_BUTTON	PORTNUM2PIN(PC,0)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PIN_C2		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PIN_C7		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -59,20 +60,21 @@ void PVInit(void) {
 
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
 
-	encoder_init();
-	idEncoder = encoder_register(PIN_C3, PIN_C5);
+	EncoderInit();
+	idEncoder = EncoderRegister(PIN_C2,PIN_C7);
 
 	dispInit();
 	brightness = 20;
-	dispBrightness(brightness);
+	//TODO: implementar
+	//dispBrightness(brightness);
 
 	//led	
 }
 
 PVEv PVGetEv(void) {
 
-	if (encoder_event_avb(idEncoder)) {
-		event_t ev = encoder_pop_event(idEncoder);
+	if (EncoderEventAVB(idEncoder)) {
+		event_t ev = EncoderPopEvent(idEncoder);
 		switch (ev) {
 		case (RIGHT_TURN):
 			return ENC_RIGHT;
@@ -101,7 +103,39 @@ PVEv PVGetEv(void) {
 }
 
 void PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) {
-	ButtonSetIRQ(button, IRQ_mode, fcallback);
+	uint8_t IRQ = PV_CANT_MODES;
+	bool correct_mode = true;
+	switch(IRQ_mode){
+	case (PV_DISABLE):
+		IRQ = GPIO_IRQ_MODE_DISABLE;
+		break;
+	case (PV_LSTATE):
+		IRQ = GPIO_IRQ_MODE_LOW_STATE;
+		break;
+	case (PV_HSTATE):
+		IRQ = GPIO_IRQ_MODE_HIGH_STATE;
+		break;
+	case (PV_REDGE):
+		IRQ = GPIO_IRQ_MODE_RISING_EDGE;
+		break;
+	case (PV_FEDGE):
+		IRQ = GPIO_IRQ_MODE_FALLING_EDGE;
+		break;
+	case (PV_BEDGES):
+		IRQ = GPIO_IRQ_MODE_BOTH_EDGES;
+		break;
+	default:
+		correct_mode = false;
+		break;
+	}
+	
+	if (correct_mode) {
+		ButtonSetIRQ(button, IRQ, fcallback);
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 void PVDisplayClear(void) {

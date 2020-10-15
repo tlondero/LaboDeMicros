@@ -18,7 +18,7 @@
 
 void App_Init (void)
 {
-	encoder_init();
+	EncoderInit();
 	encoder_test_infinite_count_cc();
 
 }

@@ -29,6 +29,8 @@ enum {
 	ENC_RIGHT, ENC_LEFT, BTN_PRESS, BTN_RELEASE, BTN_LKP, BTN_SKP, NO_PV_EV
 };
 
+enum {PV_DISABLE, PV_LSTATE, PV_HSTATE, PV_REDGE, PV_FEDGE, PV_BEDGES, PV_CANT_MODES};
+
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
