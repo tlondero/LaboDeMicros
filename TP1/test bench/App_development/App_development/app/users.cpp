@@ -102,13 +102,25 @@ bool getBlockedStatus(uint32_t userID) {
     return ret;
 }
 
-bool checkExistance(uint32_t userID) {
+bool checkExistance(uint32_t user_ID) {
     bool ret = false;
     uint8_t i = 0;
-    while ((userID != users[i].id) && (i < MAX_USERS)) {
+    while ((user_ID != users[i].id) && (i < MAX_USERS)) {
         i++;
     }
-    if ((users[i].id == userID) && (users[i].available)) {
+    if ((users[i].id == user_ID) && (users[i].available)) {
+        ret = true;
+    }
+    return ret;
+}
+
+bool checkPassword(uint32_t user_ID, uint32_t user_pin) {
+    bool ret = false;
+    uint8_t i = 0;
+    while ((user_ID != users[i].id) && (i < MAX_USERS)) {
+        i++;
+    }
+    if ((users[i].id == user_ID) && (users[i].available) && (users[i].password == user_pin)) {        
         ret = true;
     }
     return ret;

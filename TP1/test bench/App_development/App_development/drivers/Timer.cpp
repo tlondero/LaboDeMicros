@@ -22,3 +22,6 @@ void timerStop(tim_id_t id) {
 void timerReset(tim_id_t id) {
 	cout << "Restarting timer " << (int)id << endl;
 }
+void timerResume(tim_id_t id) {
+	cout << "Timer " << (int)id << " resumed" << endl;
+}
