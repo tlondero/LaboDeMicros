@@ -10,6 +10,7 @@
 
 #include "../headers/FRDM.h"
 #include "../headers/board.h"
+#include "../headers/gpio.h"
 #include <stdbool.h>
 
 /*******************************************************************************
@@ -178,7 +179,34 @@ bool FRDMLedPeriod(uint8_t led, uint8_t value) {
 
 bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 	if ((button == BUTTON_SW2) || (button == BUTTON_SW3)) {
-		ButtonSetIRQ(button, IRQ_mode, fcallback);
+		uint8_t IRQ = BT_CANT_MODES;
+		bool correct_mode = true;
+		switch(IRQ_mode){
+		case (BT_DISABLE):
+			IRQ = GPIO_IRQ_MODE_DISABLE;
+			break;
+		case (BT_LSTATE):
+			IRQ = GPIO_IRQ_MODE_LOW_STATE;
+			break;
+		case (BT_HSTATE):
+			IRQ = GPIO_IRQ_MODE_HIGH_STATE;
+			break;
+		case (BT_REDGE):
+			IRQ = GPIO_IRQ_MODE_RISING_EDGE;
+			break;
+		case (BT_FEDGE):
+			IRQ = GPIO_IRQ_MODE_FALLING_EDGE;
+			break;
+		case (BT_BEDGES):
+			IRQ = GPIO_IRQ_MODE_BOTH_EDGES;
+			break;
+		default:
+			correct_mode = false;
+			break;
+		}
+		if (correct_mode) {
+			ButtonSetIRQ(button, IRQ, fcallback);
+		}
 		return true;
 	} else {
 		return false;
