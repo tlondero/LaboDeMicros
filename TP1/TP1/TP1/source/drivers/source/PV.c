@@ -33,8 +33,8 @@
  * VARIABLES WITH LOCAL SCOPE
  ******************************************************************************/
 
-static PVButton button;
-static PVEncoder idEncoder;
+static PVButton_t button;
+static PVEncoder_t idEncoder;
 
 static uint8_t brightness;
 
@@ -59,8 +59,7 @@ static uint8_t brightness;
 void PVInit(void) {
 
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
-
-	EncoderInit();
+	
 	idEncoder = EncoderRegister(PIN_C2,PIN_C7);
 
 	dispInit();
@@ -71,7 +70,7 @@ void PVInit(void) {
 	//led	
 }
 
-PVEv PVGetEv(void) {
+PVEv_t PVGetEv(void) {
 
 	if (EncoderEventAVB(idEncoder)) {
 		event_t ev = EncoderPopEvent(idEncoder);
@@ -102,7 +101,7 @@ PVEv PVGetEv(void) {
 	}
 }
 
-void PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) {
+void PVButton_tIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 	uint8_t IRQ = PV_CANT_MODES;
 	bool correct_mode = true;
 	switch(IRQ_mode){
@@ -179,12 +178,40 @@ bool PVDecreaseBrightness(void) {
 	return bottomValue;
 }
 
-//INCREASE BRIGHT AND DECREASE
+bool PVDisplaySendChar(char ch, uint8_t seven_seg_module){
+	
+	bool valid = false;
+	
+	if (seven_seg_module < 4){
+		dispSendChar(ch, seven_seg_module);
+		valid = true;
+	}
+	
+	return valid;
+	
+}
+
+void PVDisplayShift(PVDirection direction){
+	
+	bool valid = true;
+	
+	if (direction == PV_RIGHT){
+		dispShift(RIGHT);
+	} else if direction == PV_LEFT) {
+		dispShift(LEFT);
+	} else {
+		valid = false;
+	)
+	return valid;
+}
+
+void PVAnimation_t(PVAnimation_t animation, bool activate){
+	uint8_t tuvi = 1;
+}
+
 
 /*******************************************************************************
  *******************************************************************************
  LOCAL FUNCTION DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
-
-/******************************************************************************/

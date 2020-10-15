@@ -31,14 +31,20 @@
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
-enum {RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS};
+enum {
+	RED, ORANGE, YELLOW, GREEN, BLUE, PURPLE, CANT_COLORS
+};
 
-enum {R, G, B, NO_LED};
+enum {
+	R, G, B, NO_LED
+};
 
-enum {BT_DISABLE, BT_LSTATE, BT_HSTATE, BT_REDGE, BT_FEDGE, BT_BEDGES, BT_CANT_MODES};
+enum {
+	BT_DISABLE, BT_LSTATE, BT_HSTATE, BT_REDGE, BT_FEDGE, BT_BEDGES, BT_CANT_MODES
+};
 
-typedef uint8_t FRDMButton;
-typedef uint8_t FRDMButtonEv;
+typedef uint8_t FRDMButton_t;
+typedef uint8_t FRDMButtonEv_t;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -58,7 +64,7 @@ void FRDMInit(void);
  * @brief Returns the event of the button
  * @param 
  */
-FRDMButtonEv FRDMButtonGetEv(uint8_t button);
+FRDMButtonEv_t FRDMButtonGetEv(uint8_t button);
 
 /**
  * @brief Turns on led
