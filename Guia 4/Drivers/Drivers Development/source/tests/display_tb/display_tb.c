@@ -59,6 +59,20 @@ void test_display029(void){
 	timerStart(id_counter, 1000, TIM_MODE_PERIODIC, helper_test_display029_2);
 }
 
+void test_multiplexing(void){
+	dispInit();
+	dispSendChar('0', 0);
+	dispSendChar('1', 1);
+	dispSendChar('2', 2);
+	dispSendChar('3', 3);
+	dispClearAll();
+	dispSendChar('4', 0);
+	dispSendChar('5', 1);
+	dispSendChar('6', 2);
+	dispSendChar('7', 3);
+
+}
+
 
 
 

@@ -12,7 +12,6 @@ void App_Run (void);
 
 int main (void)
 {
-
     hw_Init();
     hw_DisableInterrupts();
     App_Init(); /* Program-specific setup */

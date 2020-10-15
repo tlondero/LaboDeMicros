@@ -8,7 +8,7 @@
  ******************************************************************************/
 #define MAX_ENCODERS 5
 #define NO_MORE_ENCODERS 255
-#define DEVELOPMENT_MODE 0
+#define DEVELOPMENT_MODE 1
 #define HIGH 1
 #define LOW 0
 
@@ -54,6 +54,7 @@ void encoder_update(void);
 //Adds new encoder
 encoder_id encoder_register(pin_t pin_A, pin_t pin_B)
 {
+	encoder_init();
 	encoder_id id;
 
 	id = enconders_cant++;
@@ -66,11 +67,15 @@ encoder_id encoder_register(pin_t pin_A, pin_t pin_B)
 	encoders[id].in_pointer = 0;
 	encoders[id].out_pointer = 0;
 
-	gpioMode(pin_A, INPUT_PULLUP);
-	gpioIRQ(pin_A, GPIO_IRQ_MODE_LOW_STATE, encoder_update);
-	gpioMode(pin_B, INPUT_PULLUP);
+	gpioMode(encoders[id].pin_B, INPUT_PULLUP);
+	gpioIRQ(encoders[id].pin_B, GPIO_IRQ_MODE_FALLING_EDGE, encoder_update);
+	gpioMode(encoders[id].pin_A, INPUT_PULLUP);
 
 	return id;
+}
+
+void do_nothing(){
+
 }
 //Init encoder driver
 void encoder_init(void)
@@ -81,7 +86,7 @@ void encoder_init(void)
 		warm_up_rdy = true;
 		timerInit();
 		encoder_timer_id = timerGetId();
-		timerStart(encoder_timer_id, 60, TIM_MODE_SINGLESHOT, NULL); //Previene rebotes
+		timerStart(encoder_timer_id, 150, TIM_MODE_SINGLESHOT, do_nothing); //Previene rebotes
 
 #if DEVELOPMENT_MODE
 		gpioMode(DEBUG_PIN, OUTPUT);
@@ -102,18 +107,20 @@ void encoder_update(void)
 		for (id = 0; id < enconders_cant; id++)
 		{
 			//COMPARE PREV AND CURRENT STATE
-			if (gpioRead(encoders[id].pin_B) == HIGH)
+			if (gpioRead(encoders[id].pin_A) == HIGH)
 			{
 				encoder_add_new_event(id, RIGHT_TURN);
 			}
-			else if(gpioRead(encoders[id].pin_B) == LOW)
+			else if(gpioRead(encoders[id].pin_A) == LOW)
 			{
 				encoder_add_new_event(id, LEFT_TURN);
 			}
 		}
 		timerReset(encoder_timer_id);
+
 #if DEVELOPMENT_MODE
 		gpioWrite(DEBUG_PIN, LOW);
+		int a = -1;
 #endif
 	}
 }
