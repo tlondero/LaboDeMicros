@@ -5,7 +5,6 @@
  *      Author: MAGT
  */
 #include <stdbool.h>
-#include <stdint.h>
 #include "../headers/led.h"
 #include "../headers/Display.h"
 #include "../headers/gpio.h"
@@ -15,19 +14,19 @@
  ******/
 
 /******************
-7-SEGMENT DISPLAY PIN NAMING CONVENTION
+ 7-SEGMENT DISPLAY PIN NAMING CONVENTION
 
-| |||||||A||||||| |
-| |				| |
-|F|				|B|
-| |				| |
-| |||||||G||||||| |
-| |				| |
-|E|				|C|
-| |				| |
-| |||||||D||||||| |   |DP|
+ | |||||||A||||||| |
+ | |			 | |
+ |F|			 |B|
+ | |			 | |
+ | |||||||G||||||| |
+ | |			 | |
+ |E|			 |C|
+ | |			 | |
+ | |||||||D||||||| | |DP|
 
-***********************/
+ ***********************/
 
 #define PIN_A PORTNUM2PIN(PB, 18) //NEGRO
 #define PIN_B PORTNUM2PIN(PC, 16) //BLANCO
@@ -40,58 +39,70 @@
 #define SEL_LINE_A PORTNUM2PIN(PC,0)			//MARRON (ESTA EN FRENTE)
 #define SEL_LINE_B PORTNUM2PIN(PA,2)           //ROJO
 
-
 #define SEVEN_SEGMENTS_PINS 8
-const uint8_t PINES[SEVEN_SEGMENTS_PINS] = {PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT};
+const uint8_t PINES[SEVEN_SEGMENTS_PINS] = { PIN_A, PIN_B, PIN_C, PIN_D, PIN_E,
+PIN_F, PIN_G, PIN_DOT };
 
-typedef struct
-{
+typedef struct {
 	char name;
 	uint8_t pin_mode[SEVEN_SEGMENTS_PINS]; // PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
 } character_t;
 
-typedef struct{
-	char name;
-	uint8_t animation_seq[];
-};
 //PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
 
 const static character_t characters[] = {
-		{'0', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW}},
-		{'1', {LOW, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW}},
-		{'2', {HIGH, HIGH, LOW, HIGH, HIGH, LOW, HIGH, LOW}},
-		{'3', {HIGH, HIGH, HIGH, HIGH, LOW, LOW, HIGH, LOW}},
-		{'4', {LOW, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW}},
-		{'5', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW}},
-		{'6', {HIGH, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},
-		{'7', {HIGH, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW}},
-		{'8', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},
-		{'9', {HIGH, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW}}
+		{'0', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+		{'1', { LOW, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW} },
+		{'2', { HIGH, HIGH, LOW, HIGH, HIGH, LOW, HIGH, LOW} },
+		{'3', { HIGH, HIGH, HIGH, HIGH, LOW, LOW, HIGH, LOW} },
+		{'4', { LOW, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
+		{'5', { HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+		{'6', { HIGH, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+		{'7', { HIGH, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW} },
+		{'8', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+		{'9', { HIGH, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+		{'A', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'B', {LOW, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH}},
+        {'C', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
+        {'D', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, HIGH, LOW} },
+        {'E', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, HIGH, LOW} },
+        {'F', {HIGH, LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'G', {HIGH, LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+        {'H', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'I', {LOW, LOW, LOW, LOW, HIGH, HIGH, LOW, LOW} },
+        {'J', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW, LOW} },
+        {'K', {LOW, LOW, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'L', {LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
+        {'M', {HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW, LOW} },
+        {'N', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW, LOW} },
+        {'O', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+        {'P', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'Q', {HIGH, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
+        {'R', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'S', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+        {'T', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+        {'U', {LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+        {'V', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, LOW, LOW} },
+        {'W', {LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW} },
+        {'X', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+        {'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+        {'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} }
 };
 
+typedef struct {
+	bool enable;
+	char ch;
+} letter;
 
+static letter displays[4] = { { false, '0' }, { false, '0' }, { false, '0' }, {
+false, '0' } };
 
 #define MAX_CHARACTERS sizeof(characters)/sizeof(character_t)
-/******************
-7-SEGMENT DISPLAY PIN NAMING CONVENTION
-
-| |||||||A||||||| |
-| |				| |
-|F|				|B|
-| |				| |
-| |||||||G||||||| |
-| |				| |
-|E|				|C|
-| |				| |
-| |||||||D||||||| |   |DP|
-
-***********************/
-
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-static int8_t seven_segment_id[7] = {0};
+static int8_t seven_segment_id[7] = { 0 };
 static tim_id_t timer_id;
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE DECLARATION
@@ -109,33 +120,36 @@ bool dispSelect(int8_t disp);
  * @return bool, returns false if the character was invalid.
  */
 bool dispSetChar(char ch);
+/*brief": Multiplexes the display
+ * */
+void multiplexDiplayCallback(void);
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE DEFINITION
  ******************************************************************************/
 
-void dispInit(void)
-{
+void dispInit(void) {
 
 	uint8_t i;
 	led_init_driver(); // Initializes the leds driver.
-	for (i = 0; i < SEVEN_SEGMENTS_PINS; i++)
-		{
-			gpioMode(PINES[i], OUTPUT);
-			seven_segment_id[i] = led_init_led(PINES[i], TURNS_ON_WITH_1);
-		}
+	for (i = 0; i < SEVEN_SEGMENTS_PINS; i++) {
+		gpioMode(PINES[i], OUTPUT);
+		seven_segment_id[i] = led_init_led(PINES[i], TURNS_ON_WITH_1);
+	}
 	gpioMode(SEL_LINE_A, OUTPUT);
 	gpioWrite(SEL_LINE_A, LOW);
 	gpioMode(SEL_LINE_B, OUTPUT);
 	gpioWrite(SEL_LINE_B, LOW);
 	timerInit();
 	timer_id = timerGetId();
+	timerStart(timer_id, TIMER_MS2TICKS(5), TIM_MODE_PERIODIC,
+			multiplexDiplayCallback);
+	//Cada 15 ms se multiplexea el display ~ cada uno aprox 50fps
+
 }
 
-bool dispSelect(int8_t disp)
-{
+bool dispSelect(int8_t disp) {
 	int8_t ret;
-	switch (disp)
-	{
+	switch (disp) {
 	case 0:
 		gpioWrite(SEL_LINE_A, LOW);
 		gpioWrite(SEL_LINE_B, LOW);
@@ -162,47 +176,49 @@ bool dispSelect(int8_t disp)
 	return ret;
 }
 
-bool dispSetChar(char ch)
-{
+bool dispSetChar(char ch) {
 	int8_t i;
 	int8_t j;
 
 	bool ret = true;
-	for (i = 0; i < MAX_CHARACTERS; i++)
-	{
-		if (characters[i].name == ch)
-		{
-			for (j = 0; j < SEVEN_SEGMENTS_PINS; j++)
-			{
+	for (i = 0; i < MAX_CHARACTERS; i++) {
+		if (characters[i].name == ch) {
+			for (j = 0; j < SEVEN_SEGMENTS_PINS; j++) {
 				led_set_state(seven_segment_id[j], characters[i].pin_mode[j]);
 			}
 			ret = true;
 			break;
 		}
 	}
-	if (i == MAX_CHARACTERS)
-	{
+	if (i == MAX_CHARACTERS) {
 		ret = false;
 	}
 	return ret;
 }
-void dispClear(void)
-{
+void dispClearAll(void) {
 	uint8_t i, j;
-	for (i = 0; i < 4; i++)
-	{
+	for (i = 0; i < 4; i++) {
 		if (dispSelect(i))
 			for (j = 0; j < SEVEN_SEGMENTS_PINS; j++)
 				led_set_state(PINES[j], LOW);
+		displays[i].enable = false;
+
 	}
 }
 
-bool dispSendChar(char ch, uint8_t seven_seg_module)
-{
-	bool ret = false;
-	if (dispSelect(seven_seg_module))
-	{
-		ret = dispSetChar(ch);
+void dispSendChar(char ch, uint8_t seven_seg_module) {
+
+	if (seven_seg_module < 4) {
+		displays[seven_seg_module].enable = true;
+		displays[seven_seg_module].ch = ch;
 	}
-	return ret;
+}
+
+void multiplexDiplayCallback(void) {
+	uint8_t i = 0;
+	if (displays[i % 4].enable) {
+		dispSelect(i % 4);
+		dispSetChar(displays[(i++) % 4].ch);
+	}
+
 }

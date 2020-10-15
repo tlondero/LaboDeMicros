@@ -76,7 +76,7 @@ typedef uint32_t PORTFlags_t;
 
 
 
-//void	 	PORT_Init				  	  (void);
+void	 	PORT_Init				  	  (void);
 
 void 	 	PORT_SetPullResistorMode  	  (PORT_t, PORTBit_t, bool);
 void 	 	PORT_SetPullUpMode	   	  	  (PORT_t, PORTBit_t, bool);

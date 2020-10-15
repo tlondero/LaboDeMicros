@@ -14,11 +14,13 @@
 #include "drivers/headers/FRDM.h"
 #include "drivers/headers/PORT.h"
 #include "drivers/headers/board.h"
+#include "drivers/headers/gpio.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 #define PIN_PTC1 71
+#define PIN_PTC3 73
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -34,8 +36,9 @@
  * INTERRUPCIONES
  ******************************************************************************/
 static uint8_t xd;
-static int8_t button_id;
-static int8_t pwm_id;
+static int8_t button_id1;
+static int8_t pwm_id1;
+static uint8_t led_on;
 //void callback(void){
 //	xd = 10;
 //}
@@ -87,12 +90,14 @@ static int8_t pwm_id;
 void App_Init (void)
 {
     PORT_Init();
-    button_id = ButtonInit(PIN_SW2, INPUT_PULLUP);
-    pwm_id = PWMInitSignal(PIN_PTC1, 10000, 0.25, 1);
-    if(pwm_id == PWM_NO_SPACE){
+    button_id1 = ButtonInit(PIN_SW2, INPUT_PULLUP);
+    gpioMode(PIN_LED_BLUE, OUTPUT);
+    led_on = 1;
+    gpioWrite(PIN_LED_BLUE, 0);
+    if(pwm_id1 == PWM_NO_SPACE){
     	xd = 20;
     }
-
+    pwm_id1 = PWMInitSignal(PIN_PTC3, 100, 0.1, 1);
 
 	//OC_TB_AppInit();
 	//FRDMInit();
@@ -102,13 +107,37 @@ void App_Init (void)
 
 void App_Run (void)
 {
-	uint8_t ayche = *(ButtonGetEvent(button_id));
-	if(ayche == PRESS){
-		PWMStopSignal(pwm_id, 0);
-	}
-	else if(ayche == RELEASE){
-		PWMStartSignal(pwm_id);
-	}
+	const ButtonEvent * evsw1 = ButtonGetEvent(button_id1);
+	while((*evsw1) != EOQ){
+		switch (*evsw1){
+			case LKP:
+
+				break;
+			case PRESS:
+
+				break;
+
+			case RELEASE:
+
+
+				break;
+			case SKP:
+				if(led_on){
+				    led_on = 0;
+				    gpioWrite(PIN_LED_BLUE, 1);
+				}
+				else{
+				    led_on = 1;
+				    gpioWrite(PIN_LED_BLUE, 0);
+				}
+				xd = PWMIncrementDT(pwm_id1, 0.1);
+				break;
+			default:
+
+				break;
+			}
+		evsw1++;
+	    }
 }
 
 //void App_Run(void) {

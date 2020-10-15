@@ -121,66 +121,70 @@ void FRDMInit(void) {
 	led_configure_period(idLedGreen, period);
 }
 
-bool FRDMLedBright(uint8_t led, uint8_t value) {
-	bool valid = false;
+
+bool FRDMLedBright(uint8_t led, uint8_t value){
 	int8_t ledPort = getId(led);
-	if (ledPort != NO_LED) {
-		if ((value >= 1) && (value <= 100)) {
-			led_configure_brightness(ledPort, value);
-			valid = true;
-		} else if (value == 0) {
-			led_set_state(ledPort, LOW);
-			valid = true;
-		}
+	if (ledPort != NO_LED){
+		led_configure_brightness(ledPort, value);
+		return true;
 	}
-	return valid;
+	else{
+		return false;
+	}
 }
 
-bool FRDMLedFade(uint8_t led, uint8_t value) {
-	bool valid = false;
+bool FRDMLedFade(uint8_t led, uint8_t value){
 	int8_t ledPort = getId(led);
-	if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
+	if (ledPort != NO_LED){
 		led_configure_fade(ledPort, value);
-		bool valid = false;
+		return true;
 	}
-	return valid;
+	else{
+		return false;
+	}
 }
 
-bool FRDMLedDt(uint8_t led, uint8_t value) {
-	bool valid = false;
+bool FRDMLedDt(uint8_t led, uint8_t value){
 	int8_t ledPort = getId(led);
-	if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
+	if (ledPort != NO_LED){
 		led_configure_dt(ledPort, value);
-		bool valid = false;
+		return true;
 	}
-	return valid;
+	else{
+		return false;
+	}
 }
 
-bool FRDMLedFlash(uint8_t led, uint8_t value) {
-	bool valid = false;
+bool FRDMLedFlash(uint8_t led, uint8_t value){
 	int8_t ledPort = getId(led);
-	if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
+	if (ledPort != NO_LED){
 		led_configure_flashes(ledPort, value);
-		bool valid = false;
+		return true;
 	}
-	return valid;
+	else{
+		return false;
+	}
 }
 
-bool FRDMLedPeriod(uint8_t led, uint8_t value) {
-	bool valid = false;
+bool FRDMLedPeriod(uint8_t led, uint8_t value){
 	int8_t ledPort = getId(led);
-	if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
+	if (ledPort != NO_LED){
 		led_configure_period(ledPort, value);
-		bool valid = false;
+		return true;
 	}
-	return valid;
+	else{
+		return false;
+	}
 }
 
-bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
-	if ((button == BUTTON_SW2) || (button == BUTTON_SW3)) {
+
+
+bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback){
+	if ((button == BUTTON_SW2) || (button == BUTTON_SW3)){
 		ButtonSetIRQ(button, IRQ_mode, fcallback);
 		return true;
-	} else {
+	}
+	else{
 		return false;
 	}
 }

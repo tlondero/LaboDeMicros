@@ -75,7 +75,7 @@ static const uint8_t MODULE3_ID_END = 29;
 PCRstr UserPCR;
 static uint8_t FTMX_INIT[4];
 static void (*CALLBACK[FTM_PIN_CANT])(void);
-static CALLBACK_EN[FTM_PIN_CANT];
+static uint8_t CALLBACK_EN[FTM_PIN_CANT];
 static const uint32_t STATUS_CHF[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20,
 		0x40, 0x80 };
 static FTM_Type * const FTM_POINTERS[4] = { FTM0, FTM1, FTM2, FTM3 };
@@ -221,18 +221,17 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 		UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer
 		UserPCR.FIELD.IRQC = PORT_eDisabled; //desactivo las interrupciones
 		PORT_Configure2(port_ptr, num, UserPCR);
-		FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
-		FTM_POINTERS[module]->SC = (FTM_POINTERS[module]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(data.PSC);
-		FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
-		FTM_POINTERS[module]->CNT = data.CNT;							//CNT
-		FTM_POINTERS[module]->MOD = data.MODULO;						//MOD
 	}
 
 	/*
 	 * INICIALIZACION POR CANAL
 	 */
 
-
+	FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
+	FTM_POINTERS[module]->SC = (FTM_POINTERS[module]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(data.PSC);
+	FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
+	FTM_POINTERS[module]->CNT = data.CNT;							//CNT
+	FTM_POINTERS[module]->MOD = data.MODULO;						//MOD
 
 	//SET MSB:A EN OUTPUT COMPARE
 	FTM_POINTERS[module]->CONTROLS[channel].CnSC = (FTM_POINTERS[module]->CONTROLS[channel].CnSC
@@ -270,15 +269,18 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 		break;
 	}
 
-	FTM_POINTERS[module]->CONTROLS[channel].CnSC = (FTM_POINTERS[module]->CONTROLS[channel].CnSC
-			& ~FTM_CnSC_CHIE_MASK) | FTM_CnSC_CHIE(1);
+	FTMSetInterruptMode(id, 1);
 
 	/*
 	 * GUARDO EL CALLBACK PROVISTO
 	 */
-
 	CALLBACK_EN[id] = data.useCallback;
 	CALLBACK[id] = data.CALLBACK;
+
+	/*
+	 * ACTIVO LA SINCRONIZACION POR SOFTWARE DE MOD, CNTIN Y CNV
+	 */
+	FTMSetSoftwareSync(id);
 
 	if (FTMX_INIT[module] == 0) {
 		FTMStartClock(module);
@@ -294,4 +296,23 @@ void FTMSetCnV(uint8_t id, uint16_t cnv){
 
 void FTMSetPSC(uint8_t id, uint16_t PSC){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(PSC);
+}
+
+void FTMSetMOD(uint8_t id, uint16_t MOD){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->MOD = MOD;
+
+}
+
+void FTMSetInterruptMode(uint8_t id, uint8_t mode){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC
+		& ~FTM_CnSC_CHIE_MASK) | FTM_CnSC_CHIE(mode);
+}
+
+void FTMSetSoftwareSync(uint8_t id){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNCONF |= ((FTM_SYNCONF_SYNCMODE(1) | FTM_SYNCONF_SWWRBUF(1) | FTM_SYNCONF_SWRSTCNT(1)));
+
+}
+
+void FTMSetSWSYNC(uint8_t id){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_SWSYNC(1);
 }

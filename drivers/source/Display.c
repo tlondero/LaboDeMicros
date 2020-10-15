@@ -4,36 +4,120 @@
  *  Created on: Sep 26, 2020
  *      Author: MAGT
  */
-#include "header/led.h"
-#include "header/Display.h"
-#include "header/gpio.h"
-
+#include <stdbool.h>
+#include <stdint.h>
+#include "../headers/led.h"
+#include "../headers/Display.h"
+#include "../headers/gpio.h"
+#include "../headers/board.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******/
 
-#define PIN_A 0
-#define PIN_B 0
-#define PIN_C 0
-#define PIN_D 0
-#define PIN_E 0
-#define PIN_F 0
-#define PIN_G 0
-#define PIN_DOT 0
-#define SEL_LINE_A 0
-#define SEL_LINE_B 0
+/******************
+7-SEGMENT DISPLAY PIN NAMING CONVENTION
 
-const uint8_t PINES[8] = { PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT };
+| |||||||A||||||| |
+| |				| |
+|F|				|B|
+| |				| |
+| |||||||G||||||| |
+| |				| |
+|E|				|C|
+| |				| |
+| |||||||D||||||| |   |DP|
 
-//////////////////////////// ASCII CHARACTERS
-enum {
-	CH_0 = 48, CH_1, CH_2, CH_3, CH_4, CH_5, CH_6, CH_7, CH_8, CH_9
+***********************/
+
+#define PIN_A PORTNUM2PIN(PB, 18) //NEGRO
+#define PIN_B PORTNUM2PIN(PC, 16) //BLANCO
+#define PIN_C PORTNUM2PIN(PB, 19) //GRIS
+#define PIN_D PORTNUM2PIN(PC, 17) //VIOLETA
+#define PIN_E PORTNUM2PIN(PC, 1)  //AZUL
+#define PIN_F PORTNUM2PIN(PB, 9) //VERDE
+#define PIN_G PORTNUM2PIN(PC, 8)		//AMARILLO
+#define PIN_DOT PORTNUM2PIN(PA, 1) //NARANJA
+#define SEL_LINE_A PORTNUM2PIN(PC,0)			//MARRON (ESTA EN FRENTE)
+#define SEL_LINE_B PORTNUM2PIN(PA,2)           //ROJO
+
+
+#define SEVEN_SEGMENTS_PINS 8
+const uint8_t PINES[SEVEN_SEGMENTS_PINS] = {PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT};
+
+typedef struct
+{
+	char name;
+	uint8_t pin_mode[SEVEN_SEGMENTS_PINS]; // PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
+} character_t;
+
+typedef struct{
+	char name;
+	uint8_t animation_seq[];
 };
+//PIN_A, PIN_B, PIN_C, PIN_D, PIN_E, PIN_F, PIN_G, PIN_DOT
+
+const static character_t characters[] = {
+		{'0', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW}},
+		{'1', {LOW, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW}},
+		{'2', {HIGH, HIGH, LOW, HIGH, HIGH, LOW, HIGH, LOW}},
+		{'3', {HIGH, HIGH, HIGH, HIGH, LOW, LOW, HIGH, LOW}},
+		{'4', {LOW, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW}},
+		{'5', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW}},
+		{'6', {HIGH, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},
+		{'7', {HIGH, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW}},
+		{'8', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},
+		{'9', {HIGH, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW}},		
+		{'A', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW}},
+		{'B', {LOW, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH}},
+		{'C', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW}},
+		{'D', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, HIGH, LOW}},		
+		{'E', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, HIGH, LOW}},		
+		{'F', {HIGH, LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW}},		
+		{'G', {HIGH, LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW}},		
+		{'H', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW}},		
+		{'I', {LOW, LOW, LOW, LOW, HIGH, HIGH, LOW, LOW}},		
+		{'J', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW, LOW}},		
+		{'K', {LOW, LOW, HIGH, LOW, HIGH, HIGH, HIGH, LOW}},		
+		{'L', {LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW}},		
+		{'M', {HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW, LOW}},		
+		{'N', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW, LOW}},
+		{'O', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},		
+		{'P', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW}},		
+		{'Q', {HIGH, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW}},		
+		{'R', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW}},		
+		{'S', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW}},		
+		{'T', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},		
+		{'U', {LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW}},		
+		{'V', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, LOW, LOW}},		
+		{'W', {LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW}},		
+		{'X', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW}},		
+		{'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW}},
+		{'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW}}
+};
+
+
+
+#define MAX_CHARACTERS sizeof(characters)/sizeof(character_t)
+/******************
+7-SEGMENT DISPLAY PIN NAMING CONVENTION
+
+| |||||||A||||||| |
+| |				| |
+|F|				|B|
+| |				| |
+| |||||||G||||||| |
+| |				| |
+|E|				|C|
+| |				| |
+| |||||||D||||||| |   |DP|
+
+***********************/
+
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
-static int8_t seven_segment_id[7] = { 0 };
+static int8_t seven_segment_id[7] = {0};
 static tim_id_t timer_id;
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE DECLARATION
@@ -50,29 +134,34 @@ bool dispSelect(int8_t disp);
  * @param ch:Character to be written, check the define section for available characters.
  * @return bool, returns false if the character was invalid.
  */
-bool dispSetChar(int8_t ch);
+bool dispSetChar(char ch);
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE DEFINITION
  ******************************************************************************/
 
-void dispInit(void) {
+void dispInit(void)
+{
+
 	uint8_t i;
 	led_init_driver(); // Initializes the leds driver.
-	for (i = 0; i < 8; i++)
-		seven_segment_id[i] = led_init_led(PINES[i], TURNS_ON_WITH_1);
-	//////////////////////////////////////////////////////////
-	///////////PREGUNTAR TINCHO TURN ON MODE !!!//////////////
-	//////////////////////////////////////////////////////////
+	for (i = 0; i < SEVEN_SEGMENTS_PINS; i++)
+		{
+			gpioMode(PINES[i], OUTPUT);
+			seven_segment_id[i] = led_init_led(PINES[i], TURNS_ON_WITH_1);
+		}
 	gpioMode(SEL_LINE_A, OUTPUT);
+	gpioWrite(SEL_LINE_A, LOW);
 	gpioMode(SEL_LINE_B, OUTPUT);
+	gpioWrite(SEL_LINE_B, LOW);
 	timerInit();
 	timer_id = timerGetId();
-
 }
 
-bool dispSelect(int8_t disp) {
+bool dispSelect(int8_t disp)
+{
 	int8_t ret;
-	switch (disp) {
+	switch (disp)
+	{
 	case 0:
 		gpioWrite(SEL_LINE_A, LOW);
 		gpioWrite(SEL_LINE_B, LOW);
@@ -99,91 +188,46 @@ bool dispSelect(int8_t disp) {
 	return ret;
 }
 
-bool dispSetChar(int8_t ch) {
+bool dispSetChar(char ch)
+{
 	int8_t i;
-	bool ret=true;
-	for (i = 0; i < 8; i++)
-		led_set_state(PINES[i], LOW);
-	switch (ch) {
-	case CH_1:
-		led_set_state(PIN_B, HIGH);
-		led_set_state(PIN_C, HIGH);
-		break;
-	case CH_2:
-		led_set_state(PIN_A, HIGH);
-		led_set_state(PIN_B, HIGH);
-		led_set_state(PIN_G, HIGH);
-		led_set_state(PIN_E, HIGH);
-		led_set_state(PIN_D, HIGH);
-		break;
-	case CH_3:
-		led_set_state(PIN_A, HIGH);
-		led_set_state(PIN_B, HIGH);
-		led_set_state(PIN_G, HIGH);
-		led_set_state(PIN_C, HIGH);
-		led_set_state(PIN_D, HIGH);
-		break;
-	case CH_4:
-		led_set_state(PIN_F, HIGH);
-		led_set_state(PIN_B, HIGH);
-		led_set_state(PIN_C, HIGH);
-		led_set_state(PIN_G, HIGH);
-		break;
-	case CH_5:
-		led_set_state(PIN_A, HIGH);
-		led_set_state(PIN_F, HIGH);
-		led_set_state(PIN_G, HIGH);
-		led_set_state(PIN_C, HIGH);
-		led_set_state(PIN_D, HIGH);
-		break;
-	case CH_6:
-		led_set_state(PIN_F, HIGH);
-		led_set_state(PIN_A, HIGH);
-		led_set_state(PIN_C, HIGH);
-		led_set_state(PIN_E, HIGH);
-		led_set_state(PIN_D, HIGH);
-		led_set_state(PIN_G, HIGH);
-		break;
-	case CH_7:
-		led_set_state(PIN_A, HIGH);
-		led_set_state(PIN_B, HIGH);
-		led_set_state(PIN_C, HIGH);
-		break;
-	case CH_8:
-		led_set_state(PIN_A, HIGH);
-		led_set_state(PIN_B, HIGH);
-		led_set_state(PIN_C, HIGH);
-		led_set_state(PIN_D, HIGH);
-		led_set_state(PIN_E, HIGH);
-		led_set_state(PIN_F, HIGH);
-		led_set_state(PIN_G, HIGH);
-		break;
-	case CH_9:
-		led_set_state(PIN_A, HIGH);
-		led_set_state(PIN_B, HIGH);
-		led_set_state(PIN_C, HIGH);
-		led_set_state(PIN_D, HIGH);
-		led_set_state(PIN_F, HIGH);
-		led_set_state(PIN_G, HIGH);
-		break;
-	default:
-		ret=false;
+	int8_t j;
+
+	bool ret = true;
+	for (i = 0; i < MAX_CHARACTERS; i++)
+	{
+		if (characters[i].name == ch)
+		{
+			for (j = 0; j < SEVEN_SEGMENTS_PINS; j++)
+			{
+				led_set_state(seven_segment_id[j], characters[i].pin_mode[j]);
+			}
+			ret = true;
+			break;
+		}
+	}
+	if (i == MAX_CHARACTERS)
+	{
+		ret = false;
 	}
 	return ret;
 }
-void dispClear(void) {
+void dispClear(void)
+{
 	uint8_t i, j;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++)
+	{
 		if (dispSelect(i))
-			for (j = 0; j < 8; j++)
+			for (j = 0; j < SEVEN_SEGMENTS_PINS; j++)
 				led_set_state(PINES[j], LOW);
 	}
 }
 
-
-bool dispSendChar(char ch, uint8_t seven_seg_module){
-	bool ret=false;
-	if(dispSelect(seven_seg_module)){
+bool dispSendChar(char ch, uint8_t seven_seg_module)
+{
+	bool ret = false;
+	if (dispSelect(seven_seg_module))
+	{
 		ret = dispSetChar(ch);
 	}
 	return ret;
