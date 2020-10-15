@@ -40,23 +40,27 @@
  * @returns pwm_id the id of the initialized pwm.
  */
 int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state);
+
 /**
  * @brief Resumes a stopped PWM signal.
  * @param pwm_id pwm id given by init_pwm
  */
 void PWMStartSignal(int8_t pwm_id);
+
 /**
  * @brief Stops a pin from outputting a PWM signal.
  * @param pwm_id the id of the queried pwm.
  * @param final_state the electrical state of the pin when the pwm is stopped.
  */
 void PWMStopSignal(int8_t pwm_id, uint8_t final_state);
+
 /**
  * @brief Destroys a signal and frees space
  * @param pwm_id the id of the pwm signal
  * @param final_state the final electrical state of the pin
  */
 void PWMDestroySignal(uint8_t pwm_id, uint8_t final_state);
+
 /**
  * @brief Sets a new frecuency
  * @param pwm_id the id of the pwm signal
@@ -65,6 +69,7 @@ void PWMDestroySignal(uint8_t pwm_id, uint8_t final_state);
  * else returns 1.
  */
 uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq);
+
 /**
  * @brief Sets a new duty cycle
  * @param pwm_id the id of the pwm signal
@@ -73,6 +78,7 @@ uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq);
  * else returns 1.
  */
 uint8_t PWMSetDT(uint8_t pwm_id, double new_dt);
+
 /**
  * @brief increments the duty cycle of the signal by a certain quantity
  * @param pwm_id the id of the pwm signal
@@ -80,7 +86,8 @@ uint8_t PWMSetDT(uint8_t pwm_id, double new_dt);
  * @returns BAD_OP when the operation could not be satisfied
  * else returns 1.
  */
-uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT);	//TODO
+uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT);
+
 /**
  * @brief decrements the duty cycle of the signal by a certain quantity
  * @param pwm_id the id of the pwm signal
@@ -88,7 +95,7 @@ uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT);	//TODO
  * @returns BAD_OP when the operation could not be satisfied
  * else returns 1.
  */
-uint8_t PWMDecrementDT(uint8_t pwm_id, double deltaDT);	//TODO
+uint8_t PWMDecrementDT(uint8_t pwm_id, double deltaDT);
 
 
 /*******************************************************************************

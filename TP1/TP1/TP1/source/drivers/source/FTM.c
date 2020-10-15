@@ -310,6 +310,29 @@ void FTMSetInterruptMode(uint8_t id, uint8_t mode){
 
 void FTMSetSoftwareSync(uint8_t id){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNCONF |= ((FTM_SYNCONF_SYNCMODE(1) | FTM_SYNCONF_SWWRBUF(1) | FTM_SYNCONF_SWRSTCNT(1)));
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_CNTMAX(1);
+
+	switch(FTM_PINOUT[id].CHANNEL){
+	case 0:
+	case 1:
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN0(1);
+		break;
+	case 2:
+	case 3:
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN1(1);
+		break;
+	case 4:
+	case 5:
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN2(1);
+		break;
+	case 6:
+	case 7:
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN3(1);
+		break;
+
+	default: break;
+	}
+
 
 }
 

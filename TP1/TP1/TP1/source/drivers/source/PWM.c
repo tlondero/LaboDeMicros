@@ -45,7 +45,7 @@ uint8_t getPSC(double period);
 
 //MAX FREQ: 194552.53Hz -> 194.5KHz
 //MIN FREQ: 5.96Hz
-//WARNING: HIGH FREQUENCIES MAY DELIVER HIGH ERROR ON DUTY CYCLE
+//WARNING: FREQUENCIES CLOSE TO MAX MAY DELIVER SLIGHT ERROR ON DUTY CYCLE
 int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state) {
 	int8_t id = pwm_get_id();
 	double period = 1.0 / freq;
@@ -90,8 +90,8 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 				 * CNTIN = 0 -> DT = CNV
 				 */
 				data.CNV = (uint16_t) (round(
-						(PWMS[id].period / PSC2DIV(data.PSC)) * (1 - dt))
-						* ftm_clk);
+						(PWMS[id].period / PSC2DIV(data.PSC)) * (1.0 - dt)
+						* ftm_clk));
 			}
 			PWMS[id].cnv = data.CNV;
 			PWMS[id].ftm_id = FTMInit(pin, data);
@@ -131,18 +131,17 @@ void PWMStopSignal(int8_t pwm_id, uint8_t final_state) {
 			PWMS[pwm_id].queried = 0;
 			if (PWMS[pwm_id].logic) {
 				if (final_state) {
-					PWMS[pwm_id].cnv = 0xFFFF;
+					FTMSetCnV(PWMS[pwm_id].ftm_id, 0xFFFF);;
 				} else {
-					PWMS[pwm_id].cnv = 0x0000;
+					FTMSetCnV(PWMS[pwm_id].ftm_id, 0x0000);
 				}
 			} else {
 				if (final_state) {
-					PWMS[pwm_id].cnv = 0x0000;
+					FTMSetCnV(PWMS[pwm_id].ftm_id, 0x0000);
 				} else {
-					PWMS[pwm_id].cnv = 0xFFFF;
+					FTMSetCnV(PWMS[pwm_id].ftm_id, 0xFFFF);
 				}
 			}
-			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
 			FTMSetSWSYNC(pwm_id);
 		}
 	}
@@ -150,6 +149,7 @@ void PWMStopSignal(int8_t pwm_id, uint8_t final_state) {
 
 //WARNING: HIGH FREQUENCIES MAY DELIVER HIGH ERROR ON DUTY CYCLE
 uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq) {
+	uint8_t ok = 0;
 	double ftm_clk = (double) FTM_CLK;
 	double new_period = 1.0 / new_freq;
 	uint16_t new_PSC = getPSC(new_period);
@@ -173,16 +173,16 @@ uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq) {
 								/ PSC2DIV(PWMS[pwm_id].PSC)) * ftm_clk - 1));
 				FTMSetPSC(PWMS[pwm_id].ftm_id, new_PSC);
 				FTMSetSWSYNC(pwm_id);
-				return 1;
+				ok = 1;
 			}
 		}
-	} else {
-		return 0;
 	}
+	return ok;
 }
 
 uint8_t PWMSetDT(uint8_t pwm_id, double new_dt) {
 	double ftm_clk = (double) FTM_CLK;
+	uint8_t ok = 0;
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
 		if ((INITIALIZED_PWMS[pwm_id] == 1)) {
 			if (new_dt >= 0 && new_dt <= 1) {
@@ -197,16 +197,16 @@ uint8_t PWMSetDT(uint8_t pwm_id, double new_dt) {
 				}
 				FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
 				FTMSetSWSYNC(pwm_id);
-				return 1;
+				ok = 1;
 			}
 		}
-	} else {
-		return 0;
 	}
+	return ok;
 }
 
 uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT) {
 	double ftm_clk = (double) FTM_CLK;
+	uint8_t ok = 0;
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
 		if ((INITIALIZED_PWMS[pwm_id] == 1)) {
 			if (PWMS[pwm_id].dt + deltaDT <= 1) {
@@ -231,15 +231,15 @@ uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT) {
 			}
 			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
 			FTMSetSWSYNC(pwm_id);
-			return 1;
+			ok = 1;
 		}
-	} else {
-		return 0;
 	}
+	return ok;
 }
 
 uint8_t PWMDecrementDT(uint8_t pwm_id, double deltaDT) {
 	double ftm_clk = (double) FTM_CLK;
+	uint8_t ok = 0;
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
 		if ((INITIALIZED_PWMS[pwm_id] == 1)) {
 			if (PWMS[pwm_id].dt - deltaDT >= 0) {
@@ -263,11 +263,10 @@ uint8_t PWMDecrementDT(uint8_t pwm_id, double deltaDT) {
 			}
 			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
 			FTMSetSWSYNC(pwm_id);
-			return 1;
+			ok = 1;
 		}
-	} else {
-		return 0;
 	}
+	return ok;
 }
 
 uint8_t getPSC(double period) {

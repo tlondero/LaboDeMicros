@@ -52,29 +52,29 @@ uint8_t brightDown(uint8_t b) {
 }
 
 
-void App_Init (void) {
-	FRDMInit();
-	PVInit();
-}
+//void App_Init (void) {
+//	FRDMInit();
+//	PVInit();
+//}
 
-void App_Run(void) {
-
-	int8_t bright = 20;
-
-	FRDMLedBright(R, 100);
-
-	while (1) {
-		PVEv ev = PVGetEv();
-		if (ev == ENC_RIGHT) {
-			//FRDMLedFlash(R);
-			bright = brightUp(bright);
-			FRDMLedRGB(bright, 0, 0);
-		}
-		else if (ev == ENC_LEFT) {
-			//FRDMLedOff();
-			bright = brightDown(bright);
-			FRDMLedRGB(bright, 0, 0);
-		}
-		FRDMLedPoll();
-	}
-}
+//void App_Run(void) {
+//
+//	int8_t bright = 20;
+//
+//	FRDMLedBright(R, 100);
+//
+//	while (1) {
+//		PVEv ev = PVGetEv();
+//		if (ev == ENC_RIGHT) {
+//			//FRDMLedFlash(R);
+//			bright = brightUp(bright);
+//			FRDMLedRGB(bright, 0, 0);
+//		}
+//		else if (ev == ENC_LEFT) {
+//			//FRDMLedOff();
+//			bright = brightDown(bright);
+//			FRDMLedRGB(bright, 0, 0);
+//		}
+//		FRDMLedPoll();
+//	}
+//}

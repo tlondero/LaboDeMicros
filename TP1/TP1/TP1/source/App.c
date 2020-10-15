@@ -97,7 +97,7 @@ void App_Init (void)
     if(pwm_id1 == PWM_NO_SPACE){
     	xd = 20;
     }
-    pwm_id1 = PWMInitSignal(PIN_PTC3, 100, 0.1, 1);
+    pwm_id1 = PWMInitSignal(PIN_PTC3, 100, 0.1, 0);
 
 	//OC_TB_AppInit();
 	//FRDMInit();
@@ -125,12 +125,13 @@ void App_Run (void)
 				if(led_on){
 				    led_on = 0;
 				    gpioWrite(PIN_LED_BLUE, 1);
+					xd = PWMSetDT(pwm_id1, 0.5);
 				}
 				else{
 				    led_on = 1;
 				    gpioWrite(PIN_LED_BLUE, 0);
+					xd = PWMSetDT(pwm_id1, 0.05);
 				}
-				xd = PWMIncrementDT(pwm_id1, 0.1);
 				break;
 			default:
 
