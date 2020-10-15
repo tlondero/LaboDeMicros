@@ -93,9 +93,9 @@ void FRDMInit(void) {
 
 	led_init_driver();
 
-	idLedRed = led_init_led(PIN_LED_RED, TURNS_ON_WITH_0);
-	idLedBlue = led_init_led(PIN_LED_BLUE, TURNS_ON_WITH_0);
-	idLedGreen = led_init_led(PIN_LED_GREEN, TURNS_ON_WITH_0);
+	idLedRed = led_init_led(PB, 22, TURNS_ON_WITH_0);
+	idLedBlue = led_init_led(PB, 21, TURNS_ON_WITH_0);
+	idLedGreen = led_init_led(PE, 26, TURNS_ON_WITH_0);
 
 	const uint8_t brightness = 20;
 	const uint32_t fade = 100;			//ms

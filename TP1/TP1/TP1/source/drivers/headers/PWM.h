@@ -39,7 +39,7 @@
  * @initial_state the initial state of the signal.
  * @returns pwm_id the id of the initialized pwm.
  */
-int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state);
+int8_t PWMInitSignal(uint8_t port, uint8_t num, double freq, double dt, uint8_t initial_state);
 
 /**
  * @brief Resumes a stopped PWM signal.

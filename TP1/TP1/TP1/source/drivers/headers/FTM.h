@@ -20,6 +20,7 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
+#define FTM_NO_SPACE -1
 #define FTM_CLK 50000000U
 
 /*******************************************************************************
@@ -94,7 +95,7 @@ typedef struct{
  ******************************************************************************/
 //Initializes a new FTM channel
 //ftmdata is the data for the initialization of each ftm mode
-uint8_t FTMInit(uint8_t pin, FTM_DATA data);
+uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data);
 
 //Stops a FTM channel
 void FTMStopClock(uint8_t module);

@@ -20,6 +20,7 @@
 #define SC_CLKS_SYSCLK 0x01
 #define FTM_PIN_CANT 30
 
+
 typedef struct {
 	uint8_t MODULE;
 	uint8_t CHANNEL;
@@ -162,131 +163,133 @@ void FTMStopClock(uint8_t module) {
 	FTM_POINTERS[module]->SC |= FTM_SC_CLKS(SC_CLKS_OFF);
 }
 
-uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
+uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
+	int8_t id=0;
 	uint8_t i;
 	uint8_t module;
 	uint8_t channel;
 	uint8_t mux;
-	uint8_t id;
 	PCRstr UserPCR;
 	PORT_Type * port_ptr;
-	uint32_t num;
 	/*
 	 * IDENTIFICACION DE MODULO/CANAL
 	 */
 
-	for (i = 0; i < FTM_PIN_CANT - 1; i++) {
-		if (FTM_PINOUT[i].PIN == pin) {
-			pin = FTM_PINOUT[i].PIN;
-			mux = FTM_PINOUT[i].MUX;
-			channel = FTM_PINOUT[i].CHANNEL;
-			module = FTM_PINOUT[i].MODULE;
-			id = FTM_PINOUT[i].ID;
-			port_ptr = PORT_SELECTORS[FTM_PINOUT[i].PORT];
-			num = FTM_PINOUT[i].NUM;
+	i = 0;
+	while((FTM_PINOUT[i].PORT != port) || (FTM_PINOUT[i].NUM != num)){
+		if(++i ==  FTM_PIN_CANT){
+			id = FTM_NO_SPACE;
 			break;
 		}
 	}
 
-	/*
-	 * INICIALIZACION POR MODULO
-	 */
-	if (FTMX_INIT[module] == 0) {
+	if(id != FTM_NO_SPACE){
 
-		switch (module) {
-		case 0:
-			SIM->SCGC6 |= SIM_SCGC6_FTM0_MASK;	//clock-gating
-			NVIC_EnableIRQ(FTM0_IRQn); 			//nvic-enable
+		mux = FTM_PINOUT[i].MUX;
+		channel = FTM_PINOUT[i].CHANNEL;
+		module = FTM_PINOUT[i].MODULE;
+		id = FTM_PINOUT[i].ID;
+		port_ptr = PORT_SELECTORS[port];
+
+		/*
+		 * INICIALIZACION POR MODULO
+		 */
+		if (FTMX_INIT[module] == 0) {
+
+			switch (module) {
+			case 0:
+				SIM->SCGC6 |= SIM_SCGC6_FTM0_MASK;	//clock-gating
+				NVIC_EnableIRQ(FTM0_IRQn); 			//nvic-enable
+				break;
+			case 1:
+				SIM->SCGC6 |= SIM_SCGC6_FTM1_MASK;	//clock-gating
+				NVIC_EnableIRQ(FTM1_IRQn); 			//nvic-enable
+				break;
+			case 2:
+				SIM->SCGC6 |= SIM_SCGC6_FTM2_MASK;	//clock-gating
+				SIM->SCGC3 |= SIM_SCGC3_FTM2_MASK;
+				NVIC_EnableIRQ(FTM2_IRQn); 			//nvic-enable
+				break;
+			case 3:
+				SIM->SCGC6 |= SIM_SCGC3_FTM3_MASK;	//clock-gating
+				NVIC_EnableIRQ(FTM3_IRQn); 			//nvic-enable
+				break;
+			default:
+				break;
+			}
+
+			FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | 0xFF;//LDOK enable all CH
+			UserPCR.PCR = false; // seteo en falso por default
+			UserPCR.FIELD.DSE = true; //Drive Streght Enable
+			UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer
+			UserPCR.FIELD.IRQC = PORT_eDisabled; //desactivo las interrupciones
+			PORT_Configure2(port_ptr, num, UserPCR);
+		}
+
+		/*
+		 * INICIALIZACION POR CANAL
+		 */
+
+		FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
+		FTM_POINTERS[module]->SC = (FTM_POINTERS[module]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(data.PSC);
+		FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
+		FTM_POINTERS[module]->CNT = data.CNT;							//CNT
+		FTM_POINTERS[module]->MOD = data.MODULO;						//MOD
+
+		//SET MSB:A EN OUTPUT COMPARE
+		FTM_POINTERS[module]->CONTROLS[channel].CnSC = (FTM_POINTERS[module]->CONTROLS[channel].CnSC
+				& ~(FTM_CnSC_MSB_MASK | FTM_CnSC_MSA_MASK))
+				| (FTM_CnSC_MSB((data.MODE >> 1) & 0X01)
+						| FTM_CnSC_MSA((data.MODE >> 0) & 0X01));
+
+		//SET ELSB:A
+		switch(data.MODE){
+		case FTM_mInputCapture:
+			FTM_POINTERS[module]->CONTROLS[channel].CnSC =
+					(FTM_POINTERS[module]->CONTROLS[channel].CnSC
+							& ~(FTM_CnSC_ELSB_MASK | FTM_CnSC_ELSA_MASK))
+							| (FTM_CnSC_ELSB((data.IC_EDGE >> 1) & 0X01)
+									| FTM_CnSC_ELSA((data.IC_EDGE >> 0) & 0X01));
 			break;
-		case 1:
-			SIM->SCGC6 |= SIM_SCGC6_FTM1_MASK;	//clock-gating
-			NVIC_EnableIRQ(FTM1_IRQn); 			//nvic-enable
+		case FTM_mOutputCompare:
+			FTM_POINTERS[module]->CONTROLS[channel].CnSC =
+							(FTM_POINTERS[module]->CONTROLS[channel].CnSC
+									& ~(FTM_CnSC_ELSB_MASK | FTM_CnSC_ELSA_MASK))
+									| (FTM_CnSC_ELSB((data.OC_EFFECT >> 1) & 0X01)
+											| FTM_CnSC_ELSA((data.OC_EFFECT >> 0) & 0X01));
+			FTM_POINTERS[module]->CONTROLS[channel].CnV = FTM_CnV_VAL(data.CNV);
 			break;
-		case 2:
-			SIM->SCGC6 |= SIM_SCGC6_FTM2_MASK;	//clock-gating
-			SIM->SCGC3 |= SIM_SCGC3_FTM2_MASK;
-			NVIC_EnableIRQ(FTM2_IRQn); 			//nvic-enable
-			break;
-		case 3:
-			SIM->SCGC6 |= SIM_SCGC3_FTM3_MASK;	//clock-gating
-			NVIC_EnableIRQ(FTM3_IRQn); 			//nvic-enable
+		case FTM_mPulseWidthModulation:
+			FTM_POINTERS[module]->CONTROLS[channel].CnSC =
+							(FTM_POINTERS[module]->CONTROLS[channel].CnSC
+									& ~(FTM_CnSC_ELSB_MASK | FTM_CnSC_ELSA_MASK))
+									| (FTM_CnSC_ELSB((data.EPWM_LOGIC >> 1) & 0X01)
+											| FTM_CnSC_ELSA((data.EPWM_LOGIC >> 0) & 0X01));
+			FTMSetCnV(id, data.CNV);
+			//FTM_POINTERS[module]->CONTROLS[channel].CnV = FTM_CnV_VAL(data.CNV);
 			break;
 		default:
 			break;
 		}
 
-		FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | 0xFF;//LDOK enable all CH
-		UserPCR.PCR = false; // seteo en falso por default
-		UserPCR.FIELD.DSE = true; //Drive Streght Enable
-		UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer
-		UserPCR.FIELD.IRQC = PORT_eDisabled; //desactivo las interrupciones
-		PORT_Configure2(port_ptr, num, UserPCR);
+		FTMSetInterruptMode(id, 1);
+
+		/*
+		 * GUARDO EL CALLBACK PROVISTO
+		 */
+		CALLBACK_EN[id] = data.useCallback;
+		CALLBACK[id] = data.CALLBACK;
+
+		/*
+		 * ACTIVO LA SINCRONIZACION POR SOFTWARE DE MOD, CNTIN Y CNV
+		 */
+		FTMSetSoftwareSync(id);
+
+		if (FTMX_INIT[module] == 0) {
+			FTMStartClock(module);
+			FTMX_INIT[module] = 1;
+		}
 	}
-
-	/*
-	 * INICIALIZACION POR CANAL
-	 */
-
-	FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
-	FTM_POINTERS[module]->SC = (FTM_POINTERS[module]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(data.PSC);
-	FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
-	FTM_POINTERS[module]->CNT = data.CNT;							//CNT
-	FTM_POINTERS[module]->MOD = data.MODULO;						//MOD
-
-	//SET MSB:A EN OUTPUT COMPARE
-	FTM_POINTERS[module]->CONTROLS[channel].CnSC = (FTM_POINTERS[module]->CONTROLS[channel].CnSC
-			& ~(FTM_CnSC_MSB_MASK | FTM_CnSC_MSA_MASK))
-			| (FTM_CnSC_MSB((data.MODE >> 1) & 0X01)
-					| FTM_CnSC_MSA((data.MODE >> 0) & 0X01));
-
-	//SET ELSB:A
-	switch(data.MODE){
-	case FTM_mInputCapture:
-		FTM_POINTERS[module]->CONTROLS[channel].CnSC =
-				(FTM_POINTERS[module]->CONTROLS[channel].CnSC
-						& ~(FTM_CnSC_ELSB_MASK | FTM_CnSC_ELSA_MASK))
-						| (FTM_CnSC_ELSB((data.IC_EDGE >> 1) & 0X01)
-								| FTM_CnSC_ELSA((data.IC_EDGE >> 0) & 0X01));
-		break;
-	case FTM_mOutputCompare:
-		FTM_POINTERS[module]->CONTROLS[channel].CnSC =
-						(FTM_POINTERS[module]->CONTROLS[channel].CnSC
-								& ~(FTM_CnSC_ELSB_MASK | FTM_CnSC_ELSA_MASK))
-								| (FTM_CnSC_ELSB((data.OC_EFFECT >> 1) & 0X01)
-										| FTM_CnSC_ELSA((data.OC_EFFECT >> 0) & 0X01));
-		FTM_POINTERS[module]->CONTROLS[channel].CnV = FTM_CnV_VAL(data.CNV);
-		break;
-	case FTM_mPulseWidthModulation:
-		FTM_POINTERS[module]->CONTROLS[channel].CnSC =
-						(FTM_POINTERS[module]->CONTROLS[channel].CnSC
-								& ~(FTM_CnSC_ELSB_MASK | FTM_CnSC_ELSA_MASK))
-								| (FTM_CnSC_ELSB((data.EPWM_LOGIC >> 1) & 0X01)
-										| FTM_CnSC_ELSA((data.EPWM_LOGIC >> 0) & 0X01));
-		FTMSetCnV(id, data.CNV);
-		//FTM_POINTERS[module]->CONTROLS[channel].CnV = FTM_CnV_VAL(data.CNV);
-		break;
-	default:
-		break;
-	}
-
-	FTMSetInterruptMode(id, 1);
-
-	/*
-	 * GUARDO EL CALLBACK PROVISTO
-	 */
-	CALLBACK_EN[id] = data.useCallback;
-	CALLBACK[id] = data.CALLBACK;
-
-	/*
-	 * ACTIVO LA SINCRONIZACION POR SOFTWARE DE MOD, CNTIN Y CNV
-	 */
-	FTMSetSoftwareSync(id);
-
-	if (FTMX_INIT[module] == 0) {
-		FTMStartClock(module);
-		FTMX_INIT[module] = 1;
-	}
-
 	return id;
 }
 

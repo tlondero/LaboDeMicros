@@ -19,9 +19,10 @@ typedef struct {
 	double period;
 	double dt;
 	uint16_t cnv;
-	uint8_t pwm_id;
-	uint8_t ftm_id;
-	uint8_t pin;
+	int8_t pwm_id;
+	int8_t ftm_id;
+	uint8_t port;
+	uint8_t num;
 	uint8_t queried;
 	uint8_t logic;
 	uint8_t PSC;
@@ -46,7 +47,7 @@ uint8_t getPSC(double period);
 //MAX FREQ: 194552.53Hz -> 194.5KHz
 //MIN FREQ: 5.96Hz
 //WARNING: FREQUENCIES CLOSE TO MAX MAY DELIVER SLIGHT ERROR ON DUTY CYCLE
-int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state) {
+int8_t PWMInitSignal(uint8_t port, uint8_t num, double freq, double dt, uint8_t initial_state) {
 	int8_t id = pwm_get_id();
 	double period = 1.0 / freq;
 	double ftm_clk = (double) FTM_CLK;
@@ -58,7 +59,8 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 			id = -1;
 		} else {
 			INITIALIZED_PWMS[id] = 1;
-			PWMS[id].pin = pin;
+			PWMS[id].port = port;
+			PWMS[id].num = num;
 			PWMS[id].pwm_id = id;
 			PWMS[id].logic = initial_state;
 			PWMS[id].queried = 1;
@@ -94,10 +96,10 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 						* ftm_clk));
 			}
 			PWMS[id].cnv = data.CNV;
-			PWMS[id].ftm_id = FTMInit(pin, data);
+			PWMS[id].ftm_id = FTMInit(port, num, data);
 			if (PWMS[id].ftm_id == -1) {
 				INITIALIZED_PWMS[id] = 0;
-				id = -1;
+				id = PWM_NO_SPACE;
 			}
 		}
 	}
