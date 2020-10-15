@@ -10,6 +10,7 @@
 
 #include "../headers/PV.h"
 #include "../headers/board.h"
+#include "../headers/gpio.h"
 #include <stdbool.h>
 
 /*******************************************************************************
@@ -102,7 +103,39 @@ PVEv PVGetEv(void) {
 }
 
 void PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) {
-	ButtonSetIRQ(button, IRQ_mode, fcallback);
+	uint8_t IRQ = PV_CANT_MODES;
+	bool correct_mode = true;
+	switch(IRQ_mode){
+	case (PV_DISABLE):
+		IRQ = GPIO_IRQ_MODE_DISABLE;
+		break;
+	case (PV_LSTATE):
+		IRQ = GPIO_IRQ_MODE_LOW_STATE;
+		break;
+	case (PV_HSTATE):
+		IRQ = GPIO_IRQ_MODE_HIGH_STATE;
+		break;
+	case (PV_REDGE):
+		IRQ = GPIO_IRQ_MODE_RISING_EDGE;
+		break;
+	case (PV_FEDGE):
+		IRQ = GPIO_IRQ_MODE_FALLING_EDGE;
+		break;
+	case (PV_BEDGES):
+		IRQ = GPIO_IRQ_MODE_BOTH_EDGES;
+		break;
+	default:
+		correct_mode = false;
+		break;
+	}
+	
+	if (correct_mode) {
+		ButtonSetIRQ(button, IRQ, fcallback);
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 void PVDisplayClear(void) {
