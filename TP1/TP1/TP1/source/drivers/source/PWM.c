@@ -52,50 +52,53 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 	double ftm_clk = (double) FTM_CLK;
 	FTM_DATA data;
 	if (id != PWM_NO_SPACE) {
-		INITIALIZED_PWMS[id] = 1;
-		PWMS[id].pin = pin;
-		PWMS[id].pwm_id = id;
-		PWMS[id].logic = initial_state;
-		PWMS[id].queried = 1;
-		data.CNT = 0;
-		data.useCallback = 0;
-		data.MODE = FTM_mPulseWidthModulation;
 		data.PSC = getPSC(period);
-		PWMS[id].PSC = data.PSC;
-		if(data.PSC == BAD_PERIOD){
+		if (data.PSC == BAD_PERIOD) {
 			INITIALIZED_PWMS[id] = 0;
 			id = -1;
-		}
-
-		/*
-		 * Period = MOD - CNTIN + 1
-		 * CNTIN = 0 -> Period = MOD + 1
-		 */
-		PWMS[id].period = period;
-		data.MODULO = (uint16_t) ((PWMS[id].period/PSC2DIV(data.PSC)) * ftm_clk - 1);
-		data.CNTIN = 0;
-
-		if (initial_state) {
-			data.EPWM_LOGIC = FTM_lAssertedHigh;
-			/*
-			 * DT = CNV - CNTIN
-			 * CNTIN = 0 -> DT = CNV
-			 */
-			data.CNV = (uint16_t) (round((PWMS[id].period/PSC2DIV(data.PSC)) * dt * ftm_clk));
 		} else {
-			data.EPWM_LOGIC = FTM_lAssertedLow;
+			INITIALIZED_PWMS[id] = 1;
+			PWMS[id].pin = pin;
+			PWMS[id].pwm_id = id;
+			PWMS[id].logic = initial_state;
+			PWMS[id].queried = 1;
+			PWMS[id].PSC = data.PSC;
+			PWMS[id].period = period;
+			PWMS[id].dt = dt;
+			data.CNT = 0;
+			data.useCallback = 0;
+			data.MODE = FTM_mPulseWidthModulation;
 			/*
-			 * DT = CNV - CNTIN
-			 * CNTIN = 0 -> DT = CNV
+			 * Period = MOD - CNTIN + 1
+			 * CNTIN = 0 -> Period = MOD + 1
 			 */
-			data.CNV = (uint16_t) (round((PWMS[id].period/PSC2DIV(data.PSC)) * (1 - dt)) * ftm_clk);
-		}
-		PWMS[id].cnv = data.CNV;
-		PWMS[id].dt = dt;
-		PWMS[id].ftm_id = FTMInit(pin, data);
-		if (PWMS[id].ftm_id == -1) {
-			INITIALIZED_PWMS[id] = 0;
-			id = -1;
+			data.MODULO = (uint16_t) ((PWMS[id].period / PSC2DIV(data.PSC))
+					* ftm_clk - 1);
+			data.CNTIN = 0;
+			if (initial_state) {
+				data.EPWM_LOGIC = FTM_lAssertedHigh;
+				/*
+				 * DT = CNV - CNTIN
+				 * CNTIN = 0 -> DT = CNV
+				 */
+				data.CNV = (uint16_t) (round(
+						(PWMS[id].period / PSC2DIV(data.PSC)) * dt * ftm_clk));
+			} else {
+				data.EPWM_LOGIC = FTM_lAssertedLow;
+				/*
+				 * DT = CNV - CNTIN
+				 * CNTIN = 0 -> DT = CNV
+				 */
+				data.CNV = (uint16_t) (round(
+						(PWMS[id].period / PSC2DIV(data.PSC)) * (1 - dt))
+						* ftm_clk);
+			}
+			PWMS[id].cnv = data.CNV;
+			PWMS[id].ftm_id = FTMInit(pin, data);
+			if (PWMS[id].ftm_id == -1) {
+				INITIALIZED_PWMS[id] = 0;
+				id = -1;
+			}
 		}
 	}
 	return id;
@@ -103,7 +106,7 @@ int8_t PWMInitSignal(uint8_t pin, double freq, double dt, uint8_t initial_state)
 
 void PWMDestroySignal(uint8_t pwm_id, uint8_t final_state) {
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
-		if(INITIALIZED_PWMS[pwm_id] == 1){
+		if (INITIALIZED_PWMS[pwm_id] == 1) {
 			if (PWMS[pwm_id].queried) {
 				PWMStopSignal(pwm_id, final_state);
 			}
@@ -117,6 +120,7 @@ void PWMStartSignal(int8_t pwm_id) {
 		if (INITIALIZED_PWMS[pwm_id] == 1) {
 			PWMS[pwm_id].queried = 1;
 			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
+			FTMSetSWSYNC(pwm_id);
 		}
 	}
 }
@@ -139,119 +143,134 @@ void PWMStopSignal(int8_t pwm_id, uint8_t final_state) {
 				}
 			}
 			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
+			FTMSetSWSYNC(pwm_id);
 		}
 	}
 }
 
 //WARNING: HIGH FREQUENCIES MAY DELIVER HIGH ERROR ON DUTY CYCLE
-uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq){
+uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq) {
 	double ftm_clk = (double) FTM_CLK;
-	double new_period = 1.0/new_freq;
+	double new_period = 1.0 / new_freq;
 	uint16_t new_PSC = getPSC(new_period);
-	if(new_PSC != BAD_PERIOD){
-		PWMS[pwm_id].PSC = new_PSC;
-		FTMSetPSC(PWMS[pwm_id].ftm_id, new_PSC);
-		/*
-		 * Period = MOD - CNTIN + 1
-		 * CNTIN = 0 -> Period = MOD + 1
-		 */
-		PWMS[pwm_id].period = new_period;
-		FTMSetMOD(PWMS[pwm_id].ftm_id, (uint16_t)((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * ftm_clk - 1));
-		/*
-		 * DT = CNV - CNTIN
-		 * CNTIN = 0 -> DT = CNV
-		 */
-		if (PWMS[pwm_id].logic) {
-			PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * PWMS[pwm_id].dt * ftm_clk));
+	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
+		if ((INITIALIZED_PWMS[pwm_id] == 1)) {
+			if (new_PSC != BAD_PERIOD) {
+				PWMS[pwm_id].PSC = new_PSC;
+				PWMS[pwm_id].period = new_period;
+				if (PWMS[pwm_id].logic) {
+					PWMS[pwm_id].cnv = (uint16_t) (round(
+							(PWMS[pwm_id].period / PSC2DIV(PWMS[pwm_id].PSC))
+									* PWMS[pwm_id].dt * ftm_clk));
+				} else {
+					PWMS[pwm_id].cnv = (uint16_t) (round(
+							(PWMS[pwm_id].period / PSC2DIV(PWMS[pwm_id].PSC))
+									* (1.0 - PWMS[pwm_id].dt) * ftm_clk));
+				}
+				FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
+				FTMSetMOD(PWMS[pwm_id].ftm_id,
+						(uint16_t) ((PWMS[pwm_id].period
+								/ PSC2DIV(PWMS[pwm_id].PSC)) * ftm_clk - 1));
+				FTMSetPSC(PWMS[pwm_id].ftm_id, new_PSC);
+				FTMSetSWSYNC(pwm_id);
+				return 1;
+			}
 		}
-		else {
-			PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * (1.0-PWMS[pwm_id].dt) * ftm_clk));
-		}
-		FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
-		return 1;
-	}
-	else{
+	} else {
 		return 0;
 	}
 }
 
 uint8_t PWMSetDT(uint8_t pwm_id, double new_dt) {
 	double ftm_clk = (double) FTM_CLK;
-	if (new_dt >= 0 && new_dt <= 1) {
-		if (PWMS[pwm_id].logic) {
-			PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * new_dt * ftm_clk));
+	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
+		if ((INITIALIZED_PWMS[pwm_id] == 1)) {
+			if (new_dt >= 0 && new_dt <= 1) {
+				if (PWMS[pwm_id].logic) {
+					PWMS[pwm_id].cnv = (uint16_t) (round(
+							(PWMS[pwm_id].period / PSC2DIV(PWMS[pwm_id].PSC))
+									* new_dt * ftm_clk));
+				} else {
+					PWMS[pwm_id].cnv = (uint16_t) (round(
+							(PWMS[pwm_id].period * (1.0 - new_dt)
+									/ PSC2DIV(PWMS[pwm_id].PSC)) * ftm_clk));
+				}
+				FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
+				FTMSetSWSYNC(pwm_id);
+				return 1;
+			}
 		}
-		else {
-			PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period * (1.0-new_dt)/PSC2DIV(PWMS[pwm_id].PSC)) * ftm_clk));
-		}
-		FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
-		return 1;
-	}
-	else{
+	} else {
 		return 0;
 	}
 }
 
-uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT){
+uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT) {
 	double ftm_clk = (double) FTM_CLK;
-	if(pwm_id >= 0 && pwm_id < MAX_PWMS){
-		if(PWMS[pwm_id].dt + deltaDT <= 1){
-			PWMS[pwm_id].dt += deltaDT;
-			if (PWMS[pwm_id].logic) {
-				PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * PWMS[pwm_id].dt * ftm_clk));
+	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
+		if ((INITIALIZED_PWMS[pwm_id] == 1)) {
+			if (PWMS[pwm_id].dt + deltaDT <= 1) {
+				PWMS[pwm_id].dt += deltaDT;
+				if (PWMS[pwm_id].logic) {
+					PWMS[pwm_id].cnv = (uint16_t) (round(
+							(PWMS[pwm_id].period / PSC2DIV(PWMS[pwm_id].PSC))
+									* PWMS[pwm_id].dt * ftm_clk));
 
+				} else {
+					PWMS[pwm_id].cnv = (uint16_t) (round(
+							(PWMS[pwm_id].period / PSC2DIV(PWMS[pwm_id].PSC))
+									* (1.0 - PWMS[pwm_id].dt) * ftm_clk));
+				}
+			} else {
+				PWMS[pwm_id].dt = 1.0;
+				if (PWMS[pwm_id].logic) {
+					PWMS[pwm_id].cnv = 0xFFFF;
+				} else {
+					PWMS[pwm_id].cnv = 0x0000;
+				}
 			}
-			else{
-				PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * (1.0 - PWMS[pwm_id].dt) * ftm_clk));
-			}
+			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
+			FTMSetSWSYNC(pwm_id);
+			return 1;
 		}
-		else{
-			PWMS[pwm_id].dt = 1.0;
-			if (PWMS[pwm_id].logic) {
-				PWMS[pwm_id].cnv = 0xFFFF;
-			}
-			else{
-				PWMS[pwm_id].cnv = 0x0000;
-			}
-		}
-		FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
-		return 1;
-	}
-	else{
+	} else {
 		return 0;
 	}
 }
 
-uint8_t PWMDecrementDT(uint8_t pwm_id, double deltaDT){
+uint8_t PWMDecrementDT(uint8_t pwm_id, double deltaDT) {
 	double ftm_clk = (double) FTM_CLK;
-	if(pwm_id >= 0 && pwm_id < MAX_PWMS){
-		if(PWMS[pwm_id].dt - deltaDT >= 0){
-			PWMS[pwm_id].dt -= deltaDT;
-			if (PWMS[pwm_id].logic) {
-				PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * PWMS[pwm_id].dt * ftm_clk));
+	if (pwm_id >= 0 && pwm_id < MAX_PWMS) {
+		if ((INITIALIZED_PWMS[pwm_id] == 1)) {
+			if (PWMS[pwm_id].dt - deltaDT >= 0) {
+				PWMS[pwm_id].dt -= deltaDT;
+				if (PWMS[pwm_id].logic) {
+					PWMS[pwm_id].cnv = (uint16_t) (round(
+							(PWMS[pwm_id].period / PSC2DIV(PWMS[pwm_id].PSC))
+									* PWMS[pwm_id].dt * ftm_clk));
+				} else {
+					PWMS[pwm_id].cnv = (uint16_t) (round(
+							(PWMS[pwm_id].period / PSC2DIV(PWMS[pwm_id].PSC))
+									* (1.0 - PWMS[pwm_id].dt) * ftm_clk));
+				}
+			} else {
+				PWMS[pwm_id].dt = 0.0;
+				if (PWMS[pwm_id].logic) {
+					PWMS[pwm_id].cnv = 0x0000;
+				} else {
+					PWMS[pwm_id].cnv = 0xFFFF;
+				}
 			}
-			else{
-				PWMS[pwm_id].cnv = (uint16_t) (round((PWMS[pwm_id].period/PSC2DIV(PWMS[pwm_id].PSC)) * (1.0 - PWMS[pwm_id].dt) * ftm_clk));
-			}
+			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
+			FTMSetSWSYNC(pwm_id);
+			return 1;
 		}
-		else{
-			PWMS[pwm_id].dt = 0.0;
-			if (PWMS[pwm_id].logic) {
-				PWMS[pwm_id].cnv = 0x0000;
-			}
-			else{
-				PWMS[pwm_id].cnv = 0xFFFF;
-			}
-		}
-		FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
-		return 1;
-	}
-	else{
+	} else {
 		return 0;
 	}
 }
 
-uint8_t getPSC(double period){
+uint8_t getPSC(double period) {
 	uint8_t PSC;
 	/*
 	 * PS=x1
@@ -316,8 +335,7 @@ uint8_t getPSC(double period){
 	 */
 	else if ((period > 41.9424e-3) && (period < 167.7696e-3)) {
 		PSC = FTM_PSC_x128;
-	}
-	else{
+	} else {
 		PSC = BAD_PERIOD;
 	}
 	return PSC;

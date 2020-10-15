@@ -20,6 +20,7 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 #define PIN_PTC1 71
+#define PIN_PTC3 73
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -96,7 +97,7 @@ void App_Init (void)
     if(pwm_id1 == PWM_NO_SPACE){
     	xd = 20;
     }
-
+    pwm_id1 = PWMInitSignal(PIN_PTC3, 100, 0.1, 1);
 
 	//OC_TB_AppInit();
 	//FRDMInit();
@@ -124,15 +125,12 @@ void App_Run (void)
 				if(led_on){
 				    led_on = 0;
 				    gpioWrite(PIN_LED_BLUE, 1);
-				    PWMDestroySignal(pwm_id1, 0);
-				    pwm_id1 = PWMInitSignal(PIN_PTC1, 60, 0.25, 1);
 				}
 				else{
 				    led_on = 1;
 				    gpioWrite(PIN_LED_BLUE, 0);
-				    PWMSetFrequency(pwm_id1, 100);
 				}
-				//xd = PWMIncrementDT(pwm_id1, 0.1);
+				xd = PWMIncrementDT(pwm_id1, 0.1);
 				break;
 			default:
 

@@ -269,15 +269,18 @@ uint8_t FTMInit(uint8_t pin, FTM_DATA data) {
 		break;
 	}
 
-	FTM_POINTERS[module]->CONTROLS[channel].CnSC = (FTM_POINTERS[module]->CONTROLS[channel].CnSC
-			& ~FTM_CnSC_CHIE_MASK) | FTM_CnSC_CHIE(1);
+	FTMSetInterruptMode(id, 1);
 
 	/*
 	 * GUARDO EL CALLBACK PROVISTO
 	 */
-
 	CALLBACK_EN[id] = data.useCallback;
 	CALLBACK[id] = data.CALLBACK;
+
+	/*
+	 * ACTIVO LA SINCRONIZACION POR SOFTWARE DE MOD, CNTIN Y CNV
+	 */
+	FTMSetSoftwareSync(id);
 
 	if (FTMX_INIT[module] == 0) {
 		FTMStartClock(module);
@@ -297,4 +300,19 @@ void FTMSetPSC(uint8_t id, uint16_t PSC){
 
 void FTMSetMOD(uint8_t id, uint16_t MOD){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->MOD = MOD;
+
+}
+
+void FTMSetInterruptMode(uint8_t id, uint8_t mode){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC
+		& ~FTM_CnSC_CHIE_MASK) | FTM_CnSC_CHIE(mode);
+}
+
+void FTMSetSoftwareSync(uint8_t id){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNCONF |= ((FTM_SYNCONF_SYNCMODE(1) | FTM_SYNCONF_SWWRBUF(1) | FTM_SYNCONF_SWRSTCNT(1)));
+
+}
+
+void FTMSetSWSYNC(uint8_t id){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_SWSYNC(1);
 }

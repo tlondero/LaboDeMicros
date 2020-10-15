@@ -108,4 +108,10 @@ void FTMSetPSC(uint8_t id, uint16_t PSC);
 
 void FTMSetMOD(uint8_t id, uint16_t MOD);
 
+void FTMSetInterruptMode(uint8_t id, uint8_t mode);
+
+void FTMSetSoftwareSync(uint8_t id);
+
+void FTMSetSWSYNC(uint8_t id);
+
 #endif /* FTM_H_ */
