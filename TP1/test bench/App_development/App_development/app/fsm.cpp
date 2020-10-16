@@ -142,7 +142,7 @@ state IDDLERoutine(void) {
 	}
 	state updated_state = IDDLE;
 	if (prev_state != IDDLE) {
-		PVAnimation(IDDLE_ANIMATION, true);
+		//PVAnimation(IDDLE_ANIMATION, true);
 		id_counter = 0;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
@@ -151,29 +151,31 @@ state IDDLERoutine(void) {
 		//activar las interrupciones de cancel y del
 	}
 	if (PVencoder_event_avb(my_encoder_id)) {
+		//PVAnimation(IDDLE_ANIMATION, false);
 		using_encoder = true;
 	}
 	if (using_encoder) {
 		if (cancel_triggered) {
-			uint8_t i = 0;
-			for (i = 0; i < id_counter; i++) {
-				encoder_id_digits[i] = CLEARED_DIGIT;
-			}
+			//uint8_t i = 0;
+			//for (i = 0; i < id_counter; i++) {
+			//	encoder_id_digits[i] = CLEARED_DIGIT; //sospechado al p2
+			//}
+			//PVAnimation(IDDLE_ANIMATION, true);
 			id_counter = 0;
 			using_encoder = false;
 			cancel_triggered = false;
 		}
 		if (back_triggered) {
 			if (id_counter > 0) {//osea lease borre el ultimo caracter
-				encoder_id_digits[id_counter] = CLEARED_DIGIT;
-				if (id_counter < 4)
-					PVdispSendChar(' ', id_counter);
-				else {
-					uint8_t i;
-					for (i = 0; i < 4; i++) {
-						PVdispSendChar(encoder_id_digits[id_counter - 1 - i] + '0', 3 - i);
-					}
-				}
+				//encoder_id_digits[id_counter] = CLEARED_DIGIT;
+				//if (id_counter < 4)
+				//	PVdispSendChar(' ', id_counter);
+				//else {
+				//	uint8_t i;
+				//	for (i = 0; i < 4; i++) {
+				//		PVdispSendChar(encoder_id_digits[id_counter - 1 - i] + '0', 3 - i);
+				//	}
+				//}
 				//////////////////////////////////////////////////
 				// ACA HAY QUE VER PARA QUE EN EL DISPLAY NO QUEDE CAGADO //creo que lo hice bien pero estaría bueno que me lo chequeens
 				//////////////////////////////////////////////////////////
@@ -190,6 +192,13 @@ state IDDLERoutine(void) {
 					actual_encoder_number = 9;
 				else
 					actual_encoder_number--;
+				//if (id_counter < 4) {
+
+				//	PVdispSendChar(actual_encoder_number + '0', id_counter);//Aca habría que ver bien el orden de los displays
+				//}
+				//else {
+				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+				//}
 				break;
 			case RIGHT_TURN:
 				if (actual_encoder_number == 9)
@@ -197,33 +206,33 @@ state IDDLERoutine(void) {
 
 				else
 					actual_encoder_number++;
-				if (id_counter < 4) {
+				//if (id_counter < 4) {
 
-					PVdispSendChar(actual_encoder_number + '0', id_counter);//Aca habría que ver bien el orden de los displays
-				}
-				else {
-					PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
-				}
+				//	PVdispSendChar(actual_encoder_number + '0', id_counter);//Aca habría que ver bien el orden de los displays
+				//}
+				//else {
+				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+				//}
 				break;
 			case BUTTON_PRESS:
 				if (id_counter < ID_LEN) {
 					encoder_id_digits[id_counter] = actual_encoder_number;
-					PVdispShift(LEFT);
+					//PVdispShift(LEFT);
 					id_counter++;
 				}
 				else {
 					if (checkExistance(transformToNum(&encoder_id_digits[0], ID_LEN))) {
-						if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
-							PVAnimation(BLOCKED_ANIMATION, true);
+						if (getBlockedStatus(transformToNum(&encoder_id_digits[0], ID_LEN))) {
+							//PVAnimation(BLOCKED_ANIMATION, true);
 							updated_state = IDDLE;
 						}
 						else {
 							updated_state = ASK_PIN;
 						}
 					}
-					else {
-						PVAnimation(INVALID_ID_ANIMATION, true);
-					}
+					//else {
+						//PVAnimation(INVALID_ID_ANIMATION, true);
+					//}
 				}
 				break;
 			default:
@@ -233,26 +242,22 @@ state IDDLERoutine(void) {
 
 	}
 	else if (card_event != NULL) {
+		PVAnimation(IDDLE_ANIMATION, false);
 		if (checkExistance(transformToNum(card_event, ID_LEN))) {
 			if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
-				PVAnimation(BLOCKED_ANIMATION, true);
+				//PVAnimation(BLOCKED_ANIMATION, true);
 				updated_state = IDDLE;
 			}
 			else {
 				updated_state = ASK_PIN;
 			}
-
 		}
 		else {
 			card_event = NULL;
-			PVAnimation(INVALID_ID_ANIMATION, true);
+			//PVAnimation(INVALID_ID_ANIMATION, true);
 		}
 
 	}
-
-
-
-
 	return updated_state;
 }
 state askPinRoutine(void) {
@@ -272,29 +277,30 @@ state askPinRoutine(void) {
 
 	if (cancel_triggered) {
 		uint8_t i = 0;
-		for (i = 0; i < pin_counter; i++) {
-			encoder_pin_digits[i] = CLEARED_DIGIT;
-		}
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
+		//for (i = 0; i < pin_counter; i++) {
+		//	encoder_pin_digits[i] = CLEARED_DIGIT;
+		//}
 		pin_counter = 0;
 		cancel_triggered = false;
 	}
 	if (back_triggered) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
 		if (pin_counter > 0) {//osea lease borre el ultimo caracter
-			encoder_pin_digits[pin_counter] = CLEARED_DIGIT;
-			if (pin_counter < 4)
-				PVdispSendChar(' ', pin_counter);
-			else {
-				uint8_t i;
-				for (i = 0; i < 3; i++) {
-					PVdispSendChar('-', i);
-				}
-				PVdispSendChar(encoder_pin_digits[pin_counter] + '0', 3);//escribo '-' en todos exepto el ultimo
+			//encoder_pin_digits[pin_counter] = CLEARED_DIGIT;
+			//if (pin_counter < 4)
+			//	PVdispSendChar(' ', pin_counter);
+			//else {
+			//	uint8_t i;
+			//	for (i = 0; i < 3; i++) {
+			//		PVdispSendChar('-', i);
+			//	}
+			//	PVdispSendChar(encoder_pin_digits[pin_counter] + '0', 3);//escribo '-' en todos exepto el ultimo
 
-			//////////////////////////////////////////////////
-			// ACA HAY QUE VER PARA QUE EN EL DISPLAY NO QUEDE CAGADO //creo que lo hice bien pero estaría bueno que me lo chequeens
-			//////////////////////////////////////////////////////////
-				pin_counter--;
-			}
+			//}
+			pin_counter--;
 			back_triggered = false;
 		}
 	}
@@ -309,6 +315,17 @@ state askPinRoutine(void) {
 				actual_encoder_number = 9;
 			else
 				actual_encoder_number--;
+			//if (pin_counter < 4) {
+			//	uint8_t k = 0;
+			//	for (k = 0; k < pin_counter; k++) {
+			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
+			//	}
+			//	PVdispSendChar(actual_encoder_number + '0', pin_counter);//Aca habría que ver bien el orden de los displays
+			//}
+			//else {
+			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
+			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+			//}
 			break;
 		case RIGHT_TURN:
 			if (actual_encoder_number == 9)
@@ -316,30 +333,30 @@ state askPinRoutine(void) {
 
 			else
 				actual_encoder_number++;
-			if (pin_counter < 4) {
-				uint8_t k = 0;
-				for (k = 0; k < pin_counter; k++) {
-					PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
-				}
-				PVdispSendChar(actual_encoder_number + '0', pin_counter);//Aca habría que ver bien el orden de los displays
-			}
-			else {
-				PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-				PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
-			}
+			//if (pin_counter < 4) {
+			//	uint8_t k = 0;
+			//	for (k = 0; k < pin_counter; k++) {
+			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
+			//	}
+			//	PVdispSendChar(actual_encoder_number + '0', pin_counter);//Aca habría que ver bien el orden de los displays
+			//}
+			//else {
+			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
+			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+			//}
 			break;
 		case BUTTON_PRESS:
 			if (pin_counter < PIN_LEN) {
 				encoder_pin_digits[pin_counter] = actual_encoder_number;
-				if (pin_counter > 3)
-					PVdispShift(LEFT);
+				//if (pin_counter > 3)
+					//PVdispShift(LEFT);
 				pin_counter++;
 			}
 			else {
 				if (checkPassword(transformToNum(&encoder_pin_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN)))
 					updated_state = ACCESS;
 				else {
-					PVAnimation(INVALID_PIN_ANIMATION, true);
+					//PVAnimation(INVALID_PIN_ANIMATION, true);
 					addStrike(transformToNum(&encoder_pin_digits[0], ID_LEN));
 				}
 			}
@@ -360,7 +377,7 @@ state askPinRoutine(void) {
 state accessRoutine(void) {
 	state updated_state = ACCESS;
 	if (prev_state != ACCESS) {
-		PVAnimation(IDDLE_ANIMATION, false);
+		//PVAnimation(IDDLE_ANIMATION, false);
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		//desactivar las interrupciones de cancel y del
@@ -373,7 +390,7 @@ state accessRoutine(void) {
 state openRoutine(void) {
 	state updated_state = OPEN;
 	if (prev_state != OPEN) {
-		PVAnimation(OPEN_ANIMATION, true);
+		//PVAnimation(OPEN_ANIMATION, true);
 		timerReset(open_timer_id);
 		timerResume(open_timer_id);
 	}
@@ -387,7 +404,7 @@ state openRoutine(void) {
 state usersRoutine(void) {
 	state updated_state = IDDLE;
 	if (prev_state != USERS) {
-		PVAnimation(IDDLE_ANIMATION, false);
+		//PVAnimation(IDDLE_ANIMATION, false);
 	}
 	return updated_state;
 }
@@ -401,7 +418,7 @@ state brightnessRoutine(void) {
 
 	if (prev_state != BRIGHTNESS) {
 		//desactivar interrupciones de cancel y back
-		PVAnimation(BRIGHTNESS_ANIMATION, true);        //Aca debería mandar al display la palabra acorde a BRIGHTNESS para ver como cambia
+		//PVAnimation(BRIGHTNESS_ANIMATION, true);        //Aca debería mandar al display la palabra acorde a BRIGHTNESS para ver como cambia
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 	}
@@ -410,10 +427,10 @@ state brightnessRoutine(void) {
 		timerResume(inactivity_timer_id);
 		event_t ev = PVencoder_pop_event(my_encoder_id);
 		if (ev == LEFT_TURN) {
-			PVDecreaseBrightness();
+			//PVDecreaseBrightness();
 		}
 		else if (ev == RIGHT_TURN) {
-			PVIncreaseBrightness();
+			//PVIncreaseBrightness();
 		}
 		else if (ev == BUTTON_PRESS) {
 			updated_state = ACCESS;
