@@ -4,6 +4,31 @@
 // @author   Nicolás Magliola
 // ******************************************************************************/
 //
+////////// MAIN DE PROGRAMA??//////////////////
+
+#include "drivers/headers/Card.h"
+#include "drivers/headers/FRDM.h"
+#include "drivers/headers/PV.h"
+#include "drivers/headers/timer.h"
+#include "app/headers/fsm.h"
+#include "app/headers/FEData.h"
+static state st;
+void App_Init(void) {
+	timerInit();
+	FRDMInit();
+	cardInitDriver(0);
+	PVInit();
+	st=FSMInitState();
+}
+
+void App_Run(void) {
+
+	st = FSMRun(st);
+	FEData  mydata = *(FSMGetFEData());
+//  doStuffFrontEnd(mydata);
+}
+
+
 ///*******************************************************************************
 // * INCLUDE HEADER FILES
 // ******************************************************************************/
@@ -246,26 +271,3 @@
 ////		FRDMLedPoll();
 ////	}
 ////}
-
-////////// MAIN DE PROGRAMA??//////////////////
-
-//#include "drivers/headers/Card.h"
-#include "drivers/headers/FRDM.h"
-#include "drivers/headers/PV.h"
-#include "drivers/headers/timer.h"
-#include "app/fsm.h"
-
-void appInit(void) {
-	timerInit();
-	FRDMInit();
-	cardInitDriver(0);
-	PVInit();
-	st=FSMInitState();
-}
-
-void appRun(void) {
-
-	st = FSMRun(st);
-	FEData  mydata = *(FSMGetFEData());
-//  doStuffFrontEnd(mydata);
-}

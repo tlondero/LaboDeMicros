@@ -10,7 +10,7 @@
 #ifndef _FSM_H_
 #define _FSM_H_
 #include <stdint.h>
-#include "../app/headers/FEData.h"
+#include "FEData.h"
   /*******************************************************************************
    * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
    ******************************************************************************/
@@ -18,13 +18,13 @@
 #define OPEN_TRIGGER_TIME (5000) //ms
 #define ID_LEN 8
 #define PIN_LEN 5
-const char BRIGHTNESS_MSG[4] = { 'B','R','G','H' };
-const char OPEN_MSG[4] = { 'O','P','E','N' };
-const char USER_MSG[4] = { 'U','S','E','R' };
-
-const char PASSWORD_MSG[4] = { 'P','A','S','S' };
-const char ADD_USER_MSG[4] = { 'A','D','D','U' };
-const char DEL_USER_MSG[4] = { 'D','E','L','U' };
+//const char BRIGHTNESS_MSG[4] = { 'B','R','G','H' };
+//const char OPEN_MSG[4] = { 'O','P','E','N' };
+//const char USER_MSG[4] = { 'U','S','E','R' };
+//
+//const char PASSWORD_MSG[4] = { 'P','A','S','S' };
+//const char ADD_USER_MSG[4] = { 'A','D','D','U' };
+//const char DEL_USER_MSG[4] = { 'D','E','L','U' };
 
 /*******************************************************************************
 * ENUMERATIONS AND STRUCTURES AND TYPEDEFS

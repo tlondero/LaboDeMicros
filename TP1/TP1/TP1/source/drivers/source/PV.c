@@ -204,31 +204,31 @@ bool PVDisplayShift(PVDirection_t direction) {
 	return valid;
 }
 
-bool PVAnimation(PVAnimation_t animation, bool activate) {
-	bool valid = true;
-	if (activate) {
-		switch (animation) {
-		case IDDLE_ANIMATION:
-			break;
-		case ASK_PIN_ANIMATION:
-			break;
-		case ACCESS_ANIMATION:
-			break;
-		case OPEN_ANIMATION:
-			break;
-		case USERS_ANIMATION:
-			break;
-		case BRIGHTNESS_ANIMATION:
-			break;
-		case INVALID_ID_ANIMATION:
-			break;
-		default:
-			valid = false;
-			break;
-		}
-	}
-	return valid;
-}
+//bool PVAnimation(PVAnimation_t animation, bool activate) {
+//	bool valid = true;
+//	if (activate) {
+//		switch (animation) {
+//		case IDDLE_ANIMATION:
+//			break;
+//		case ASK_PIN_ANIMATION:
+//			break;
+//		case ACCESS_ANIMATION:
+//			break;
+//		case OPEN_ANIMATION:
+//			break;
+//		case USERS_ANIMATION:
+//			break;
+//		case BRIGHTNESS_ANIMATION:
+//			break;
+//		case INVALID_ID_ANIMATION:
+//			break;
+//		default:
+//			valid = false;
+//			break;
+//		}
+//	}
+//	return valid;
+//}
 
 /*******************************************************************************
  *******************************************************************************
