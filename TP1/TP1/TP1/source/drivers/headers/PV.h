@@ -108,7 +108,7 @@ void PVDisplayShift(PVDirection_t direction);
 /**
  * @brief 
  */
-void PVAnimation(PVAnimation_t animation, bool activate);
+bool PVAnimation(PVAnimation_t animation, bool activate);
 
 /*******************************************************************************
  ******************************************************************************/

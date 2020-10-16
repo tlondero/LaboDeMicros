@@ -59,8 +59,8 @@ static uint8_t brightness;
 void PVInit(void) {
 
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
-	
-	idEncoder = EncoderRegister(PIN_C2,PIN_C7);
+
+	idEncoder = EncoderRegister(PIN_C2, PIN_C7);
 
 	dispInit();
 	brightness = 20;
@@ -104,7 +104,7 @@ PVEv_t PVGetEv(void) {
 void PVButton_tIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 	uint8_t IRQ = PV_CANT_MODES;
 	bool correct_mode = true;
-	switch(IRQ_mode){
+	switch (IRQ_mode) {
 	case (PV_DISABLE):
 		IRQ = GPIO_IRQ_MODE_DISABLE;
 		break;
@@ -127,12 +127,11 @@ void PVButton_tIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 		correct_mode = false;
 		break;
 	}
-	
+
 	if (correct_mode) {
 		ButtonSetIRQ(button, IRQ, fcallback);
 		return true;
-	}
-	else{
+	} else {
 		return false;
 	}
 }
@@ -178,24 +177,24 @@ bool PVDecreaseBrightness(void) {
 	return bottomValue;
 }
 
-bool PVDisplaySendChar(char ch, uint8_t seven_seg_module){
-	
+bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
+
 	bool valid = false;
-	
-	if (seven_seg_module < 4){
+
+	if (seven_seg_module < 4) {
 		dispSendChar(ch, seven_seg_module);
 		valid = true;
 	}
-	
+
 	return valid;
-	
+
 }
 
-void PVDisplayShift(PVDirection_t direction){
-	
+void PVDisplayShift(PVDirection_t direction) {
+
 	bool valid = true;
-	
-	if (direction == PV_RIGHT){
+
+	if (direction == PV_RIGHT) {
 		dispShift(RIGHT);
 	} else if (direction == PV_LEFT) {
 		dispShift(LEFT);
@@ -205,10 +204,28 @@ void PVDisplayShift(PVDirection_t direction){
 	return valid;
 }
 
-void PVAnimation(PVAnimation_t animation, bool activate){
-	uint8_t tuvi = 1;
+bool PVAnimation(PVAnimation_t animation, bool activate) {
+	bool valid = true;
+	switch (animation) {
+	case IDDLE_ANIMATION:
+		break;
+	case ASK_PIN_ANIMATION:
+		break;
+	case ACCESS_ANIMATION:
+		break;
+	case OPEN_ANIMATION:
+		break;
+	case USERS_ANIMATION:
+		break;
+	case BRIGHTNESS_ANIMATION:
+		break;
+	case INVALID_ID_ANIMATION:
+		break;
+	default:
+		valid = false;
+		break;
+	}
 }
-
 
 /*******************************************************************************
  *******************************************************************************
