@@ -51,8 +51,11 @@ static FRDMButton_t sw2;
 static FRDMButton_t sw3;
 
 static int8_t idLedRed;
-static int8_t idLedBlue;
 static int8_t idLedGreen;
+static int8_t idLedBlue;
+
+static bool ledOn;
+static uint8_t lastColor;
 
 /*******************************************************************************
  *******************************************************************************
@@ -60,37 +63,10 @@ static int8_t idLedGreen;
  *******************************************************************************
  ******************************************************************************/
 
-int8_t getId(uint8_t led) {
-	int8_t ledPort = NO_LED;
-	switch (led) {
-	case (R):
-		ledPort = idLedRed;
-		break;
-	case (G):
-		ledPort = idLedRed;
-		break;
-	case (B):
-		ledPort = idLedRed;
-		break;
-	default:
-		break;
-	}
-	return ledPort;
-}
-
 void FRDMInit(void) {
 	//Button Init
 	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
 	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
-
-	/*
-	gpioMode(PIN_LED_BLUE, OUTPUT);
-	gpioWrite(PIN_LED_BLUE, HIGH);
-	gpioMode(PIN_LED_RED, OUTPUT);
-	gpioWrite(PIN_LED_RED, HIGH);
-	gpioMode(PIN_LED_GREEN, OUTPUT);
-	gpioWrite(PIN_LED_GREEN, HIGH);
-	*/
 
 	led_init_driver();
 
@@ -98,84 +74,80 @@ void FRDMInit(void) {
 	idLedBlue = led_init_led(PB, 21, TURNS_ON_WITH_0);
 	idLedGreen = led_init_led(PE, 26, TURNS_ON_WITH_0);
 
-	const uint8_t brightness = 20;
-	const uint32_t fade = 100;			//ms
-	const uint32_t dt = 50;				//%
-	const uint8_t flashes = 0;
-	const uint32_t period = 1000;		//ms
+	ledOn = false;
+	lastColor = CANT_COLORS;
 
-	led_configure_brightness(idLedRed, brightness);
-	led_configure_fade(idLedRed, fade);
-	led_configure_dt(idLedRed, dt);
-	led_configure_flashes(idLedRed, flashes);
-	led_configure_period(idLedRed, period);
-
-	led_configure_brightness(idLedBlue, brightness);
-	led_configure_fade(idLedBlue, fade);
-	led_configure_dt(idLedBlue, dt);
-	led_configure_flashes(idLedBlue, flashes);
-	led_configure_period(idLedBlue, period);
-
-	led_configure_brightness(idLedGreen, brightness);
-	led_configure_fade(idLedGreen, fade);
-	led_configure_dt(idLedGreen, dt);
-	led_configure_flashes(idLedGreen, flashes);
-	led_configure_period(idLedGreen, period);
+	led_set_state(idLedRed, LED_OFF);
+	led_set_state(idLedBlue, LED_OFF);
+	led_set_state(idLedGreen, LED_OFF);
 }
 
-bool FRDMLedBright(uint8_t led, uint8_t value) {
-	bool valid = false;
-	int8_t ledPort = getId(led);
-	if (ledPort != NO_LED) {
-		if ((value >= 1) && (value <= 100)) {
-			led_configure_brightness(ledPort, value);
-			valid = true;
-		} else if (value == 0) {
-			led_set_state(ledPort, LOW);
-			valid = true;
+void FRDMLedToggle(void) {
+	if (lastColor != CANT_COLORS) {
+		if (ledOn) {
+			FRDMLedOff();
+		} else {
+			FRDMLedColor(lastColor);
+
 		}
 	}
-	return valid;
 }
 
-bool FRDMLedFade(uint8_t led, uint8_t value) {
-	bool valid = false;
-	int8_t ledPort = getId(led);
-	if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
-		led_configure_fade(ledPort, value);
-		bool valid = false;
-	}
-	return valid;
+void FRDMLedOff(void) {
+	led_set_state(idLedRed, LED_OFF);
+	led_set_state(idLedBlue, LED_OFF);
+	led_set_state(idLedGreen, LED_OFF);
+	ledOn = false;
 }
 
-bool FRDMLedDt(uint8_t led, uint8_t value) {
-	bool valid = false;
-	int8_t ledPort = getId(led);
-	if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
-		led_configure_dt(ledPort, value);
-		bool valid = false;
+void FRDMLedColor(uint8_t color) {
+
+	FRDMLedOff();
+	ledOn = true;
+
+	switch (color) {
+	case (RED):
+		led_set_state(idLedRed, LED_ON);
+		lastColor = RED;
+		break;
+	case (YELLOW):
+		led_set_state(idLedRed, LED_ON);
+		led_set_state(idLedGreen, LED_ON);
+		lastColor = YELLOW;
+		break;
+	case (GREEN):
+		led_set_state(idLedGreen, LED_ON);
+		lastColor = GREEN;
+		break;
+	case (BLUE):
+		led_set_state(idLedBlue, LED_ON);
+		lastColor = BLUE;
+		break;
+	case (CYAN):
+		led_set_state(idLedGreen, LED_ON);
+		led_set_state(idLedBlue, LED_ON);
+		lastColor = CYAN;
+		break;
+	case (PURPLE):
+		led_set_state(idLedRed, LED_ON);
+		led_set_state(idLedBlue, LED_ON);
+		lastColor = PURPLE;
+		break;
+	case (WHITE):
+		led_set_state(idLedRed, LED_ON);
+		led_set_state(idLedBlue, LED_ON);
+		led_set_state(idLedGreen, LED_ON);
+		lastColor = WHITE;
+		break;
+	default:
+		lastColor = CANT_COLORS;
+		ledOn = false;
+		break;
 	}
-	return valid;
 }
 
-bool FRDMLedFlash(uint8_t led, uint8_t value) {
-	bool valid = false;
-	int8_t ledPort = getId(led);
-	if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
-		led_configure_flashes(ledPort, value);
-		bool valid = false;
-	}
-	return valid;
-}
-
-bool FRDMLedPeriod(uint8_t led, uint8_t value) {
-	bool valid = false;
-	int8_t ledPort = getId(led);
-	if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
-		led_configure_period(ledPort, value);
-		bool valid = false;
-	}
-	return valid;
+void FRDMLedPoll(void) {
+	led_poll();
 }
 
 bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
@@ -229,86 +201,119 @@ FRDMButtonEv_t FRDMButtonGetEv(uint8_t button) {
 	}
 }
 
-void FRDMLedColor(uint8_t color) {
+/*
 
-	FRDMLedOff();
-	led_configure_brightness(idLedGreen, 20);
-	led_configure_brightness(idLedRed, 20);
-	led_configure_brightness(idLedBlue, 20);
+ int8_t getId(uint8_t led) {
+ int8_t ledPort = NO_LED;
+ switch (led) {
+ case (R):
+ ledPort = idLedRed;
+ break;
+ case (G):
+ ledPort = idLedGreen;
+ break;
+ case (B):
+ ledPort = idLedBlue;
+ break;
+ default:
+ break;
+ }
+ return ledPort;
+ }
 
-	switch (color) {
-	case (RED):
-		led_set_state(idLedRed, HIGH);
-		break;
-	case (ORANGE):
-		led_flash(idLedRed);
-		led_configure_brightness(idLedBlue, 2);
-		led_configure_brightness(idLedGreen, 15);
-		led_configure_brightness(idLedRed, 35);
-		led_set_state(idLedBlue, HIGH);
-		led_set_state(idLedGreen, HIGH);
-		break;
-	case (YELLOW):
-		led_configure_brightness(idLedBlue, 2);
-		led_configure_brightness(idLedGreen, 25);
-		led_configure_brightness(idLedRed, 30);
-		led_set_state(idLedBlue, HIGH);
-		led_set_state(idLedGreen, HIGH);
-		break;
-	case (GREEN):
-		led_set_state(idLedGreen, HIGH);
-		break;
-	case (BLUE):
-		led_set_state(idLedBlue, HIGH);
-		break;
-	case (PURPLE):
-		led_set_state(idLedRed, HIGH);
-		led_set_state(idLedBlue, HIGH);
-		break;
-	default:
-		break;
-	}
+ bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b) {
 
-}
+ if ((r > 255) || (g > 255) || (b > 255)) {
+ return false;
+ } else {
+ if ((r > 0) && (r <= 255)) {
+ led_configure_brightness(idLedRed, r);
+ led_set_state(idLedRed, LED_ON);
+ } else if (r == 0) {
+ led_set_state(idLedRed, LED_OFF);
+ }
 
-bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b) {
+ if ((g > 0) && (g <= 255)) {
+ led_configure_brightness(idLedGreen, g);
+ led_set_state(idLedRed, LED_ON);
+ } else if (g == 0) {
+ led_set_state(idLedGreen, LED_OFF);
+ }
 
-	if ((r > 255) || (g > 255) || (b > 255)) {
-		return false;
-	} else {
-		if ((r > 0) && (r <= 255)) {
-			led_configure_brightness(idLedRed, r);
-			led_set_state(idLedRed, HIGH);
-		} else if (r == 0) {
-			led_set_state(idLedRed, LOW);
-		}
+ if ((b > 0) && (b <= 255)) {
+ led_configure_brightness(idLedBlue, b);
+ led_set_state(idLedBlue, LED_ON);
+ } else if (b == 0) {
+ led_set_state(idLedBlue, LED_OFF);
+ }
+ return true;
+ }
+ }
 
-		if ((g > 0) && (g <= 255)) {
-			led_configure_brightness(idLedGreen, g);
-			led_set_state(idLedRed, HIGH);
-		} else if (g == 0) {
-			led_set_state(idLedGreen, LOW);
-		}
+ bool FRDMLedBright(uint8_t led, uint8_t value) {
+ bool valid = false;
+ int8_t ledPort = getId(led);
+ if (ledPort != NO_LED) {
+ if ((value >= 1) && (value <= 100)) {
+ led_configure_brightness(ledPort, value);
+ led_set_state(ledPort, LED_ON);
+ valid = true;
+ } else if (value == 0) {
+ led_set_state(ledPort, LED_OFF);
+ valid = true;
+ }
+ }
+ return valid;
+ }
 
-		if ((b > 0) && (b <= 255)) {
-			led_configure_brightness(idLedBlue, b);
-			led_set_state(idLedBlue, HIGH);
-		} else if (b == 0) {
-			led_set_state(idLedBlue, LOW);
-		}
-		return true;
-	}
-}
+ bool FRDMLedFade(uint8_t led, uint8_t value) {
+ bool valid = false;
+ int8_t ledPort = getId(led);
+ if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
+ led_configure_fade(ledPort, value);
+ led_set_state(ledPort, LED_ON);
+ setState(ledPort, true);
+ valid = true;
+ }
+ return valid;
+ }
 
-void FRDMLedOff(void) {
-	led_set_state(idLedRed, LOW);
-	led_set_state(idLedBlue, LOW);
-	led_set_state(idLedGreen, LOW);
-}
+ bool FRDMLedDt(uint8_t led, uint8_t value) {
+ bool valid = false;
+ int8_t ledPort = getId(led);
+ if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
+ led_configure_dt(ledPort, value);
+ led_set_state(ledPort, LED_ON);
+ setState(ledPort, true);
+ valid = true;
+ }
+ return valid;
+ }
 
-void FRDMLedPoll(void) {
-	led_poll();
-}
+ bool FRDMLedFlash(uint8_t led, uint8_t value) {
+ bool valid = false;
+ int8_t ledPort = getId(led);
+ if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
+ led_set_state(ledPort, LED_ON);
+ led_configure_flashes(ledPort, value);
+ setState(ledPort, true);
+ valid = true;
+ }
+ return valid;
+ }
+
+ bool FRDMLedPeriod(uint8_t led, uint8_t value) {
+ bool valid = false;
+ int8_t ledPort = getId(led);
+ if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
+ led_configure_period(ledPort, value);
+ led_set_state(ledPort, LED_ON);
+ setState(ledPort, true);
+ valid = true;
+ }
+ return valid;
+ }
+ */
 
 /*******************************************************************************
  *******************************************************************************
