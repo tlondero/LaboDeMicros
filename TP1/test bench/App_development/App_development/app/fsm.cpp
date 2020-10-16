@@ -14,6 +14,7 @@
  /*******************************************************************************
   * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
   ******************************************************************************/
+enum{OPEN_SEL,BRIGHT_SEL,USER_SEL};
   /*******************************************************************************
    * VARIABLE PROTOTYPES WITH FILE SCOPE
    ******************************************************************************/
@@ -428,6 +429,8 @@ state askPinRoutine(void) {
 
 state accessRoutine(void) {
 	state updated_state = ACCESS;
+	static uint8_t selection=OPEN_SEL;
+
 	if (prev_state != ACCESS) {
 		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
@@ -436,7 +439,66 @@ state accessRoutine(void) {
 		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
 		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
 	}
-
+	if (PVencoder_event_avb(my_encoder_id)) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVencoder_pop_event(my_encoder_id);
+		switch (ev) {
+		case LEFT_TURN:
+			if (selection == OPEN_SEL)
+				selection = USER_SEL;
+			else 
+				selection--;
+			fe_data.animation_en = true;
+			switch (selection) {
+			case USER_SEL :
+				fe_data.animation_opt = USER_SELECTED_ANIMATION;
+				break;
+			case OPEN_SEL:
+				fe_data.animation_opt = OPEN_SELECTED_ANIMATION;
+				break;
+			case BRIGHT_SEL:
+				fe_data.animation_opt = BRIGHTNESS_SELECTED_ANIMATION;
+				break;
+			default: break;
+			}
+			break;
+		case RIGHT_TURN:
+			if (selection == USER_SEL)
+				selection = OPEN_SEL;
+			else
+				selection++;
+			fe_data.animation_en = true;
+			switch (selection) {
+			case USER_SEL:
+				fe_data.animation_opt = USER_SELECTED_ANIMATION;
+				break;
+			case OPEN_SEL:
+				fe_data.animation_opt = OPEN_SELECTED_ANIMATION;
+				break;
+			case BRIGHT_SEL:
+				fe_data.animation_opt = BRIGHTNESS_SELECTED_ANIMATION;
+				break;
+			default: break;
+			}
+			break;
+		case BUTTON_PRESS :
+			switch (selection) {
+			case USER_SEL:
+				updated_state = USERS;
+				break;
+			case OPEN_SEL:
+				updated_state= OPEN;
+				break;
+			case BRIGHT_SEL:
+				updated_state = BRIGHTNESS;
+				break;
+			default: break;
+			}
+			break;
+		default: break;
+		}
+	}
 	return updated_state;
 }
 state openRoutine(void) {
