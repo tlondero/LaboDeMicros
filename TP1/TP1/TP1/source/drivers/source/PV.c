@@ -18,8 +18,8 @@
  ******************************************************************************/
 
 #define	PV_BUTTON	PORTNUM2PIN(PC,0)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C2		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C7		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -60,7 +60,7 @@ void PVInit(void) {
 
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
 
-	idEncoder = EncoderRegister(PIN_C2, PIN_C7);
+	idEncoder = EncoderRegister(PIN_C2_EN, PIN_C7_EN);
 
 	dispInit();
 	brightness = 20;
@@ -101,7 +101,7 @@ PVEv_t PVGetEv(void) {
 	}
 }
 
-void PVButton_tIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
+bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 	uint8_t IRQ = PV_CANT_MODES;
 	bool correct_mode = true;
 	switch (IRQ_mode) {
@@ -190,7 +190,7 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 
 }
 
-void PVDisplayShift(PVDirection_t direction) {
+bool PVDisplayShift(PVDirection_t direction) {
 
 	bool valid = true;
 
@@ -206,25 +206,28 @@ void PVDisplayShift(PVDirection_t direction) {
 
 bool PVAnimation(PVAnimation_t animation, bool activate) {
 	bool valid = true;
-	switch (animation) {
-	case IDDLE_ANIMATION:
-		break;
-	case ASK_PIN_ANIMATION:
-		break;
-	case ACCESS_ANIMATION:
-		break;
-	case OPEN_ANIMATION:
-		break;
-	case USERS_ANIMATION:
-		break;
-	case BRIGHTNESS_ANIMATION:
-		break;
-	case INVALID_ID_ANIMATION:
-		break;
-	default:
-		valid = false;
-		break;
+	if (activate) {
+		switch (animation) {
+		case IDDLE_ANIMATION:
+			break;
+		case ASK_PIN_ANIMATION:
+			break;
+		case ACCESS_ANIMATION:
+			break;
+		case OPEN_ANIMATION:
+			break;
+		case USERS_ANIMATION:
+			break;
+		case BRIGHTNESS_ANIMATION:
+			break;
+		case INVALID_ID_ANIMATION:
+			break;
+		default:
+			valid = false;
+			break;
+		}
 	}
+	return valid;
 }
 
 /*******************************************************************************
