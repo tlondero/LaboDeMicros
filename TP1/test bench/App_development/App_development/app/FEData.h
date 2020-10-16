@@ -20,4 +20,11 @@ typedef struct {
 	bool pin_state;
 
 	uint8_t brightness;
+
+	bool blocked_user;
+	bool bad_id;
+	bool good_id;
+	bool bad_pin;
+	bool good_pin;
+	bool open;
 }FEData;
