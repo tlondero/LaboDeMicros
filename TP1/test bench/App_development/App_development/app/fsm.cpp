@@ -104,22 +104,22 @@ state FSMRun(state actual_state) {
 	state updated_state;
 	switch (actual_state) {
 	case IDDLE:
-		updated_state = IDDLERoutine();//IN PROGRESS
+		updated_state = IDDLERoutine();//DONE
 		break;
 	case ASK_PIN:
-		updated_state = askPinRoutine();//TODO
+		updated_state = askPinRoutine();//DONE
 		break;
 	case ACCESS:
 		updated_state = accessRoutine();//TODO
 		break;
 	case OPEN:
-		updated_state = openRoutine();
+		updated_state = openRoutine();//DONE
 		break;
 	case USERS:
 		updated_state = usersRoutine();//TODO
 		break;
 	case BRIGHTNESS:
-		updated_state = brightnessRoutine();
+		updated_state = brightnessRoutine();//DONE
 		break;
 	default:
 		break;
@@ -226,8 +226,16 @@ state IDDLERoutine(void) {
 
 	}
 	else if (card_event != NULL) {
-		if (checkExistance(transformToNum(card_event, ID_LEN)))
-			updated_state = ASK_PIN;
+		if (checkExistance(transformToNum(card_event, ID_LEN))) {
+			if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
+				PVAnimation(BLOCKED_ANIMATION, true);
+				updated_state = IDDLE;
+			}
+			else {
+				updated_state = ASK_PIN;
+			}
+
+		}
 		else {
 			card_event = NULL;
 			PVAnimation(INVALID_ID_ANIMATION, true);
@@ -325,6 +333,7 @@ state askPinRoutine(void) {
 					updated_state = ACCESS;
 				else {
 					PVAnimation(INVALID_PIN_ANIMATION, true);
+					addStrike(transformToNum(&encoder_pin_digits[0], ID_LEN));
 				}
 			}
 			break;

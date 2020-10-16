@@ -12,7 +12,7 @@ typedef enum { RIGHT, LEFT } direction_t;
 
 
 typedef uint_fast8_t encoder_id;
-typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION, INVALID_PIN_ANIMATION
+typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION, INVALID_PIN_ANIMATION,BLOCKED_ANIMATION
 } animation_t;
 //Claramente no vamos a anecesitar una animacion de cada uno, pero por las dudas le metiel define
 /*******************************************************************************
