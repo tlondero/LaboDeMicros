@@ -9,6 +9,7 @@
   * INCLUDE HEADER FILES
   ******************************************************************************/
 #include <cstdint>
+#include "../app/FEData.h"
   /*******************************************************************************
    * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
    ******************************************************************************/
@@ -24,11 +25,12 @@ const char PASSWORD_MSG[4] = { 'P','A','S','S' };
 const char ADD_USER_MSG[4] = { 'A','D','D','U' };
 const char DEL_USER_MSG[4] = { 'D','E','L','U' };
 
-   /*******************************************************************************
-    * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
-    ******************************************************************************/
+/*******************************************************************************
+* ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+******************************************************************************/
 
 typedef enum {IDDLE,ASK_PIN,ACCESS,OPEN,USERS,BRIGHTNESS} state;
+
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -48,3 +50,9 @@ state FSMInitState(void);
  * @return state, the state updated after the fsm was executed.
  */
 state FSMRun(state actual_state);
+
+/**
+ * @brief Returns the necessary data for the front end.
+ * @return FEData, dedicated structure in FEData.h.
+ */
+FEData const * FSMGetFEData(void);
