@@ -4,11 +4,11 @@
   @brief    
   @author   MAGT
  ******************************************************************************/
-#pragma once
  /*******************************************************************************
   * INCLUDE HEADER FILES
   ******************************************************************************/
-#include "users.h"
+#include "../headers/users.h"
+
   /*******************************************************************************
    * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
    ******************************************************************************/
@@ -39,7 +39,7 @@ void addUser(user_t new_user) {
         i++;
     }
     if (new_user.id == users[i].id) {
-        users[i] = new_user;   //si lo encontré le cambio la contraseña
+        users[i] = new_user;   //si lo encontrï¿½ le cambio la contraseï¿½a
     }
     else {
         i = 0;

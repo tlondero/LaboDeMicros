@@ -1,12 +1,12 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include "fsm.h"
-#include "../drivers/Timer.h"
-#include "../drivers/placaVerde.h"
-#include "../drivers/Card.h"
-#include "../drivers/FRDM.h"
-#include "../app/users.h"
+#include "../headers/fsm.h"
+#include "../../drivers/headers/timer.h"
+#include "../../drivers/headers/PV.h"
+#include "../../drivers/headers/Card.h"
+#include "../../drivers/headers/FRDM.h"
+#include "../../app/headers/users.h"
  /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -111,7 +111,6 @@ state FSMInitState(void) {
 	//Pido ids de todos los servicios
 	inactivity_timer_id = timerGetId();
 	open_timer_id = timerGetId();
-	my_encoder_id = PVencoder_register();
 
 	//Comienzo timers
 	timerStart(inactivity_timer_id, TIMER_MS2TICKS(INACTIVITY_TRIGGER_TIME), TIM_MODE_SINGLESHOT, inactivityCallback);
@@ -129,6 +128,10 @@ state FSMInitState(void) {
 	fe_data.brightness = 100;
 	fe_data.id_data = &encoder_id_digits[0];
 	fe_data.pin_data = &encoder_pin_digits[0];
+	//me suscribo a los eventos de encoder
+	PVSuscribeEvent(BTN_PRESS, true);
+	PVSuscribeEvent(ENC_LEFT, true);
+	PVSuscribeEvent(ENC_RIGHT, true);
 	return IDDLE;
 }
 
@@ -222,7 +225,7 @@ state IDDLERoutine(void) {
 		}
 	}
 
-	if (PVencoder_event_avb(my_encoder_id)) {
+	if (PVCheckEvent()) {
 		fe_data.animation_en = false;
 		using_encoder = true;
 	}
@@ -245,17 +248,17 @@ state IDDLERoutine(void) {
 				//	}
 				//}
 				//////////////////////////////////////////////////
-				// ACA HAY QUE VER PARA QUE EN EL DISPLAY NO QUEDE CAGADO //creo que lo hice bien pero estaría bueno que me lo chequeens
+				// ACA HAY QUE VER PARA QUE EN EL DISPLAY NO QUEDE CAGADO //creo que lo hice bien pero estarï¿½a bueno que me lo chequeens
 				//////////////////////////////////////////////////////////
 				fe_data.id_counter--;
 			}
 			back_triggered = false;
 		}
 		//ahora hay que fijarse si llego un evento de encoder, si es derecha aumento el numero si es izquierda lo achico si es enter avanzo
-		if (PVencoder_event_avb(my_encoder_id)) {
-			event_t ev = PVencoder_pop_event(my_encoder_id);
+		if (PVCheckEvent()) {
+			event_t ev = PVGetEv();
 			switch (ev) {
-			case LEFT_TURN:
+			case ENC_LEFT:
 				if (actual_encoder_number == 0)
 					actual_encoder_number = 9;
 				else
@@ -264,13 +267,13 @@ state IDDLERoutine(void) {
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
 				//if (fe_data.id_counter < 4) {
 
-				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habría que ver bien el orden de los displays
+				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habrï¿½a que ver bien el orden de los displays
 				//}
 				//else {
-				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habrï¿½a que ver bien el orden de los displays
 				//}
 				break;
-			case RIGHT_TURN:
+			case ENC_RIGHT:
 				if (actual_encoder_number == 9)
 					actual_encoder_number = 0;
 
@@ -279,13 +282,13 @@ state IDDLERoutine(void) {
 
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
 				//if (fe_data.id_counter < 4) {
-				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habría que ver bien el orden de los displays
+				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habrï¿½a que ver bien el orden de los displays
 				//}
 				//else {
-				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habrï¿½a que ver bien el orden de los displays
 				//}
 				break;
-			case BUTTON_PRESS:
+			case BTN_PRESS:
 				if (fe_data.id_counter < ID_LEN-1) {
 					fe_data.id_counter++;
 				}
@@ -359,12 +362,12 @@ state askPinRoutine(void) {
 		}
 	}
 	//ahora hay que fijarse si llego un evento de encoder, si es derecha aumento el numero si es izquierda lo achico si es enter avanzo
-	if (PVencoder_event_avb(my_encoder_id)) {
+	if (PVCheckEvent()) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);//Reinicio timer
-		event_t ev = PVencoder_pop_event(my_encoder_id);
+		event_t ev = PVGetEv();
 		switch (ev) {
-		case LEFT_TURN:
+		case ENC_LEFT:
 			if (actual_encoder_number == 0)
 				actual_encoder_number = 9;
 			else
@@ -376,14 +379,14 @@ state askPinRoutine(void) {
 			//	for (k = 0; k < fe_data.pin_counter; k++) {
 			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
 			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habrï¿½a que ver bien el orden de los displays
 			//}
 			//else {
 			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habrï¿½a que ver bien el orden de los displays
 			//}
 			break;
-		case RIGHT_TURN:
+		case ENC_RIGHT:
 			if (actual_encoder_number == 9)
 				actual_encoder_number = 0;
 
@@ -396,14 +399,14 @@ state askPinRoutine(void) {
 			//	for (k = 0; k < fe_data.pin_counter; k++) {
 			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
 			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habrï¿½a que ver bien el orden de los displays
 			//}
 			//else {
 			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habrï¿½a que ver bien el orden de los displays
 			//}
 			break;
-		case BUTTON_PRESS:
+		case BTN_PRESS:
 			if (fe_data.pin_counter < PIN_LEN) {
 				fe_data.pin_counter++;
 			}
@@ -448,12 +451,12 @@ state accessRoutine(void) {
 		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
 		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
 	}
-	if (PVencoder_event_avb(my_encoder_id)) {
+	if (PVCheckEvent()) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);//Reinicio timer
-		event_t ev = PVencoder_pop_event(my_encoder_id);
+		event_t ev = PVGetEv();
 		switch (ev) {
-		case LEFT_TURN:
+		case ENC_LEFT:
 			if (selection == OPEN_SEL)
 				selection = USER_SEL;
 			else 
@@ -472,7 +475,7 @@ state accessRoutine(void) {
 			default: break;
 			}
 			break;
-		case RIGHT_TURN:
+		case ENC_RIGHT:
 			if (selection == USER_SEL)
 				selection = OPEN_SEL;
 			else
@@ -491,7 +494,7 @@ state accessRoutine(void) {
 			default: break;
 			}
 			break;
-		case BUTTON_PRESS :
+		case BTN_PRESS :
 			switch (selection) {
 			case USER_SEL:
 				updated_state = USERS;
@@ -536,7 +539,7 @@ state usersRoutine(void) {
 
 state brightnessRoutine(void) {
 	state updated_state = BRIGHTNESS;
-	//Si entré aca , el estado actual es brightness
+	//Si entrï¿½ aca , el estado actual es brightness
 	//por lo que si el estado previo es distinto de brightenss 
 	//es la primera vez que entro, por lo que debo iniciar el timer de timout
 
@@ -547,17 +550,17 @@ state brightnessRoutine(void) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 	}
-	if (PVencoder_event_avb(my_encoder_id)) {
+	if (PVCheckEvent()) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		event_t ev = PVencoder_pop_event(my_encoder_id);
-		if ((ev == LEFT_TURN) && (fe_data.brightness > 0)) {
+		event_t ev = PVGetEv();
+		if ((ev == ENC_LEFT) && (fe_data.brightness > 0)) {
 			fe_data.brightness--;
 		}
-		else if ((ev == RIGHT_TURN) && (fe_data.brightness < 100)) {
+		else if ((ev == ENC_RIGHT) && (fe_data.brightness < 100)) {
 			fe_data.brightness++;
 		}
-		else if (ev == BUTTON_PRESS) {
+		else if (ev == BTN_PRESS) {
 			updated_state = ACCESS;
 			timerStop(inactivity_timer_id);
 		}

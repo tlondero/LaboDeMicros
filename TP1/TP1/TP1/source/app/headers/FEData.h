@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _FEND_T_H_
+#define _FEND_T_H_
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -28,3 +29,4 @@ typedef struct {
 	bool good_pin;
 	bool open;
 }FEData;
+#endif

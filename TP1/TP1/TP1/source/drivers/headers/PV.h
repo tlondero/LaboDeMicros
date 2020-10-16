@@ -39,8 +39,8 @@ typedef enum {
 
 typedef enum { PV_RIGHT, PV_LEFT } PVDirection_t;
 
-typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION
-} PVAnimation_t;
+//typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION
+//} PVAnimation_t;
 
 typedef uint8_t PVButton_t;
 typedef encoder_id PVEncoder_t;
@@ -110,7 +110,7 @@ bool PVDisplayShift(PVDirection_t direction);
 /**
  * @brief 
  */
-bool PVAnimation(PVAnimation_t animation, bool activate);
+//bool PVAnimation(PVAnimation_t animation, bool activate);
 
 /*******************************************************************************
  ******************************************************************************/

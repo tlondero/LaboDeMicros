@@ -4,6 +4,31 @@
 // @author   Nicolás Magliola
 // ******************************************************************************/
 //
+////////// MAIN DE PROGRAMA??//////////////////
+
+#include "drivers/headers/Card.h"
+#include "drivers/headers/FRDM.h"
+#include "drivers/headers/PV.h"
+#include "drivers/headers/timer.h"
+#include "app/headers/fsm.h"
+#include "app/headers/FEData.h"
+static state st;
+void App_Init(void) {
+	timerInit();
+	FRDMInit();
+	cardInitDriver(0);
+	PVInit();
+	st=FSMInitState();
+}
+
+void App_Run(void) {
+
+	st = FSMRun(st);
+	FEData  mydata = *(FSMGetFEData());
+//  doStuffFrontEnd(mydata);
+}
+
+
 ///*******************************************************************************
 // * INCLUDE HEADER FILES
 // ******************************************************************************/
@@ -101,20 +126,20 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include "stdbool.h"
-#include <stdio.h>
-#include "drivers/headers/FTM.h"
-#include "drivers/headers/FRDM.h"
-#include "drivers/headers/PORT.h"
-#include "drivers/headers/board.h"
-#include "drivers/headers/gpio.h"
-
-/*******************************************************************************
- * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
- ******************************************************************************/
-#define PIN_PTC1 71
-#define PIN_PTC3 73
-#define PIN_PTB21 67
+//#include "stdbool.h"
+//#include <stdio.h>
+//#include "drivers/headers/FTM.h"
+//#include "drivers/headers/FRDM.h"
+//#include "drivers/headers/PORT.h"
+//#include "drivers/headers/board.h"
+//#include "drivers/headers/gpio.h"
+//
+///*******************************************************************************
+// * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
+// ******************************************************************************/
+//#define PIN_PTC1 71
+//#define PIN_PTC3 73
+//#define PIN_PTB21 67
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -129,9 +154,9 @@
 /*******************************************************************************
  * INTERRUPCIONES
  ******************************************************************************/
-static uint8_t xd;
-static int8_t button_id1;
-static uint8_t ledid;
+//static uint8_t xd;
+//static int8_t button_id1;
+//static uint8_t ledid;
 //void callback(void){
 //	xd = 10;
 //}
@@ -180,45 +205,45 @@ static uint8_t ledid;
 //			FTMStartClock(0);
 //}
 
-void App_Init (void)
-{
-    PORT_Init();
-    button_id1 = ButtonInit(PIN_SW2, INPUT_PULLUP);
-    led_init_driver();
-    ledid = led_init_led(PC, 3, TURNS_ON_WITH_0);
-    led_configure_brightness(ledid, 0.25);
-    led_configure_time(ledid, 3000);
-
-}
-
-
-void App_Run (void)
-{
-	const ButtonEvent * evsw1 = ButtonGetEvent(button_id1);
-	while((*evsw1) != EOQ){
-		switch (*evsw1){
-			case LKP:
-
-				break;
-			case PRESS:
-
-				break;
-
-			case RELEASE:
-
-
-				break;
-			case SKP:
-				led_set_state(ledid, LED_ON);
-				break;
-			default:
-
-				break;
-			}
-		evsw1++;
-	    }
-	led_poll();
-}
+//void App_Init (void)
+//{
+//    PORT_Init();
+//    button_id1 = ButtonInit(PIN_SW2, INPUT_PULLUP);
+//    led_init_driver();
+//    ledid = led_init_led(PC, 3, TURNS_ON_WITH_0);
+//    led_configure_brightness(ledid, 0.25);
+//    led_configure_time(ledid, 3000);
+//
+//}
+//
+//
+//void App_Run (void)
+//{
+//	const ButtonEvent * evsw1 = ButtonGetEvent(button_id1);
+//	while((*evsw1) != EOQ){
+//		switch (*evsw1){
+//			case LKP:
+//
+//				break;
+//			case PRESS:
+//
+//				break;
+//
+//			case RELEASE:
+//
+//
+//				break;
+//			case SKP:
+//				led_set_state(ledid, LED_ON);
+//				break;
+//			default:
+//
+//				break;
+//			}
+//		evsw1++;
+//	    }
+//	led_poll();
+//}
 //
 ////void App_Run(void) {
 ////	int8_t bright = 20;

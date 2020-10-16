@@ -1,73 +1,47 @@
 /***************************************************************************//**
-  @file     App.c
-  @brief    Application functions
-  @author   Nicolás Magliola
+  @file     Card.h
+  @brief    magnetic card xd
+  @author   MAGT
  ******************************************************************************/
+
+#ifndef CARD_H_
+#define CARD_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-
-//#include <header/ejercicios_headers/BalizaSwitchSysTick/balizaSwitchSysTick.h>
-//#include "header/ejercicios_headers/Baliza/baliza.h"
-//#include "header/ejercicios_headers/BalizaSysTick/balizast.h"
-#include "header/board.h"
-#include "header/gpio.h"
-#include "stdbool.h"
-#include <stdio.h>
 #include <stdint.h>
-#include "header/SysTick.h"
-#include "timer.h"
-#include "header/Button.h"
-#include "header/Card.h"
+
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
+#define PAN_LENGHT (19)
+/*******************************************************************************
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+ ******************************************************************************/
+/*******************************************************************************
+ * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
+ ******************************************************************************/
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
+ ******************************************************************************/
+/**
+ * @brief  cardGetPAN: returns a pointer to the data, its null if it doesnt have a message, or the message had an error.
+ * @returns pointer to the data.
+ */
+uint8_t * cardGetPAN(void);
+
+/**
+ * @brief  cardInitDriver: Initializes all the drivers that the card driver uses.
+ */
+void cardInitDriver(void (*fun_callback)(void));
+
 
 
 /*******************************************************************************
- * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
- ******************************************************************************/
-
-
-/*******************************************************************************
- *******************************************************************************
-                        GLOBAL FUNCTION DEFINITIONS
- *******************************************************************************
- *******************************************************************************
- ******************************************************************************/
-
-
-/*******************************************************************************
- * INTERRUPCIONES
  ******************************************************************************/
 
 
 
-
-/*******************************************************************************
- * BALIZA
- ******************************************************************************/
-
-//static void update_baliza(int period);
-
-
-void App_Init (void)
-{
-	cardInitDriver(NULL);
-}
-
-
-/* Función que se llama constantemente en un ciclo infinito */
-static uint8_t *dato;
-void App_Run (void)
-{
-
-	dato = cardGetPAN();
-	if(dato != NULL){
-		int i = 0;
-		for (i = 0; i< PAN_LENGHT; i++){
-			uint8_t a = dato[i];
-		}
-	}
-}
+#endif /* CARD_H_ */

@@ -3,9 +3,12 @@ using namespace std;
 #include <iostream>
 uint8_t* cardGetPAN(void) {
 	static uint8_t PAN[PAN_LENGHT] = 
-	{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
-	cout << "Returning PAN " << endl;
-	return &PAN[0];
+	//{0,0,0,0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1};//ID VALIDA
+	{0,0,0,0,0,5,5,5,1,1,1,1,1,1,1,1,1,1,1};//ID INVALIDA
+	//cout << "Returning PAN " << endl;
+	//return &PAN[0];
+	cout << "Entered get PAN, returning NULL" << endl;
+	return 0;
 }
 
 void cardInitDriver(void (*fun_callback)(void)) {

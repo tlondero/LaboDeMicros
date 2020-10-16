@@ -6,8 +6,8 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include "header/Card.h"
-#include "header/gpio.h"
+#include "../headers/Card.h"
+#include "../headers/gpio.h"
 #include "MK64F12.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
