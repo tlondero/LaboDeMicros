@@ -38,6 +38,10 @@ static PVEncoder_t idEncoder;
 
 static uint8_t brightness;
 
+static bool isEvent = false;
+static PVEv_t event = NO_PV_EV;
+static uint8_t listEv[NO_PV_EV] = { 0 };
+
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -70,35 +74,47 @@ void PVInit(void) {
 	//led	
 }
 
-PVEv_t PVGetEv(void) {
+void PVSuscribeEvent(PVEv_t ev, bool state) {
+	listEv[ev] = state;
+}
+
+bool PVCheckEvent(void) {
 
 	if (EncoderEventAVB(idEncoder)) {
 		event_t ev = EncoderPopEvent(idEncoder);
-		switch (ev) {
-		case (RIGHT_TURN):
-			return ENC_RIGHT;
-		case (LEFT_TURN):
-			return ENC_LEFT;
-		default:
-			return NO_PV_EV;
+		if ((ev == RIGHT_TURN) && (listEv[ENC_RIGHT])) {
+			event = ENC_RIGHT;
+		} else if ((ev == LEFT_TURN) && (listEv[ENC_LEFT])) {
+			event = ENC_LEFT;
+		} else {
+			event = NO_PV_EV;
 		}
 	} else {
 		uint8_t btnev = *ButtonGetEvent(button);
-		switch (btnev) {
-		case (PRESS):
-			return BTN_PRESS;
-		case (RELEASE):
-			return BTN_RELEASE;
-		case (LKP):
-			return BTN_LKP;
-		case (SKP):
-			return BTN_SKP;
-		case (NO_EV):
-			return NO_PV_EV;
-		default:
-			return NO_PV_EV;
+		if ((btnev == PRESS) && (listEv[BTN_PRESS])) {
+			event = BTN_PRESS;
+		} else if ((btnev == RELEASE) && (listEv[BTN_RELEASE])) {
+			event = BTN_RELEASE;
+		} else if ((btnev == LKP) && (listEv[BTN_LKP])) {
+			event = BTN_LKP;
+		} else if ((btnev == SKP) && (listEv[BTN_SKP])) {
+			event = BTN_SKP;
+		} else if ((btnev == NO_EV) && (listEv[NO_PV_EV])) {
+			event = NO_PV_EV;
+		} else {
+			event = NO_PV_EV;
 		}
 	}
+	if (event != NO_PV_EV) {
+		isEvent = true;
+	} else {
+		isEvent = false;
+	}
+	return isEvent;
+}
+
+PVEv_t PVGetEv(void) {
+	return event;
 }
 
 bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {

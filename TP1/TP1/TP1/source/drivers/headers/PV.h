@@ -58,12 +58,14 @@ typedef encoder_id PVEncoder_t;
  */
 void PVInit(void);
 
+void PVSuscribeEvent(PVEv_t ev, bool state);
+
+bool PVCheckEvent(void);
 
 /**
  * @brief Get encoder or button event
  */
 PVEv_t PVGetEv(void);
-
 
 /**
  * @brief Clear display
