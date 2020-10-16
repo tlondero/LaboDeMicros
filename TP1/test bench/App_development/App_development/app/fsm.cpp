@@ -212,8 +212,15 @@ state IDDLERoutine(void) {
 					id_counter++;
 				}
 				else {
-					if (checkExistance(transformToNum(&encoder_id_digits[0], ID_LEN)))
-						updated_state = ASK_PIN;
+					if (checkExistance(transformToNum(&encoder_id_digits[0], ID_LEN))) {
+						if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
+							PVAnimation(BLOCKED_ANIMATION, true);
+							updated_state = IDDLE;
+						}
+						else {
+							updated_state = ASK_PIN;
+						}
+					}
 					else {
 						PVAnimation(INVALID_ID_ANIMATION, true);
 					}
