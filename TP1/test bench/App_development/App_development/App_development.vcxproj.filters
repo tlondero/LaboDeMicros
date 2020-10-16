@@ -68,5 +68,8 @@
     <ClInclude Include="app\users.h">
       <Filter>Header Files\App</Filter>
     </ClInclude>
+    <ClInclude Include="FEData.h">
+      <Filter>Header Files\App</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

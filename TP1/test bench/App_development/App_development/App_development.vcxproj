@@ -153,6 +153,7 @@
     <ClInclude Include="drivers\FRDM.h" />
     <ClInclude Include="drivers\placaVerde.h" />
     <ClInclude Include="drivers\Timer.h" />
+    <ClInclude Include="FEData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

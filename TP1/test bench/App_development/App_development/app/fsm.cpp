@@ -17,20 +17,39 @@
   /*******************************************************************************
    * VARIABLE PROTOTYPES WITH FILE SCOPE
    ******************************************************************************/
-static tim_id_t inactivity_timer_id;
-static tim_id_t open_timer_id;
-static const uint8_t cancel_switch = BUTTON_SW2;
-static const uint8_t back_switch = BUTTON_SW3;
+
+//Frond-end data
+static FEData fe_data;
+static FEData * const fe_data_ptr;
+
+//Encoder
 static encoder_id my_encoder_id;
-static uint8_t encoder_id_digits[ID_LEN];
+
+//Pin buffer
 static uint8_t encoder_pin_digits[PIN_LEN];
 
+//Id Buffer
+static uint8_t encoder_id_digits[ID_LEN];
+
+//Inactivity
+static tim_id_t inactivity_timer_id;
 static bool inactivity_triggered;
+
+//Open
+static tim_id_t open_timer_id;
 static bool open_triggered;
+
+//Cancel
+static const uint8_t cancel_switch = BUTTON_SW2;
 static bool cancel_triggered;
+
+//Back
+static const uint8_t back_switch = BUTTON_SW3;
 static bool back_triggered;
 
+//Fsm
 static state prev_state = IDDLE;
+
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH FILE SCOPE
  ******************************************************************************/
@@ -85,21 +104,40 @@ void openCallback(void);
  ******************************************************************************/
 
 state FSMInitState(void) {
+
+	//Pido ids de todos los servicios
 	inactivity_timer_id = timerGetId();
 	open_timer_id = timerGetId();
 	my_encoder_id = PVencoder_register();
+
+	//Comienzo timers
 	timerStart(inactivity_timer_id, TIMER_MS2TICKS(INACTIVITY_TRIGGER_TIME), TIM_MODE_SINGLESHOT, inactivityCallback);
 	timerStop(inactivity_timer_id);
 	timerStart(open_timer_id, TIMER_MS2TICKS(OPEN_TRIGGER_TIME), TIM_MODE_SINGLESHOT, openCallback);
 	timerStop(open_timer_id);
+
 	//Tengo que activar las interrupciones de cancel y delete
 	FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
 	FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
-	PVAnimation(IDDLE_ANIMATION, true);
+
+	//Front-end related stuff
+	fe_data.animation_en = true;
+	fe_data.animation_opt = IDDLE_ANIMATION;
+	fe_data.brightness = 100;
+
 	return IDDLE;
 }
 
 state FSMRun(state actual_state) {
+
+	//Cada vez que entro de nuevo a FSMRun desactivo
+	//los bools que le informaban al front end de las cosas que sucedieron
+	fe_data.blocked_user = false;
+	fe_data.bad_id = false;
+	fe_data.good_id = false;
+	fe_data.bad_pin = false;
+	fe_data.good_pin = false;
+	fe_data.open = false;
 
 	state updated_state;
 	switch (actual_state) {
@@ -128,58 +166,84 @@ state FSMRun(state actual_state) {
 	return updated_state;
 }
 
+FEData const * FSMGetFEData(void) {
+	return fe_data_ptr;
+}
+
 /*******************************************************************************
  * FUNCTION DEFINITION WITH FILE SCOPE
  ******************************************************************************/
 state IDDLERoutine(void) {
 	static bool using_encoder = false;
-	static uint8_t id_counter = 0;
 	static uint8_t actual_encoder_number = 0;
-
 	uint8_t* card_event = 0;
-	if (!using_encoder) {
-		card_event = cardGetPAN();
-	}
+
 	state updated_state = IDDLE;
+
+	/*
+	* STATE INIT
+	*/
 	if (prev_state != IDDLE) {
-		//PVAnimation(IDDLE_ANIMATION, true);
-		id_counter = 0;
+		fe_data.animation_en = true;
+		fe_data.animation_opt = IDDLE_ANIMATION;
+		fe_data.id_counter = 0;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
+
+	/*
+	* STATE RUN
+	*/
+	if (!using_encoder) {
+		card_event = cardGetPAN();
+		if (card_event != NULL) {
+			if (checkExistance(transformToNum(card_event, ID_LEN))) {
+				if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
+					fe_data.blocked_user = true;
+					updated_state = IDDLE;
+				}
+				else {
+					updated_state = ASK_PIN;
+					fe_data.good_id = true;
+				}
+			}
+			else {
+				card_event = NULL;
+				fe_data.bad_id = true;
+			}
+
+		}
+	}
+
 	if (PVencoder_event_avb(my_encoder_id)) {
-		//PVAnimation(IDDLE_ANIMATION, false);
+		fe_data.animation_en = false;
 		using_encoder = true;
 	}
-	if (using_encoder) {
+	if (using_encoder && updated_state == IDDLE) {
 		if (cancel_triggered) {
-			//uint8_t i = 0;
-			//for (i = 0; i < id_counter; i++) {
-			//	encoder_id_digits[i] = CLEARED_DIGIT; //sospechado al p2
-			//}
-			//PVAnimation(IDDLE_ANIMATION, true);
-			id_counter = 0;
+			fe_data.animation_en = true;
+			fe_data.id_counter = 0;
 			using_encoder = false;
 			cancel_triggered = false;
 		}
-		if (back_triggered) {
-			if (id_counter > 0) {//osea lease borre el ultimo caracter
-				//encoder_id_digits[id_counter] = CLEARED_DIGIT;
-				//if (id_counter < 4)
-				//	PVdispSendChar(' ', id_counter);
+		else if (back_triggered) {
+			if (fe_data.id_counter > 0) {
+				//encoder_id_digits[fe_data.id_counter] = CLEARED_DIGIT;
+				//if (fe_data.id_counter < 4)
+				//	PVdispSendChar(' ', fe_data.id_counter);
 				//else {
 				//	uint8_t i;
 				//	for (i = 0; i < 4; i++) {
-				//		PVdispSendChar(encoder_id_digits[id_counter - 1 - i] + '0', 3 - i);
+				//		PVdispSendChar(encoder_id_digits[fe_data.id_counter - 1 - i] + '0', 3 - i);
 				//	}
 				//}
 				//////////////////////////////////////////////////
 				// ACA HAY QUE VER PARA QUE EN EL DISPLAY NO QUEDE CAGADO //creo que lo hice bien pero estaría bueno que me lo chequeens
 				//////////////////////////////////////////////////////////
-				id_counter--;
+				fe_data.id_counter--;
 			}
 			back_triggered = false;
 		}
@@ -192,9 +256,11 @@ state IDDLERoutine(void) {
 					actual_encoder_number = 9;
 				else
 					actual_encoder_number--;
-				//if (id_counter < 4) {
 
-				//	PVdispSendChar(actual_encoder_number + '0', id_counter);//Aca habría que ver bien el orden de los displays
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+				//if (fe_data.id_counter < 4) {
+
+				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habría que ver bien el orden de los displays
 				//}
 				//else {
 				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
@@ -206,68 +272,51 @@ state IDDLERoutine(void) {
 
 				else
 					actual_encoder_number++;
-				//if (id_counter < 4) {
 
-				//	PVdispSendChar(actual_encoder_number + '0', id_counter);//Aca habría que ver bien el orden de los displays
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+				//if (fe_data.id_counter < 4) {
+
+				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habría que ver bien el orden de los displays
 				//}
 				//else {
 				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
 				//}
 				break;
 			case BUTTON_PRESS:
-				if (id_counter < ID_LEN) {
-					encoder_id_digits[id_counter] = actual_encoder_number;
-					//PVdispShift(LEFT);
-					id_counter++;
+				if (fe_data.id_counter < ID_LEN - 1) {
+					fe_data.id_counter++;
 				}
 				else {
 					if (checkExistance(transformToNum(&encoder_id_digits[0], ID_LEN))) {
 						if (getBlockedStatus(transformToNum(&encoder_id_digits[0], ID_LEN))) {
-							//PVAnimation(BLOCKED_ANIMATION, true);
+							fe_data.blocked_user = true;
+							fe_data.animation_en = true;
 							updated_state = IDDLE;
 						}
 						else {
 							updated_state = ASK_PIN;
+							fe_data.good_id = true;
 						}
 					}
-					//else {
-						//PVAnimation(INVALID_ID_ANIMATION, true);
-					//}
+					else {
+						fe_data.bad_id = true;
+					}
 				}
 				break;
 			default:
 				break;
 			}
 		}
-
-	}
-	else if (card_event != NULL) {
-		PVAnimation(IDDLE_ANIMATION, false);
-		if (checkExistance(transformToNum(card_event, ID_LEN))) {
-			if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
-				//PVAnimation(BLOCKED_ANIMATION, true);
-				updated_state = IDDLE;
-			}
-			else {
-				updated_state = ASK_PIN;
-			}
-		}
-		else {
-			card_event = NULL;
-			//PVAnimation(INVALID_ID_ANIMATION, true);
-		}
-
 	}
 	return updated_state;
 }
 state askPinRoutine(void) {
 	state updated_state = ASK_PIN;
-	static uint8_t pin_counter = 0;
 	static uint8_t actual_encoder_number = 0;
 
 	if (prev_state != ASK_PIN) {
-		pin_counter = 0;
-		PVAnimation(IDDLE_ANIMATION, false);//apago animaciones
+		fe_data.pin_counter = 0;
+		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
@@ -279,28 +328,25 @@ state askPinRoutine(void) {
 		uint8_t i = 0;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		//for (i = 0; i < pin_counter; i++) {
-		//	encoder_pin_digits[i] = CLEARED_DIGIT;
-		//}
-		pin_counter = 0;
+		fe_data.pin_counter = 0;
 		cancel_triggered = false;
 	}
 	if (back_triggered) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		if (pin_counter > 0) {//osea lease borre el ultimo caracter
-			//encoder_pin_digits[pin_counter] = CLEARED_DIGIT;
-			//if (pin_counter < 4)
-			//	PVdispSendChar(' ', pin_counter);
+		if (fe_data.pin_counter > 0) {//osea lease borre el ultimo caracter
+			//encoder_pin_digits[fe_data.pin_counter] = CLEARED_DIGIT;
+			//if (fe_data.pin_counter < 4)
+			//	PVdispSendChar(' ', fe_data.pin_counter);
 			//else {
 			//	uint8_t i;
 			//	for (i = 0; i < 3; i++) {
 			//		PVdispSendChar('-', i);
 			//	}
-			//	PVdispSendChar(encoder_pin_digits[pin_counter] + '0', 3);//escribo '-' en todos exepto el ultimo
+			//	PVdispSendChar(encoder_pin_digits[fe_data.pin_counter] + '0', 3);//escribo '-' en todos exepto el ultimo
 
 			//}
-			pin_counter--;
+			fe_data.pin_counter--;
 			back_triggered = false;
 		}
 	}
@@ -315,12 +361,14 @@ state askPinRoutine(void) {
 				actual_encoder_number = 9;
 			else
 				actual_encoder_number--;
-			//if (pin_counter < 4) {
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			//if (fe_data.pin_counter < 4) {
 			//	uint8_t k = 0;
-			//	for (k = 0; k < pin_counter; k++) {
+			//	for (k = 0; k < fe_data.pin_counter; k++) {
 			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
 			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', pin_counter);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habría que ver bien el orden de los displays
 			//}
 			//else {
 			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
@@ -333,12 +381,14 @@ state askPinRoutine(void) {
 
 			else
 				actual_encoder_number++;
-			//if (pin_counter < 4) {
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			//if (fe_data.pin_counter < 4) {
 			//	uint8_t k = 0;
-			//	for (k = 0; k < pin_counter; k++) {
+			//	for (k = 0; k < fe_data.pin_counter; k++) {
 			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
 			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', pin_counter);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habría que ver bien el orden de los displays
 			//}
 			//else {
 			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
@@ -346,18 +396,20 @@ state askPinRoutine(void) {
 			//}
 			break;
 		case BUTTON_PRESS:
-			if (pin_counter < PIN_LEN) {
-				encoder_pin_digits[pin_counter] = actual_encoder_number;
-				//if (pin_counter > 3)
-					//PVdispShift(LEFT);
-				pin_counter++;
+			if (fe_data.pin_counter < PIN_LEN) {
+				fe_data.pin_counter++;
 			}
 			else {
-				if (checkPassword(transformToNum(&encoder_pin_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN)))
+				if (checkPassword(transformToNum(&encoder_pin_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN))) {
 					updated_state = ACCESS;
+					fe_data.good_pin = true;
+				}
 				else {
-					//PVAnimation(INVALID_PIN_ANIMATION, true);
 					addStrike(transformToNum(&encoder_pin_digits[0], ID_LEN));
+					fe_data.bad_pin = true;
+					if (getBlockedStatus(transformToNum(&encoder_pin_digits[0], ID_LEN))) {
+						fe_data.blocked_user = true;
+					}
 				}
 			}
 			break;
@@ -377,7 +429,7 @@ state askPinRoutine(void) {
 state accessRoutine(void) {
 	state updated_state = ACCESS;
 	if (prev_state != ACCESS) {
-		//PVAnimation(IDDLE_ANIMATION, false);
+		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		//desactivar las interrupciones de cancel y del
@@ -390,7 +442,8 @@ state accessRoutine(void) {
 state openRoutine(void) {
 	state updated_state = OPEN;
 	if (prev_state != OPEN) {
-		//PVAnimation(OPEN_ANIMATION, true);
+		fe_data.animation_en = true;
+		fe_data.open = true;
 		timerReset(open_timer_id);
 		timerResume(open_timer_id);
 	}
@@ -404,7 +457,7 @@ state openRoutine(void) {
 state usersRoutine(void) {
 	state updated_state = IDDLE;
 	if (prev_state != USERS) {
-		//PVAnimation(IDDLE_ANIMATION, false);
+		fe_data.animation_en = false;
 	}
 	return updated_state;
 }
@@ -418,7 +471,7 @@ state brightnessRoutine(void) {
 
 	if (prev_state != BRIGHTNESS) {
 		//desactivar interrupciones de cancel y back
-		//PVAnimation(BRIGHTNESS_ANIMATION, true);        //Aca debería mandar al display la palabra acorde a BRIGHTNESS para ver como cambia
+		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 	}
@@ -426,11 +479,11 @@ state brightnessRoutine(void) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		event_t ev = PVencoder_pop_event(my_encoder_id);
-		if (ev == LEFT_TURN) {
-			//PVDecreaseBrightness();
+		if ((ev == LEFT_TURN) && (fe_data.brightness > 0)) {
+			fe_data.brightness--;
 		}
-		else if (ev == RIGHT_TURN) {
-			//PVIncreaseBrightness();
+		else if ((ev == RIGHT_TURN) && (fe_data.brightness < 100)) {
+			fe_data.brightness++;
 		}
 		else if (ev == BUTTON_PRESS) {
 			updated_state = ACCESS;
@@ -444,6 +497,7 @@ state brightnessRoutine(void) {
 	}
 	return updated_state;
 }
+
 /*******************************************************************************
  * CALLBACKS DEFINITION
  ******************************************************************************/
