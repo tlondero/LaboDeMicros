@@ -86,7 +86,8 @@ const static character_t characters[] = {
         {'W', {LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW} },
         {'X', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
         {'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
-        {'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} }
+        {'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} },
+		{'-', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW} }
 };
 
 typedef struct {
@@ -202,7 +203,6 @@ void dispClearAll(void) {
 			for (j = 0; j < SEVEN_SEGMENTS_PINS; j++)
 				led_set_state(PINES[j], LOW);
 		displays[i].enable = false;
-
 	}
 }
 

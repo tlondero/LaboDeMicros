@@ -83,6 +83,15 @@ void FRDMInit(void) {
 	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
 	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
 
+	/*
+	gpioMode(PIN_LED_BLUE, OUTPUT);
+	gpioWrite(PIN_LED_BLUE, HIGH);
+	gpioMode(PIN_LED_RED, OUTPUT);
+	gpioWrite(PIN_LED_RED, HIGH);
+	gpioMode(PIN_LED_GREEN, OUTPUT);
+	gpioWrite(PIN_LED_GREEN, HIGH);
+	*/
+
 	led_init_driver();
 
 	idLedRed = led_init_led(PB, 22, TURNS_ON_WITH_0);
@@ -173,7 +182,7 @@ bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 	if ((button == BUTTON_SW2) || (button == BUTTON_SW3)) {
 		uint8_t IRQ = BT_CANT_MODES;
 		bool correct_mode = true;
-		switch(IRQ_mode){
+		switch (IRQ_mode) {
 		case (BT_DISABLE):
 			IRQ = GPIO_IRQ_MODE_DISABLE;
 			break;
@@ -196,15 +205,14 @@ bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 			correct_mode = false;
 			break;
 		}
-		
+
 		if (correct_mode) {
 			ButtonSetIRQ(button, IRQ, fcallback);
 			return true;
-		}
-		else{
+		} else {
 			return false;
 		}
-		
+
 	} else {
 		return false;
 	}

@@ -73,7 +73,7 @@ void PVDisplayClear(void);
 /**
  * @brief Sets button IQR
  */
-void PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) ;
+bool PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) ;
 
 /**
  * @brief Set brightness
@@ -103,12 +103,12 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
  * @brief dispShift: shifts the msg in screen one row to the "direction"
  * @params direction:see the PVDirection for the modes.
  */
-void PVDisplayShift(PVDirection_t direction);
+bool PVDisplayShift(PVDirection_t direction);
 
 /**
  * @brief 
  */
-void PVAnimation(PVAnimation_t animation, bool activate);
+bool PVAnimation(PVAnimation_t animation, bool activate);
 
 /*******************************************************************************
  ******************************************************************************/
