@@ -147,6 +147,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="app\FEData.h" />
     <ClInclude Include="app\fsm.h" />
     <ClInclude Include="app\users.h" />
     <ClInclude Include="drivers\Card.h" />

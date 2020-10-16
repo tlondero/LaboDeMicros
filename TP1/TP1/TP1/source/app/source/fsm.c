@@ -1,12 +1,12 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include "fsm.h"
-#include "../drivers/Timer.h"
-#include "../drivers/placaVerde.h"
-#include "../drivers/Card.h"
-#include "../drivers/FRDM.h"
-#include "../app/users.h"
+#include "headers/fsm.h"
+#include "../drivers/headers/Timer.h"
+#include "../drivers/headers/PV.h"
+#include "../drivers/headers/Card.h"
+#include "../drivers/headers/FRDM.h"
+#include "../app/headers/users.h"
  /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -245,7 +245,7 @@ state IDDLERoutine(void) {
 				//	}
 				//}
 				//////////////////////////////////////////////////
-				// ACA HAY QUE VER PARA QUE EN EL DISPLAY NO QUEDE CAGADO //creo que lo hice bien pero estaría bueno que me lo chequeens
+				// ACA HAY QUE VER PARA QUE EN EL DISPLAY NO QUEDE CAGADO //creo que lo hice bien pero estarï¿½a bueno que me lo chequeens
 				//////////////////////////////////////////////////////////
 				fe_data.id_counter--;
 			}
@@ -264,10 +264,10 @@ state IDDLERoutine(void) {
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
 				//if (fe_data.id_counter < 4) {
 
-				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habría que ver bien el orden de los displays
+				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habrï¿½a que ver bien el orden de los displays
 				//}
 				//else {
-				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habrï¿½a que ver bien el orden de los displays
 				//}
 				break;
 			case RIGHT_TURN:
@@ -279,10 +279,10 @@ state IDDLERoutine(void) {
 
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
 				//if (fe_data.id_counter < 4) {
-				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habría que ver bien el orden de los displays
+				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habrï¿½a que ver bien el orden de los displays
 				//}
 				//else {
-				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habrï¿½a que ver bien el orden de los displays
 				//}
 				break;
 			case BUTTON_PRESS:
@@ -376,11 +376,11 @@ state askPinRoutine(void) {
 			//	for (k = 0; k < fe_data.pin_counter; k++) {
 			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
 			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habrï¿½a que ver bien el orden de los displays
 			//}
 			//else {
 			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habrï¿½a que ver bien el orden de los displays
 			//}
 			break;
 		case RIGHT_TURN:
@@ -396,11 +396,11 @@ state askPinRoutine(void) {
 			//	for (k = 0; k < fe_data.pin_counter; k++) {
 			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
 			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habrï¿½a que ver bien el orden de los displays
 			//}
 			//else {
 			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
+			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habrï¿½a que ver bien el orden de los displays
 			//}
 			break;
 		case BUTTON_PRESS:
@@ -536,7 +536,7 @@ state usersRoutine(void) {
 
 state brightnessRoutine(void) {
 	state updated_state = BRIGHTNESS;
-	//Si entré aca , el estado actual es brightness
+	//Si entrï¿½ aca , el estado actual es brightness
 	//por lo que si el estado previo es distinto de brightenss 
 	//es la primera vez que entro, por lo que debo iniciar el timer de timout
 

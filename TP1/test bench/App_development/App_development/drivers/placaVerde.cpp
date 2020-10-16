@@ -62,13 +62,22 @@ encoder_id PVencoder_register(void) {
 
 event_t PVencoder_pop_event(encoder_id id) {
 	static unsigned int i = 0;
-	int8_t evs[10] = { 0,1,2,3,4,5,6,7,8,9 };
-	//aca deberías poner los eventos que querés recibir;
-	cout << "Popping Event " << evs[i%10] <<endl;
-	return  evs[(++i) % 10];
+	int8_t evs[20] = { BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,RIGHT_TURN,RIGHT_TURN,BUTTON_PRESS
+	,BUTTON_PRESS,RIGHT_TURN,BUTTON_PRESS,RIGHT_TURN,BUTTON_PRESS,RIGHT_TURN,BUTTON_PRESS,RIGHT_TURN,BUTTON_PRESS,RIGHT_TURN };
+	//EVENTOS ID BIEN CONTRASEÑA BIEN
+
+	//	int8_t evs[20] = { BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,BUTTON_PRESS,RIGHT_TURN,RIGHT_TURN,BUTTON_PRESS
+	//,RIGHT_TURN,RIGHT_TURN,BUTTON_PRESS,RIGHT_TURN,BUTTON_PRESS,RIGHT_TURN,BUTTON_PRESS,RIGHT_TURN,BUTTON_PRESS,RIGHT_TURN };
+	//ID bien PIN mal
+
+//aca deberías poner los eventos que querés recibir;
+	cout << "Popping Event " <<(int) evs[i%10] <<endl;
+	return  evs[(i++) % 20];
 }
 
 bool PVencoder_event_avb(encoder_id id) {
+	//cout << "Entered Encoder is there ev: returning false" << endl;
+	//return false;
 	cout << "Entered ;is there ev; returning true" << endl;
 	return true;
 }

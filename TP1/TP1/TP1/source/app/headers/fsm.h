@@ -4,12 +4,13 @@
   @brief    fsm that controls the system
   @author   MAGT
  ******************************************************************************/
-#pragma once
  /*******************************************************************************
   * INCLUDE HEADER FILES
   ******************************************************************************/
-#include <cstdint>
-#include "../app/FEData.h"
+#ifndef _FSM_H_
+#define _FSM_H_
+#include <stdint.h>
+#include "../app/headers/FEData.h"
   /*******************************************************************************
    * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
    ******************************************************************************/
@@ -56,3 +57,4 @@ state FSMRun(state actual_state);
  * @return FEData, dedicated structure in FEData.h.
  */
 FEData  * const FSMGetFEData(void);
+#endif
