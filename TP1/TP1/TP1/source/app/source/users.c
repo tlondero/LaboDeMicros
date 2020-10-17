@@ -124,6 +124,9 @@ bool checkExistance(uint32_t user_ID) {
     }
     return ret;
 }
+user_t * getUsersList(void){
+	return &users[0];
+}
 
 bool checkPassword(uint32_t user_ID, uint32_t user_pin) {
     bool ret = false;
@@ -136,3 +139,4 @@ bool checkPassword(uint32_t user_ID, uint32_t user_pin) {
     }
     return ret;
 }
+

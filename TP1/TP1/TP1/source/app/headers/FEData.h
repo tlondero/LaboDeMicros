@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 typedef enum {
-	IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION, INVALID_ID_ANIMATION, INVALID_PIN_ANIMATION, BLOCKED_ANIMATION,OPEN_SELECTED_ANIMATION, BRIGHTNESS_SELECTED_ANIMATION, USER_SELECTED_ANIMATION
+	IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION, INVALID_ID_ANIMATION, INVALID_PIN_ANIMATION, BLOCKED_ANIMATION,OPEN_SELECTED_ANIMATION, BRIGHTNESS_SELECTED_ANIMATION, USER_SELECTED_ANIMATION, CLAVE_SELECTED_ANIMATION, ADD_SELECTED_ANIMATION, DEL_SELECTED_ANIMATION
 } animation_t;
 
 typedef struct {
@@ -29,11 +29,12 @@ typedef struct {
 	bool good_pin;
 	bool open;
 }FEData;
-const char BRIGHTNESS_MSG[4] = { 'B','R','G','H' };
-const char OPEN_MSG[4] = { 'O','P','E','N' };
-const char USER_MSG[4] = { 'U','S','E','R' };
 
-const char PASSWORD_MSG[4] = { 'P','A','S','S' };
-const char ADD_USER_MSG[4] = { 'A','D','D','U' };
-const char DEL_USER_MSG[4] = { 'D','E','L','U' };
+extern const char BRIGHTNESS_MSG[4];// = { 'B','R','G','H' };
+extern const char OPEN_MSG[4];// = { 'O','P','E','N' };
+extern const char USER_MSG[4];// = { 'U','S','E','R' };
+
+extern const char PASSWORD_MSG[4];// = { 'P','A','S','S' };
+extern const char ADD_USER_MSG[4];// = { 'A','D','D','U' };
+extern const char DEL_USER_MSG[4];// = { 'D','E','L','U' };
 #endif

@@ -76,3 +76,5 @@ bool checkExistance(uint32_t user_ID);
 bool checkPassword(uint32_t user_ID, uint32_t user_pin);
 
 void setPassword(uint32_t user_ID, uint32_t new_pin);
+
+user_t* getUsersList(void);
