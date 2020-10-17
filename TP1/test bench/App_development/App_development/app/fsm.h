@@ -29,7 +29,7 @@ const char DEL_USER_MSG[4] = { 'D','E','L','U' };
 * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
 ******************************************************************************/
 
-typedef enum {IDDLE,ASK_PIN,ACCESS,OPEN,USERS,BRIGHTNESS} state;
+typedef enum {IDDLE,ASK_PIN,ACCESS,OPEN,USERS,BRIGHTNESS, USERS_CLAVE, USERS_ADD , USERS_DEL} state;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE

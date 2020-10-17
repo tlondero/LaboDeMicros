@@ -55,6 +55,10 @@ void deleteUser(uint32_t userID);
 */
 void addStrike(uint32_t userID);
 /**
+* @brief getStrikes: Increases the strike counter of the user ID, Three strikes and you're out.
+*/
+uint8_t getStrikes(uint32_t userID);
+/**
 * @brief clearStrikes: Clears the strikes of all users.
 */
 void clearStrikes(void);

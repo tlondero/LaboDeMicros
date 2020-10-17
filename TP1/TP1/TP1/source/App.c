@@ -24,9 +24,13 @@ void App_Init(void) {
 void App_Run(void) {
 
 	st = FSMRun(st);
-	FEData  mydata = *(FSMGetFEData());
-//  doStuffFrontEnd(mydata);
+	drawFrontEnd((*(FSMGetFEData())),st);
 }
+
+
+
+
+
 
 
 ///*******************************************************************************

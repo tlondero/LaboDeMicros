@@ -534,10 +534,9 @@ state usersRoutine(void) {
 	if (prev_state != USERS) {
 		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
-					//desactivar las interrupciones de cancel y del
-					FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
-					FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
+		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
 	}
 	
 	if (cancel_triggered || back_triggered) {
@@ -550,12 +549,12 @@ state usersRoutine(void) {
 		event_t ev = PVencoder_pop_event(my_encoder_id);
 		switch (ev) {
 		case LEFT_TURN:
-			if(getAdminStatus()){
+			if(getAdminStatus(transformToNum(&encoder_id_digits[0], ID_LEN))){
 				if (selection == USERS_CLAVE_SEL)
 					selection = USERS_DEL_SEL;
 				else 
 					selection--;
-				//fe_data.animation_en = true;
+				fe_data.animation_en = true;
 				switch (selection) {
 				case USERS_CLAVE_SEL :
 					fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
@@ -571,7 +570,7 @@ state usersRoutine(void) {
 			}
 			break;
 		case RIGHT_TURN:
-			if(getAdminStatus()){
+			if(getAdminStatus(transformToNum(&encoder_id_digits[0], ID_LEN))){
 				if (selection == USERS_DEL_SEL)
 					selection = USERS_CLAVE_SEL;
 				else
