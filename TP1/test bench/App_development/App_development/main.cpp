@@ -31,6 +31,8 @@ void appRun(void) {
 	
 	st = FSMRun(st);
 	FEData  mydata = *(FSMGetFEData());
+
+	cout << st << endl;
 	printData(mydata);
 }
 

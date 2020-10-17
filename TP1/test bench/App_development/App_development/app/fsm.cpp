@@ -184,10 +184,13 @@ state FSMRun(state actual_state) {
 		break;
 	case USERS_CLAVE:
 		updated_state = claveRoutine();
+		break;
 	case USERS_DEL:
 		updated_state = delRoutine();
+		break;
 	case USERS_ADD:
 		updated_state = addRoutine();
+		break;
 	default:
 		break;
 	}
@@ -537,7 +540,7 @@ state openRoutine(void) {
 
 state usersRoutine(void) {
 	state updated_state = USERS;
-	static uint8_t selection=USERS_DEL_SEL;
+	static uint8_t selection=USERS_CLAVE_SEL;
 
 	if (prev_state != USERS) {
 		fe_data.animation_en = false;
@@ -711,6 +714,7 @@ state claveRoutine(void) {
 			}
 			else {
 				setPassword(transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN));
+				fe_data.good_pin = 1;
 				updated_state = USERS;
 			}
 			break;
