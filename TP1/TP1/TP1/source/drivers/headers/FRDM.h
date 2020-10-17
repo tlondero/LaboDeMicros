@@ -35,12 +35,15 @@ enum {
 	RED, YELLOW, GREEN, BLUE, CYAN, PURPLE, WHITE, CANT_COLORS
 };
 
+typedef enum{
+	PRESS_SW2, RELEASE_SW2, LKP_SW2, SKP_SW2, PRESS_SW3, RELEASE_SW3, LKP_SW3, SKP_SW3, NO_FRDM_EV
+} FRDMEv_t;
+
 enum {
 	BT_DISABLE, BT_LSTATE, BT_HSTATE, BT_REDGE, BT_FEDGE, BT_BEDGES, BT_CANT_MODES
 };
 
 typedef uint8_t FRDMButton_t;
-typedef uint8_t FRDMButtonEv_t;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -59,7 +62,7 @@ void FRDMInit(void);
 /**
  * @brief Returns the event of the button
  */
-FRDMButtonEv_t FRDMButtonGetEv(uint8_t button);
+FRDMEv_t FRDMButtonGetEv(uint8_t button);
 
 /**
  * @brief Set fade time
@@ -101,7 +104,6 @@ void FRDMLedOff(void);
  */
 void FRDMLedPoll(void);
 
-
 /**
  * @brief Toggle On/Off whit last color set
  */
@@ -111,6 +113,13 @@ void FRDMToggleOnOff(void);
  * @brief Turns on a color
  */
 void FRDMLedColor(uint8_t color);
+
+
+bool FRDMCheckEvent(void);
+
+FRDMEv_t FRDMGetEv(void);
+
+void FRDMSuscribeEvent(FRDMEv_t ev, bool state);
 
 
 /*******************************************************************************

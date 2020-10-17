@@ -51,6 +51,10 @@ static int8_t idLedBlue;
 static bool ledOn;
 static uint8_t lastColor;
 
+static bool isEvent = false;
+static FRDMEv_t event = NO_FRDM_EV;
+static uint8_t listEv[NO_FRDM_EV] = { 0 };
+
 /*******************************************************************************
  *******************************************************************************
  GLOBAL FUNCTION DEFINITIONS
@@ -295,137 +299,71 @@ bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 			return true;
 		} else {
 			return false;
-		}
 
+		}
 	} else {
 		return false;
 	}
 }
 
-FRDMButtonEv_t FRDMButtonGetEv(uint8_t button) {
-	switch (button) {
-	case (BUTTON_SW2):
-		return *ButtonGetEvent(sw2);
-	case (BUTTON_SW3):
-		return *ButtonGetEvent(sw3);
-	default:
-		return NULL;
-	}
+void FRDMSuscribeEvent(FRDMEv_t ev, bool state) {
+	listEv[ev] = state;
 }
 
-/*
+bool FRDMCheckEvent(void) {
+	FRDMEv_t ev = *ButtonGetEvent(sw2);
+	if (ev != NO_EV) {
+		switch (ev) {
+		case (PRESS):
+			event = PRESS_SW2;
+			break;
+		case (RELEASE):
+			event = RELEASE_SW2;
+			break;
+		case (LKP):
+			event = LKP_SW2;
+			break;
+		case (SKP):
+			event = SKP_SW2;
+			break;
+		default:
+			event = NO_FRDM_EV;
+			break;
+		}
 
- int8_t getId(uint8_t led) {
- int8_t ledPort = NO_LED;
- switch (led) {
- case (R):
- ledPort = idLedRed;
- break;
- case (G):
- ledPort = idLedGreen;
- break;
- case (B):
- ledPort = idLedBlue;
- break;
- default:
- break;
- }
- return ledPort;
- }
+	} else if ((ev = *ButtonGetEvent(sw3)) != NO_EV) {
+		switch (ev) {
+		case (PRESS):
+			event = PRESS_SW3;
+			break;
+		case (RELEASE):
+			event = RELEASE_SW3;
+			break;
+		case (LKP):
+			event = LKP_SW3;
+			break;
+		case (SKP):
+			event = SKP_SW3;
+			break;
+		default:
+			event = NO_FRDM_EV;
+			break;
+		}
+	} else {
+		event = NO_FRDM_EV;
+	}
 
- bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b) {
+	if (event != NO_FRDM_EV) {
+		isEvent = true;
+	} else {
+		isEvent = false;
+	}
+	return isEvent;
+}
 
- if ((r > 255) || (g > 255) || (b > 255)) {
- return false;
- } else {
- if ((r > 0) && (r <= 255)) {
- led_configure_brightness(idLedRed, r);
- led_set_state(idLedRed, LED_ON);
- } else if (r == 0) {
- led_set_state(idLedRed, LED_OFF);
- }
-
- if ((g > 0) && (g <= 255)) {
- led_configure_brightness(idLedGreen, g);
- led_set_state(idLedRed, LED_ON);
- } else if (g == 0) {
- led_set_state(idLedGreen, LED_OFF);
- }
-
- if ((b > 0) && (b <= 255)) {
- led_configure_brightness(idLedBlue, b);
- led_set_state(idLedBlue, LED_ON);
- } else if (b == 0) {
- led_set_state(idLedBlue, LED_OFF);
- }
- return true;
- }
- }
-
- bool FRDMLedBright(uint8_t led, uint8_t value) {
- bool valid = false;
- int8_t ledPort = getId(led);
- if (ledPort != NO_LED) {
- if ((value >= 1) && (value <= 100)) {
- led_configure_brightness(ledPort, value);
- led_set_state(ledPort, LED_ON);
- valid = true;
- } else if (value == 0) {
- led_set_state(ledPort, LED_OFF);
- valid = true;
- }
- }
- return valid;
- }
-
- bool FRDMLedFade(uint8_t led, uint8_t value) {
- bool valid = false;
- int8_t ledPort = getId(led);
- if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
- led_configure_fade(ledPort, value);
- led_set_state(ledPort, LED_ON);
- setState(ledPort, true);
- valid = true;
- }
- return valid;
- }
-
- bool FRDMLedDt(uint8_t led, uint8_t value) {
- bool valid = false;
- int8_t ledPort = getId(led);
- if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
- led_configure_dt(ledPort, value);
- led_set_state(ledPort, LED_ON);
- setState(ledPort, true);
- valid = true;
- }
- return valid;
- }
-
- bool FRDMLedFlash(uint8_t led, uint8_t value) {
- bool valid = false;
- int8_t ledPort = getId(led);
- if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
- led_set_state(ledPort, LED_ON);
- led_configure_flashes(ledPort, value);
- setState(ledPort, true);
- valid = true;
- }
- return valid;
- }
-
- bool FRDMLedPeriod(uint8_t led, uint8_t value) {
- bool valid = false;
- int8_t ledPort = getId(led);
- if ((ledPort != NO_LED) && ((value >= 0) && (value <= 100))) {
- led_configure_period(ledPort, value);
- led_set_state(ledPort, LED_ON);
- setState(ledPort, true);
- valid = true;
- }
- return valid;
- }
- */
+FRDMEv_t FRDMGetEv(void) {
+	return event;
+}
 
 /*******************************************************************************
  *******************************************************************************
