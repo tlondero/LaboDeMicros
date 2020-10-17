@@ -15,6 +15,7 @@
   * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
   ******************************************************************************/
 enum{OPEN_SEL,BRIGHT_SEL,USER_SEL};
+enum{USERS_CLAVE_SEL, USERS_ADD_SEL, USERS_DEL_SEL};
   /*******************************************************************************
    * VARIABLE PROTOTYPES WITH FILE SCOPE
    ******************************************************************************/
@@ -441,12 +442,14 @@ state accessRoutine(void) {
 	static uint8_t selection=OPEN_SEL;
 
 	if (prev_state != ACCESS) {
-		fe_data.animation_en = false;
+		fe_data.animation_en = true;
+		fe_data.animation_opt = OPEN_SELECTED_ANIMATION;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		//desactivar las interrupciones de cancel y del
 		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
 		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
+		
 	}
 	if (PVencoder_event_avb(my_encoder_id)) {
 		timerReset(inactivity_timer_id);
@@ -458,7 +461,6 @@ state accessRoutine(void) {
 				selection = USER_SEL;
 			else 
 				selection--;
-			fe_data.animation_en = true;
 			switch (selection) {
 			case USER_SEL :
 				fe_data.animation_opt = USER_SELECTED_ANIMATION;
@@ -477,7 +479,6 @@ state accessRoutine(void) {
 				selection = OPEN_SEL;
 			else
 				selection++;
-			fe_data.animation_en = true;
 			switch (selection) {
 			case USER_SEL:
 				fe_data.animation_opt = USER_SELECTED_ANIMATION;
@@ -527,9 +528,84 @@ state openRoutine(void) {
 }
 
 state usersRoutine(void) {
-	state updated_state = IDDLE;
+	state updated_state = USERS;
+	static uint8_t selection=USERS_DEL_SEL;
+
 	if (prev_state != USERS) {
 		fe_data.animation_en = false;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
+	}
+	
+	if (cancel_triggered || back_triggered) {
+		updated_state = ACCESS;
+	}
+	
+	if ((updated_state == USERS) && (PVencoder_event_avb(my_encoder_id))) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVencoder_pop_event(my_encoder_id);
+		switch (ev) {
+		case LEFT_TURN:
+			if(getAdminStatus(transformToNum(&encoder_id_digits[0], ID_LEN))){
+				if (selection == USERS_CLAVE_SEL)
+					selection = USERS_DEL_SEL;
+				else 
+					selection--;
+				fe_data.animation_en = true;
+				switch (selection) {
+				case USERS_CLAVE_SEL :
+					fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
+					break;
+				case USERS_ADD_SEL:
+					fe_data.animation_opt = ADD_SELECTED_ANIMATION;
+					break;
+				case USERS_DEL_SEL:
+					fe_data.animation_opt = DEL_SELECTED_ANIMATION;
+					break;
+				default: break;
+				}
+			}
+			break;
+		case RIGHT_TURN:
+			if(getAdminStatus(transformToNum(&encoder_id_digits[0], ID_LEN))){
+				if (selection == USERS_DEL_SEL)
+					selection = USERS_CLAVE_SEL;
+				else
+					selection++;
+				//fe_data.animation_en = true;
+				switch (selection) {
+				case USERS_CLAVE_SEL:
+					fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
+					break;
+				case USERS_ADD_SEL:
+					fe_data.animation_opt = ADD_SELECTED_ANIMATION;
+					break;
+				case USERS_DEL_SEL:
+					fe_data.animation_opt = DEL_SELECTED_ANIMATION;
+					break;
+				default: break;
+				}
+			}
+			break;
+		case BUTTON_PRESS :
+			switch (selection) {
+			case USERS_CLAVE_SEL:
+				updated_state = USERS_CLAVE;
+				break;
+			case USERS_ADD_SEL:
+				updated_state= USERS_ADD;
+				break;
+			case USERS_DEL_SEL:
+				updated_state = USERS_DEL;
+				break;
+			default: break;
+			}
+			break;
+		default: break;
+		}
 	}
 	return updated_state;
 }
@@ -580,7 +656,6 @@ void inactivityCallback(void) {
 void openCallback(void) {
 	open_triggered = true;
 }
-
 
 void cancelCallback(void) {
 	cancel_triggered = true;

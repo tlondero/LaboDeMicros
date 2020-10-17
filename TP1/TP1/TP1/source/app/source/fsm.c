@@ -21,8 +21,7 @@ enum{OPEN_SEL,BRIGHT_SEL,USER_SEL};
 
 
 
-//Encoder
-static encoder_id my_encoder_id;
+
 
 //Pin buffer
 static uint8_t encoder_pin_digits[PIN_LEN];
@@ -265,13 +264,13 @@ state IDDLERoutine(void) {
 					actual_encoder_number--;
 
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
-				//if (fe_data.id_counter < 4) {
-
-				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habr�a que ver bien el orden de los displays
-				//}
-				//else {
-				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habr�a que ver bien el orden de los displays
-				//}
+//				if (fe_data.id_counter < 4) {
+//
+//					PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habr�a que ver bien el orden de los displays
+//				}
+//				else {
+//					PVdispSendChar(actual_encoder_number + '0', 3);//Aca habr�a que ver bien el orden de los displays
+//				}
 				break;
 			case ENC_RIGHT:
 				if (actual_encoder_number == 9)
@@ -335,7 +334,6 @@ state askPinRoutine(void) {
 	}
 
 	if (cancel_triggered) {
-		uint8_t i = 0;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		fe_data.pin_counter = 0;
@@ -597,7 +595,6 @@ uint32_t transformToNum(uint8_t* data, uint8_t count) {
 	uint32_t ret = 0;
 	uint32_t aux = 0;
 	uint8_t i = 0;
-	uint8_t j = 0;;
 	for (i = 0; i < count; i++) {
 		aux = 0;
 		aux = data[count - 1 - i] * pwr(10, i);
