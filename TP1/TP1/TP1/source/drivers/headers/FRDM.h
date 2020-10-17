@@ -35,11 +35,6 @@ enum {
 	RED, YELLOW, GREEN, BLUE, CYAN, PURPLE, WHITE, CANT_COLORS
 };
 
-
-enum {
-	R, G, B, NO_LED
-};
-
 enum {
 	BT_DISABLE, BT_LSTATE, BT_HSTATE, BT_REDGE, BT_FEDGE, BT_BEDGES, BT_CANT_MODES
 };
@@ -63,9 +58,33 @@ void FRDMInit(void);
 
 /**
  * @brief Returns the event of the button
- * @param 
  */
 FRDMButtonEv_t FRDMButtonGetEv(uint8_t button);
+
+/**
+ * @brief Set fade time
+ */
+bool FRDMLedSetFade(uint8_t value);
+
+/**
+ * @brief Set DT %
+ */
+bool FRDMLedSetDt(uint8_t value);
+
+/**
+ * @brief Set amounts of flashes (0 = forever)
+ */
+bool FRDMLedSetFlash(uint8_t value);
+
+/**
+ * @brief Set flash period
+ */
+bool FRDMLedSetPeriod(uint8_t value);
+
+/**
+ * @brief Set flash ON
+ */
+bool FRDMLedFlash(uint8_t led);
 
 /**
  * @brief Set button IQR
@@ -85,21 +104,12 @@ void FRDMLedPoll(void);
 /**
  * @brief Toggle On/Off whit last color set
  */
-void FRDMLedToggle(void);
+void FRDMToggleOnOff(void);
 
 /**
  * @brief Turns on a color
  */
 void FRDMLedColor(uint8_t color);
-
-/*
-bool FRDMLedRGB(uint8_t r, uint8_t g, uint8_t b);
-bool FRDMLedBright(uint8_t led, uint8_t value);
-bool FRDMLedFade(uint8_t led, uint8_t value);
-bool FRDMLedDt(uint8_t led, uint8_t value);
-bool FRDMLedFlash(uint8_t led, uint8_t value);
-bool FRDMLedPeriod(uint8_t led, uint8_t value);
-*/
 
 
 /*******************************************************************************
