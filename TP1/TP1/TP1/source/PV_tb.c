@@ -50,10 +50,10 @@ void App_Run(void) {
 
 	if (PVCheckEvent()) {
 		if (PVGetEv() == ENC_RIGHT) {
-			PVLedFlash(PURPLE);
+			PVLedFlash(PV_LED_1,0);
 		}
 		else if (PVGetEv() == ENC_LEFT) {
-			PVLedOff();
+			PVLedOff(PV_LED_1);
 		}
 	}
 

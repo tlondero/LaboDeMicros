@@ -37,9 +37,9 @@ typedef enum {
 	PV_DISABLE, PV_LSTATE, PV_HSTATE, PV_REDGE, PV_FEDGE, PV_BEDGES, PV_CANT_MODES
 } PVIRQMode_t;
 
-enum {
-	PV_RED, PV_YELLOW, PV_GREEN, PV_BLUE, PV_CYAN, PV_PURPLE, PV_WHITE, PV_CANT_COLORS
-};
+typedef enum {
+	PV_LED_1, PV_LED_2, PV_LED_3, PV_LED_ALL, PV_CANT_COLORS
+} PVLed_t;
 
 typedef enum { PV_RIGHT, PV_LEFT } PVDirection_t;
 
@@ -74,52 +74,47 @@ PVEv_t PVGetEv(void);
 /**
  * @brief LED Set brightnes
  */
-bool PVLedSetBright(uint8_t value);
+bool PVLedSetBright(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED Set fade time
  */
-bool PVLedSetFade(uint8_t value);
+bool PVLedSetFade(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED Set DT %
  */
-bool PVLedSetDt(uint8_t value);
+bool PVLedSetDt(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED  Set amounts of flashes (0 = forever)
  */
-bool PVLedSetFlash(uint8_t value);
+bool PVLedSetFlash(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED  Set flash period
  */
-bool PVLedSetPeriod(uint8_t value);
+bool PVLedSetPeriod(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED  Set flash ON
  */
-bool PVLedFlash(uint8_t led);
+bool PVLedFlash(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED COLOR SET
  */
-bool PVLedColor(uint8_t led);
+bool PVLedOn(PVLed_t led, uint8_t value);
 
 /**
  * @brief Turn off ALL LED (R G B)
  */
-void PVLedOff(void);
+void PVLedOff(PVLed_t led);
 
 /**
  * @brief Poll LED and pwm
  */
 void PVLedPoll(void);
-
-/**
- * @brief Toggle led on/off
- */
-void PVToggleOnOff(void);
 
 /**
  * @brief Clear display
