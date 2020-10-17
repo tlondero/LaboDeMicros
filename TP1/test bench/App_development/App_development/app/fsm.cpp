@@ -96,6 +96,24 @@ state usersRoutine(void);
  * @return state variable with the updated state
  */
 state brightnessRoutine(void);
+/**
+ * @brief claveRoutine RELLENAR.
+ *
+ * @return state variable with the updated state
+ */
+state claveRoutine(void);
+/**
+ * @brief delRoutine RELLENAR.
+ *
+ * @return state variable with the updated state
+ */
+state delRoutine(void);
+/**
+ * @brief addRoutine RELLENAR.
+ *
+ * @return state variable with the updated state
+ */
+state addRoutine(void);
 ///////////////////////////
 //     Callbacks        //
 //////////////////////////
@@ -147,23 +165,29 @@ state FSMRun(state actual_state) {
 	state updated_state;
 	switch (actual_state) {
 	case IDDLE:
-		updated_state = IDDLERoutine();//DONE
+		updated_state = IDDLERoutine();
 		break;
 	case ASK_PIN:
-		updated_state = askPinRoutine();//DONE
+		updated_state = askPinRoutine();
 		break;
 	case ACCESS:
-		updated_state = accessRoutine();//TODO
+		updated_state = accessRoutine();
 		break;
 	case OPEN:
-		updated_state = openRoutine();//DONE
+		updated_state = openRoutine();
 		break;
 	case USERS:
-		updated_state = usersRoutine();//TODO
+		updated_state = usersRoutine();
 		break;
 	case BRIGHTNESS:
-		updated_state = brightnessRoutine();//DONE
+		updated_state = brightnessRoutine();
 		break;
+	case USERS_CLAVE:
+		updated_state = claveRoutine();
+	case USERS_DEL:
+		updated_state = delRoutine();
+	case USERS_ADD:
+		updated_state = addRoutine();
 	default:
 		break;
 	}
@@ -179,8 +203,8 @@ FEData  * const FSMGetFEData(void) {
  * FUNCTION DEFINITION WITH FILE SCOPE
  ******************************************************************************/
 state IDDLERoutine(void) {
-	static bool using_encoder = false;
 	static uint8_t actual_encoder_number = 0;
+	static bool using_encoder = false;
 	uint8_t* card_event = 0;
 
 	state updated_state = IDDLE;
@@ -372,17 +396,6 @@ state askPinRoutine(void) {
 				actual_encoder_number--;
 
 			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
-			//if (fe_data.pin_counter < 4) {
-			//	uint8_t k = 0;
-			//	for (k = 0; k < fe_data.pin_counter; k++) {
-			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
-			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habría que ver bien el orden de los displays
-			//}
-			//else {
-			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
-			//}
 			break;
 		case RIGHT_TURN:
 			if (actual_encoder_number == 9)
@@ -392,17 +405,6 @@ state askPinRoutine(void) {
 				actual_encoder_number++;
 
 			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
-			//if (fe_data.pin_counter < 4) {
-			//	uint8_t k = 0;
-			//	for (k = 0; k < fe_data.pin_counter; k++) {
-			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
-			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habría que ver bien el orden de los displays
-			//}
-			//else {
-			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habría que ver bien el orden de los displays
-			//}
 			break;
 		case BUTTON_PRESS:
 			if (fe_data.pin_counter < PIN_LEN) {
@@ -451,6 +453,12 @@ state accessRoutine(void) {
 		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
 		
 	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
 	if (PVencoder_event_avb(my_encoder_id)) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);//Reinicio timer
@@ -541,6 +549,11 @@ state usersRoutine(void) {
 	
 	if (cancel_triggered || back_triggered) {
 		updated_state = ACCESS;
+	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
 	}
 	
 	if ((updated_state == USERS) && (PVencoder_event_avb(my_encoder_id))) {
@@ -643,6 +656,237 @@ state brightnessRoutine(void) {
 		updated_state = IDDLE;
 		inactivity_triggered = false;
 	}
+	return updated_state;
+}
+
+state claveRoutine(void) {
+	state updated_state = USERS_CLAVE;
+	static uint8_t actual_encoder_number = 0;
+
+	if (prev_state != USERS_CLAVE) {
+		fe_data.pin_counter = 0;
+		fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
+		fe_data.animation_en = true;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		//activar las interrupciones de cancel y del
+	}
+
+	if (cancel_triggered || back_triggered) {
+		updated_state = ACCESS;
+	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if ((updated_state == USERS_CLAVE) && (PVencoder_event_avb(my_encoder_id))) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVencoder_pop_event(my_encoder_id);
+		switch (ev) {
+		case LEFT_TURN:
+			if (actual_encoder_number == 0)
+				actual_encoder_number = 9;
+			else
+				actual_encoder_number--;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case RIGHT_TURN:
+			if (actual_encoder_number == 9)
+				actual_encoder_number = 0;
+
+			else
+				actual_encoder_number++;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case BUTTON_PRESS:
+			if (fe_data.pin_counter < PIN_LEN) {
+				fe_data.pin_counter++;
+			}
+			else {
+				setPassword(transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN));
+				updated_state = USERS;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	return updated_state;
+}
+
+state addRoutine(void) {
+	state updated_state = USERS_ADD;
+	static uint8_t actual_encoder_number = 0;
+	static bool using_encoder = false;
+	uint8_t* card_event = 0;
+	static bool asking_pin = false;
+
+
+	if (prev_state != USERS_ADD) {
+		fe_data.animation_opt = ADD_SELECTED_ANIMATION;
+		fe_data.animation_en = true;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		//activar las interrupciones de cancel y del
+	}
+
+	if (cancel_triggered || back_triggered) {
+		updated_state = ACCESS;
+	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if (!using_encoder && !asking_pin) {
+		card_event = cardGetPAN();
+		if (card_event != NULL) {
+			asking_pin = true;
+		}
+	}
+
+	if (PVencoder_event_avb(my_encoder_id)) {
+		fe_data.animation_en = false;
+		using_encoder = true;
+	}
+
+	if (using_encoder && updated_state == IDDLE && !asking_pin) {
+		if (cancel_triggered) {
+			fe_data.animation_en = true;
+			fe_data.id_counter = 0;
+			using_encoder = false;
+			cancel_triggered = false;
+		}
+		else if (back_triggered) {
+			if (fe_data.id_counter > 0) {
+				fe_data.id_counter--;
+			}
+			back_triggered = false;
+		}
+		//ahora hay que fijarse si llego un evento de encoder, si es derecha aumento el numero si es izquierda lo achico si es enter avanzo
+		if (PVencoder_event_avb(my_encoder_id)) {
+			event_t ev = PVencoder_pop_event(my_encoder_id);
+			switch (ev) {
+			case LEFT_TURN:
+				if (actual_encoder_number == 0)
+					actual_encoder_number = 9;
+				else
+					actual_encoder_number--;
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+
+				break;
+			case RIGHT_TURN:
+				if (actual_encoder_number == 9)
+					actual_encoder_number = 0;
+				else
+					actual_encoder_number++;
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+
+				break;
+			case BUTTON_PRESS:
+				if (fe_data.id_counter < ID_LEN - 1) {
+					fe_data.id_counter++;
+				}
+				else {
+					asking_pin = true;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	if ((PVencoder_event_avb(my_encoder_id)) && asking_pin) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVencoder_pop_event(my_encoder_id);
+		switch (ev) {
+		case LEFT_TURN:
+			if (actual_encoder_number == 0)
+				actual_encoder_number = 9;
+			else
+				actual_encoder_number--;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case RIGHT_TURN:
+			if (actual_encoder_number == 9)
+				actual_encoder_number = 0;
+
+			else
+				actual_encoder_number++;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case BUTTON_PRESS:
+			if (fe_data.pin_counter < PIN_LEN) {
+				fe_data.pin_counter++;
+			}
+			else {
+				addUser({ transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN), false, true, 0 });
+				updated_state = USERS;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	return updated_state;
+}
+
+state delRoutine(void) {
+	state updated_state = USERS_DEL;
+	static uint8_t i = 0;
+
+	if (prev_state != USERS_DEL) {
+		fe_data.animation_opt = DEL_SELECTED_ANIMATION;
+		fe_data.pin_counter = 0;
+		fe_data.animation_en = true;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		//activar las interrupciones de cancel y del
+	}
+
+	if (cancel_triggered || back_triggered) {
+		updated_state = ACCESS;
+	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if (PVencoder_event_avb(my_encoder_id)) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVencoder_pop_event(my_encoder_id);
+		switch (ev) {
+		case LEFT_TURN:
+
+			break;
+		case RIGHT_TURN:
+	
+			break;
+		case BUTTON_PRESS:
+			
+			break;
+		default: break;
+		}
+	}
+
 	return updated_state;
 }
 
