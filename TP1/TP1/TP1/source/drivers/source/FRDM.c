@@ -77,12 +77,32 @@ void FRDMInit(void) {
 	ledOn = false;
 	lastColor = CANT_COLORS;
 
+	uint32_t fade = 100;			//ms
+	uint32_t dt = 50;				//%
+	uint8_t flashes = 0;
+	uint32_t period = 1000;		//ms
+
+	led_configure_fade(idLedRed, fade);
+	led_configure_dt(idLedRed, dt);
+	led_configure_flashes(idLedRed, flashes);
+	led_configure_period(idLedRed, period);
+
+	led_configure_fade(idLedBlue, fade);
+	led_configure_dt(idLedBlue, dt);
+	led_configure_flashes(idLedBlue, flashes);
+	led_configure_period(idLedBlue, period);
+
+	led_configure_fade(idLedGreen, fade);
+	led_configure_dt(idLedGreen, dt);
+	led_configure_flashes(idLedGreen, flashes);
+	led_configure_period(idLedGreen, period);
+
 	led_set_state(idLedRed, LED_OFF);
 	led_set_state(idLedBlue, LED_OFF);
 	led_set_state(idLedGreen, LED_OFF);
 }
 
-void FRDMLedToggle(void) {
+void FRDMToggleOnOff(void) {
 	if (lastColor != CANT_COLORS) {
 		if (ledOn) {
 			FRDMLedOff();
@@ -98,6 +118,53 @@ void FRDMLedOff(void) {
 	led_set_state(idLedBlue, LED_OFF);
 	led_set_state(idLedGreen, LED_OFF);
 	ledOn = false;
+}
+
+bool FRDMLedSetFade(uint8_t value) {
+	bool valide = false;
+	if ((value >= 0) && (value <= 100)) {
+		led_configure_fade(idLedRed, value);
+		led_configure_fade(idLedGreen, value);
+		led_configure_fade(idLedBlue, value);
+		value = true;
+	}
+	return value;
+}
+
+bool FRDMLedSetDt(uint8_t value) {
+	bool valide = false;
+	if ((value >= 0) && (value <= 100)) {
+		uint8_t realdt = 100 - value;
+		led_configure_dt(idLedRed, realdt);
+		led_configure_dt(idLedGreen, realdt);
+		led_configure_dt(idLedBlue, realdt);
+		value = true;
+	}
+	return value;
+
+}
+
+bool FRDMLedSetFlash(uint8_t value) {
+	bool valide = false;
+	if ((value >= 0) && (value <= 100)) {
+		led_configure_flashes(idLedRed, value);
+		led_configure_flashes(idLedGreen, value);
+		led_configure_flashes(idLedBlue, value);
+		value = true;
+	}
+	return value;
+
+}
+
+bool FRDMLedSetPeriod(uint8_t value) {
+	bool valide = false;
+	if ((value >= 0) && (value <= 100)) {
+		led_configure_period(idLedRed, value);
+		led_configure_period(idLedGreen, value);
+		led_configure_period(idLedBlue, value);
+		value = true;
+	}
+	return value;
 }
 
 void FRDMLedColor(uint8_t color) {
@@ -144,6 +211,55 @@ void FRDMLedColor(uint8_t color) {
 		ledOn = false;
 		break;
 	}
+}
+
+bool FRDMLedFlash(uint8_t color) {
+
+	bool valid = false;
+	FRDMLedOff();
+	ledOn = true;
+	valid = true;
+	switch (color) {
+	case (RED):
+		led_flash(idLedRed);
+		lastColor = RED;
+		break;
+	case (YELLOW):
+		led_flash(idLedRed);
+		led_flash(idLedGreen);
+		lastColor = YELLOW;
+		break;
+	case (GREEN):
+		led_flash(idLedGreen);
+		lastColor = GREEN;
+		break;
+	case (BLUE):
+		led_flash(idLedBlue);
+		lastColor = BLUE;
+		break;
+	case (CYAN):
+		led_flash(idLedBlue);
+		led_flash(idLedGreen);
+		lastColor = CYAN;
+		break;
+	case (PURPLE):
+		led_flash(idLedRed);
+		led_flash(idLedBlue);
+		lastColor = PURPLE;
+		break;
+	case (WHITE):
+		led_flash(idLedRed);
+		led_flash(idLedBlue);
+		led_flash(idLedGreen);
+		lastColor = WHITE;
+		break;
+	default:
+		lastColor = CANT_COLORS;
+		ledOn = false;
+		valid = false;
+		break;
+	}
+	return valid;
 }
 
 void FRDMLedPoll(void) {
