@@ -20,7 +20,7 @@
 #include "Button.h"
 #include "encoder.h"
 #include "Display.h"
-
+#include "../../app/headers/FEData.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -110,7 +110,7 @@ bool PVDisplayShift(PVDirection_t direction);
 /**
  * @brief 
  */
-//bool PVAnimation(PVAnimation_t animation, bool activate);
+bool PVAnimation(animation_t animation, bool activate);
 
 /*******************************************************************************
  ******************************************************************************/

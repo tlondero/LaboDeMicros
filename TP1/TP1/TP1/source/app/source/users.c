@@ -73,6 +73,17 @@ void addStrike(uint32_t userID) {
         users[i].blocked = true;
     }
 }
+
+uint8_t getStrikes(uint32_t userID){
+    uint8_t i=0;
+    while ((userID != users[i].id) && (i < MAX_USERS)) {
+        i++;
+    }
+    if (users[i].id == userID) {
+    	return users[i].strikes;
+    }
+    else return 0;
+}
 void clearStrikes(void) {
     int8_t i;
     for (i = 0; i < MAX_USERS; i++) {
