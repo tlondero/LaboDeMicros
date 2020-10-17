@@ -92,18 +92,20 @@ bool PVCheckEvent(void) {
 		}
 	} else {
 		uint8_t btnev = *ButtonGetEvent(button);
-		if ((btnev == PRESS) && (listEv[BTN_PRESS])) {
-			event = BTN_PRESS;
-		} else if ((btnev == RELEASE) && (listEv[BTN_RELEASE])) {
-			event = BTN_RELEASE;
-		} else if ((btnev == LKP) && (listEv[BTN_LKP])) {
-			event = BTN_LKP;
-		} else if ((btnev == SKP) && (listEv[BTN_SKP])) {
-			event = BTN_SKP;
-		} else if ((btnev == NO_EV) && (listEv[NO_PV_EV])) {
-			event = NO_PV_EV;
-		} else {
-			event = NO_PV_EV;
+		if ((btnev != NO_EV) && (btnev != EOQ)) {
+			if ((btnev == PRESS) && (listEv[BTN_PRESS])) {
+				event = BTN_PRESS;
+			} else if ((btnev == RELEASE) && (listEv[BTN_RELEASE])) {
+				event = BTN_RELEASE;
+			} else if ((btnev == LKP) && (listEv[BTN_LKP])) {
+				event = BTN_LKP;
+			} else if ((btnev == SKP) && (listEv[BTN_SKP])) {
+				event = BTN_SKP;
+			} else if ((btnev == NO_EV) && (listEv[NO_PV_EV])) {
+				event = NO_PV_EV;
+			} else {
+				event = NO_PV_EV;
+			}
 		}
 	}
 	if (event != NO_PV_EV) {
