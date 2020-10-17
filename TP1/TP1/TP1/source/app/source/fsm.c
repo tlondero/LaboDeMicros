@@ -120,6 +120,8 @@ state FSMInitState(void) {
 	//Tengo que activar las interrupciones de cancel y delete
 	FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
 	FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+	FRDMLedSetFlash(3);
+
 	initUsers();
 	//Front-end related stuff
 	fe_data.animation_en = true;

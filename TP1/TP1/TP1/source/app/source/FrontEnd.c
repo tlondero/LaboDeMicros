@@ -36,7 +36,7 @@ uint8_t i=0;
 		else if(data.bad_id){
 			FRDMLedFlash(RED);//aca le digo que titile 3 veces rojo
 		}
-		else if(data.good_id){//TODO
+		else if(data.good_id){
 			FRDMLedFlash(GREEN);//aca le digo que titile 3 veces verde
 		}
 		break;
@@ -45,12 +45,12 @@ uint8_t i=0;
 			for(i;i<4;i++)
 				PVdispSendChar(data.pin_data[data.pin_counter-3+i] + '0', i);
 			}
-//		else if(data.bad_id){
-//			//aca le digo que titile 3 veces rojo
-//		}//TODO
-//		else if(data.good_id){
-//			//aca le digo que titile 3 veces verde
-//		}
+		else if(data.bad_id){
+			FRDMLedFlash(RED);	//aca le digo que titile 3 veces rojo
+		}
+		else if(data.good_id){
+			FRDMLedFlash(GREEN);	//aca le digo que titile 3 veces verde
+		}
 		uint8_t j=0;
 		for(j=0; j < getStrikes(transformToNum(data.id_data, ID_LEN));j++){
 			//Turn on led de rojo la placa verde
