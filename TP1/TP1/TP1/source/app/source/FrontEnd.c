@@ -135,7 +135,10 @@ void drawFrontEnd(FEData data, state st) {
 		}
 		break;
 	case USERS_DEL:
-
+		PVMarquesina(((user_t *) (data.del_user_ptr))->id);
+		if(data.del_user){
+			FRDMLedFlash(BLUE);
+		}
 		break;
 	default:
 		break;
