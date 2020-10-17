@@ -37,6 +37,10 @@ typedef enum {
 	PV_DISABLE, PV_LSTATE, PV_HSTATE, PV_REDGE, PV_FEDGE, PV_BEDGES, PV_CANT_MODES
 } PVIRQMode_t;
 
+enum {
+	PV_RED, PV_YELLOW, PV_GREEN, PV_BLUE, PV_CYAN, PV_PURPLE, PV_WHITE, PV_CANT_COLORS
+};
+
 typedef enum { PV_RIGHT, PV_LEFT } PVDirection_t;
 
 //typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION
@@ -66,6 +70,56 @@ bool PVCheckEvent(void);
  * @brief Get encoder or button event
  */
 PVEv_t PVGetEv(void);
+
+/**
+ * @brief LED Set brightnes
+ */
+bool PVLedSetBright(uint8_t value);
+
+/**
+ * @brief LED Set fade time
+ */
+bool PVLedSetFade(uint8_t value);
+
+/**
+ * @brief LED Set DT %
+ */
+bool PVLedSetDt(uint8_t value);
+
+/**
+ * @brief LED  Set amounts of flashes (0 = forever)
+ */
+bool PVLedSetFlash(uint8_t value);
+
+/**
+ * @brief LED  Set flash period
+ */
+bool PVLedSetPeriod(uint8_t value);
+
+/**
+ * @brief LED  Set flash ON
+ */
+bool PVLedFlash(uint8_t led);
+
+/**
+ * @brief LED COLOR SET
+ */
+bool PVLedColor(uint8_t led);
+
+/**
+ * @brief Turn off ALL LED (R G B)
+ */
+void PVLedOff(void);
+
+/**
+ * @brief Poll LED and pwm
+ */
+void PVLedPoll(void);
+
+/**
+ * @brief Toggle led on/off
+ */
+void PVToggleOnOff(void);
 
 /**
  * @brief Clear display

@@ -49,6 +49,7 @@ static int8_t idLedGreen;
 static int8_t idLedBlue;
 
 static bool ledOn;
+static bool ledFlash;
 static uint8_t lastColor;
 
 static bool isEvent = false;
@@ -67,6 +68,7 @@ void FRDMInit(void) {
 	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
 
 	isEvent = false;
+	ledFlash = false;
 	event = NO_FRDM_EV;
 
 	//Led init
@@ -109,9 +111,10 @@ void FRDMToggleOnOff(void) {
 	if (lastColor != CANT_COLORS) {
 		if (ledOn) {
 			FRDMLedOff();
+		} else if (ledFlash) {
+			FRDMLedFlash(lastColor);
 		} else {
 			FRDMLedColor(lastColor);
-
 		}
 	}
 }
@@ -124,56 +127,55 @@ void FRDMLedOff(void) {
 }
 
 bool FRDMLedSetFade(uint8_t value) {
-	bool valide = false;
+	bool valid = false;
 	if ((value >= 0) && (value <= 100)) {
 		led_configure_fade(idLedRed, value);
 		led_configure_fade(idLedGreen, value);
 		led_configure_fade(idLedBlue, value);
-		value = true;
+		valid = true;
 	}
-	return value;
+	return valid;
 }
 
 bool FRDMLedSetDt(uint8_t value) {
-	bool valide = false;
+	bool valid = false;
 	if ((value >= 0) && (value <= 100)) {
 		uint8_t realdt = 100 - value;
 		led_configure_dt(idLedRed, realdt);
 		led_configure_dt(idLedGreen, realdt);
 		led_configure_dt(idLedBlue, realdt);
-		value = true;
+		valid = true;
 	}
-	return value;
-
+	return valid;
 }
 
 bool FRDMLedSetFlash(uint8_t value) {
-	bool valide = false;
+	bool valid = false;
 	if ((value >= 0) && (value <= 100)) {
 		led_configure_flashes(idLedRed, value);
 		led_configure_flashes(idLedGreen, value);
 		led_configure_flashes(idLedBlue, value);
-		value = true;
+		valid = true;
 	}
-	return value;
-
+	return valid;
 }
 
 bool FRDMLedSetPeriod(uint8_t value) {
-	bool valide = false;
+	bool valid = false;
 	if ((value >= 0) && (value <= 100)) {
 		led_configure_period(idLedRed, value);
 		led_configure_period(idLedGreen, value);
 		led_configure_period(idLedBlue, value);
-		value = true;
+		valid = true;
 	}
-	return value;
+	return valid;
 }
 
 void FRDMLedColor(uint8_t color) {
 
 	FRDMLedOff();
 	ledOn = true;
+	ledFlash = true;
 
 	switch (color) {
 	case (RED):
@@ -212,6 +214,7 @@ void FRDMLedColor(uint8_t color) {
 	default:
 		lastColor = CANT_COLORS;
 		ledOn = false;
+		ledFlash = false;
 		break;
 	}
 }
