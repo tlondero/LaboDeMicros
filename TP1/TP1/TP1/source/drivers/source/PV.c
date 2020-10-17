@@ -18,9 +18,20 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define	PV_BUTTON	PORTNUM2PIN(PC,0)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define	PV_BUTTON		PORTNUM2PIN(PC,0)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+/*
+ #define P_RED
+ #define P_RED_NUM
+
+ #define P_GREEN
+ #define P_GREEN_NUM
+
+ #define P_BLUE
+ #define P_BLUE_NUM
+ */
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -37,7 +48,15 @@
 static PVButton_t button;
 static PVEncoder_t idEncoder;
 
-static uint8_t brightness;
+static int8_t dispBright;
+
+static int8_t idLedRed;
+static int8_t idLedGreen;
+static int8_t idLedBlue;
+
+static bool ledOn;
+static bool ledFlash;
+static uint8_t lastColor;
 
 static bool isEvent = false;
 static PVEv_t event = NO_PV_EV;
@@ -63,16 +82,53 @@ static uint8_t listEv[NO_PV_EV] = { 0 };
 
 void PVInit(void) {
 
+	//Button init
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
 
+	//Encoder init
 	idEncoder = EncoderRegister(PIN_C2_EN, PIN_C7_EN);
 
+	//Display init
 	dispInit();
-	brightness = 20;
-	//TODO: implementar
-	//dispBrightness(brightness);
+	dispBright = 20;
 
-	//led	
+	led_init_driver();
+
+	idLedRed = led_init_led(PB, 22, TURNS_ON_WITH_0);
+	idLedBlue = led_init_led(PB, 21, TURNS_ON_WITH_0);
+	idLedGreen = led_init_led(PE, 26, TURNS_ON_WITH_0);
+
+	ledOn = false;
+	lastColor = PV_CANT_COLORS;
+
+	//Led default config
+	uint32_t bright = 100;
+	uint32_t fade = 100;			//ms
+	uint32_t dt = 50;				//%
+	uint8_t flashes = 0;
+	uint32_t period = 1000;		//ms
+
+	led_configure_brightness(idLedRed, bright);
+	led_configure_fade(idLedRed, fade);
+	led_configure_dt(idLedRed, dt);
+	led_configure_flashes(idLedRed, flashes);
+	led_configure_period(idLedRed, period);
+
+	led_configure_brightness(idLedBlue, bright);
+	led_configure_fade(idLedBlue, fade);
+	led_configure_dt(idLedBlue, dt);
+	led_configure_flashes(idLedBlue, flashes);
+	led_configure_period(idLedBlue, period);
+
+	led_configure_brightness(idLedGreen, bright);
+	led_configure_fade(idLedGreen, fade);
+	led_configure_dt(idLedGreen, dt);
+	led_configure_flashes(idLedGreen, flashes);
+	led_configure_period(idLedGreen, period);
+
+	led_set_state(idLedRed, LED_OFF);
+	led_set_state(idLedBlue, LED_OFF);
+	led_set_state(idLedGreen, LED_OFF);
 }
 
 void PVSuscribeEvent(PVEv_t ev, bool state) {
@@ -162,8 +218,8 @@ void PVDisplayClear(void) {
 bool PVDisplaySetBright(uint8_t br) {
 	bool valid = true;
 	if ((br >= 1) && (br <= 100)) {
-		brightness = br;
-		PVDisplaySetBright(brightness);
+		dispBright = br;
+		PVDisplaySetBright(dispBright);
 	} else if (br == 0) {
 		dispClearAll();
 	} else {
@@ -174,24 +230,24 @@ bool PVDisplaySetBright(uint8_t br) {
 
 bool PVIncreaseBrightness(void) {
 	bool topValue = false;
-	brightness += 20;
-	if (brightness >= 100) {
-		brightness = 100;
+	dispBright += 20;
+	if (dispBright >= 100) {
+		dispBright = 100;
 		topValue = true;
 	}
-	dispBrightness(brightness);
+	dispBrightness(dispBright);
 	return topValue;
 }
 
 bool PVDecreaseBrightness(void) {
 	bool bottomValue = false;
-	brightness -= 20;
-	if (brightness <= 0) {
-		brightness = 0;
+	dispBright -= 20;
+	if (dispBright <= 0) {
+		dispBright = 0;
 		bottomValue = true;
 		dispClearAll();
 	} else {
-		dispBrightness(brightness);
+		dispBrightness(dispBright);
 	}
 	return bottomValue;
 }
@@ -247,6 +303,187 @@ bool PVAnimation(animation_t animation, bool activate) {
 		}
 	}
 	return valid;
+}
+
+bool PVLedSetBright(uint8_t value) {
+	bool valid = false;
+	if ((value >= 0) && (value <= 100)) {
+		double newVal = value/100;
+		led_configure_fade(idLedRed, newVal);
+		led_configure_fade(idLedGreen, newVal);
+		led_configure_fade(idLedBlue, newVal);
+		valid = true;
+	}
+	return valid;
+}
+
+bool PVLedSetFade(uint8_t value) {
+	bool valid = false;
+	if ((value >= 0) && (value <= 100)) {
+		led_configure_fade(idLedRed, value);
+		led_configure_fade(idLedGreen, value);
+		led_configure_fade(idLedBlue, value);
+		valid = true;
+	}
+	return valid;
+}
+
+bool PVLedSetDt(uint8_t value) {
+	bool valid = false;
+	if ((value >= 0) && (value <= 100)) {
+		uint8_t realdt = 100 - value;
+		led_configure_dt(idLedRed, realdt);
+		led_configure_dt(idLedGreen, realdt);
+		led_configure_dt(idLedBlue, realdt);
+		valid = true;
+	}
+	return valid;
+
+}
+
+bool PVLedSetFlash(uint8_t value) {
+	bool valid = false;
+	if ((value >= 0) && (value <= 100)) {
+		led_configure_flashes(idLedRed, value);
+		led_configure_flashes(idLedGreen, value);
+		led_configure_flashes(idLedBlue, value);
+		valid = true;
+	}
+	return valid;
+}
+
+bool PVLedSetPeriod(uint8_t value) {
+	bool valid = false;
+	if ((value >= 0) && (value <= 100)) {
+		led_configure_period(idLedRed, value);
+		led_configure_period(idLedGreen, value);
+		led_configure_period(idLedBlue, value);
+		valid = true;
+	}
+	return valid;
+}
+
+bool PVLedFlash(uint8_t color) {
+
+	bool valid = false;
+	PVLedOff();
+	ledOn = true;
+	valid = true;
+	switch (color) {
+	case (PV_RED):
+		led_flash(idLedRed);
+		lastColor = PV_RED;
+		break;
+	case (PV_YELLOW):
+		led_flash(idLedRed);
+		led_flash(idLedGreen);
+		lastColor = PV_YELLOW;
+		break;
+	case (PV_GREEN):
+		led_flash(idLedGreen);
+		lastColor = PV_GREEN;
+		break;
+	case (PV_BLUE):
+		led_flash(idLedBlue);
+		lastColor = PV_BLUE;
+		break;
+	case (PV_CYAN):
+		led_flash(idLedBlue);
+		led_flash(idLedGreen);
+		lastColor = PV_CYAN;
+		break;
+	case (PV_PURPLE):
+		led_flash(idLedRed);
+		led_flash(idLedBlue);
+		lastColor = PV_PURPLE;
+		break;
+	case (PV_WHITE):
+		led_flash(idLedRed);
+		led_flash(idLedBlue);
+		led_flash(idLedGreen);
+		lastColor = PV_WHITE;
+		break;
+	default:
+		lastColor = PV_CANT_COLORS;
+		ledOn = false;
+		valid = false;
+		break;
+	}
+	return valid;
+}
+
+bool PVLedColor(uint8_t color) {
+
+	bool valid = false;
+	PVLedOff();
+	ledOn = true;
+	ledFlash = true;
+
+	switch (color) {
+	case (PV_RED):
+		led_set_state(idLedRed, LED_ON);
+		lastColor = PV_RED;
+		break;
+	case (PV_YELLOW):
+		led_set_state(idLedRed, LED_ON);
+		led_set_state(idLedGreen, LED_ON);
+		lastColor = PV_YELLOW;
+		break;
+	case (PV_GREEN):
+		led_set_state(idLedGreen, LED_ON);
+		lastColor = PV_GREEN;
+		break;
+	case (PV_BLUE):
+		led_set_state(idLedBlue, LED_ON);
+		lastColor = PV_BLUE;
+		break;
+	case (PV_CYAN):
+		led_set_state(idLedGreen, LED_ON);
+		led_set_state(idLedBlue, LED_ON);
+		lastColor = PV_CYAN;
+		break;
+	case (PV_PURPLE):
+		led_set_state(idLedRed, LED_ON);
+		led_set_state(idLedBlue, LED_ON);
+		lastColor = PV_PURPLE;
+		break;
+	case (PV_WHITE):
+		led_set_state(idLedRed, LED_ON);
+		led_set_state(idLedBlue, LED_ON);
+		led_set_state(idLedGreen, LED_ON);
+		lastColor = PV_WHITE;
+		break;
+	default:
+		lastColor = PV_CANT_COLORS;
+		ledOn = false;
+		ledFlash = false;
+		valid = false;
+		break;
+	}
+	return valid;
+}
+
+void PVToggleOnOff(void) {
+	if (lastColor != PV_CANT_COLORS) {
+		if (ledOn) {
+			PVLedOff();
+		} else if (ledFlash) {
+			PVLedFlash(lastColor);
+		} else {
+			PVLedColor(lastColor);
+		}
+	}
+}
+
+void PVLedOff(void) {
+	led_set_state(idLedRed, LED_OFF);
+	led_set_state(idLedBlue, LED_OFF);
+	led_set_state(idLedGreen, LED_OFF);
+	ledOn = false;
+}
+
+void PVLedPoll(void) {
+	led_poll();
 }
 
 /*******************************************************************************
