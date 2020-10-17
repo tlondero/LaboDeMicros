@@ -1,4 +1,3 @@
-/*
 **************************************************************************
  @file     App.c
  @brief    Application functions
@@ -36,22 +35,6 @@
  * INTERRUPCIONES
  *****************************************************************************
 
-uint8_t brightUp(uint8_t b) {
-	b += 20;
-	if (b >= 100) {
-		b = 100;
-	}
-	return b;
-}
-
-uint8_t brightDown(uint8_t b) {
-	b -= 20;
-	if (b <= 0) {
-		b = 0;
-	}
-	return b;
-}
-
 static int8_t bright;
 static PVEv ev;
 
@@ -59,22 +42,22 @@ void App_Init (void) {
 	FRDMInit();
 	PVInit();
 	bright = 20;
-	FRDMLedBright(R, 100);
+	FRDMLed(R, 100);
+	PVSuscribeEvent(ENC_RIGHT,true);
+	PVSuscribeEvent(ENC_LEFT,true);
 }
 
 void App_Run(void) {
 
 	ev = PVGetEv();
-	if (ev == ENC_RIGHT) {
-		//FRDMLedFlash(R);
-		bright = brightUp(bright);
-		FRDMLedRGB(bright, 0, 0);
+	if (PVCheckEvent()){
+		if(PVGetEv() == ENC_RIGHT)) {
+			FRDMLedFlash(PURPLE);
+		}
+		else if (PVGetEv() == ENC_LEFT){
+			FRDMLedOff();
+		}
 	}
-	else if (ev == ENC_LEFT) {
-		//FRDMLedOff();
-		bright = brightDown(bright);
-		FRDMLedRGB(bright, 0, 0);
-	}
+	
 	FRDMLedPoll();
 }
-*/
