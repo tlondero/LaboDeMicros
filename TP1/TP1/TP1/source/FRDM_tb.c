@@ -53,6 +53,7 @@ void App_Init(void) {
 	FRDMInit();
 	FRDMSuscribeEvent(PRESS_SW2, true);
 	FRDMSuscribeEvent(PRESS_SW3, true);
+	FRDMLedFlash(PURPLE);
 }
 
 //Función que se llama constantemente en un ciclo infinito
