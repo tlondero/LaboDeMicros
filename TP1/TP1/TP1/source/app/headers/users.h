@@ -78,6 +78,6 @@ bool getBlockedStatus(uint32_t userID);
 * @brief checkExistance: returns true if the user ID specified exist.
 */
 bool checkExistance(uint32_t user_ID);
-
+user_t * getUsersList(void);
 bool checkPassword(uint32_t user_ID, uint32_t user_pin);
 #endif
