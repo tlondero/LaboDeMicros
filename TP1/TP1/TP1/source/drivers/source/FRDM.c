@@ -66,6 +66,9 @@ void FRDMInit(void) {
 	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
 	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
 
+	isEvent = false;
+	event = NO_FRDM_EV;
+
 	//Led init
 	led_init_driver();
 
@@ -311,43 +314,32 @@ void FRDMSuscribeEvent(FRDMEv_t ev, bool state) {
 }
 
 bool FRDMCheckEvent(void) {
-	FRDMEv_t ev = *ButtonGetEvent(sw2);
-	if (ev != NO_EV) {
-		switch (ev) {
-		case (PRESS):
+	ButtonEvent ev = *ButtonGetEvent(sw2);
+	ButtonEvent ev2 = *ButtonGetEvent(sw3);
+	if ((ev != NO_EV) && (ev != EOQ)) {
+		if ((ev == PRESS) && (listEv[PRESS_SW2])) {
 			event = PRESS_SW2;
-			break;
-		case (RELEASE):
+		} else if ((ev == RELEASE) && (listEv[RELEASE_SW2])) {
 			event = RELEASE_SW2;
-			break;
-		case (LKP):
+		} else if ((ev == LKP) && (listEv[LKP_SW2])) {
 			event = LKP_SW2;
-			break;
-		case (SKP):
+		} else if ((ev == SKP) && (listEv[SKP_SW2])) {
 			event = SKP_SW2;
-			break;
-		default:
+		} else {
 			event = NO_FRDM_EV;
-			break;
 		}
 
-	} else if ((ev = *ButtonGetEvent(sw3)) != NO_EV) {
-		switch (ev) {
-		case (PRESS):
+	} else if ((ev2 != NO_EV) && (ev2 != EOQ)) {
+		if ((ev2 == PRESS) && (listEv[PRESS_SW3])) {
 			event = PRESS_SW3;
-			break;
-		case (RELEASE):
+		} else if ((ev2 == RELEASE) && (listEv[RELEASE_SW3])) {
 			event = RELEASE_SW3;
-			break;
-		case (LKP):
+		} else if ((ev2 == LKP) && (listEv[LKP_SW3])) {
 			event = LKP_SW3;
-			break;
-		case (SKP):
+		} else if ((ev2 == SKP) && (listEv[SKP_SW3])) {
 			event = SKP_SW3;
-			break;
-		default:
+		} else {
 			event = NO_FRDM_EV;
-			break;
 		}
 	} else {
 		event = NO_FRDM_EV;
