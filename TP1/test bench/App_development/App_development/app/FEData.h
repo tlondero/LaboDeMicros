@@ -27,6 +27,10 @@ typedef struct {
 	bool bad_pin;
 	bool good_pin;
 	bool open;
+	bool del_user;
+
+	uint8_t del_i;
+	void* del_user_ptr;
 }FEData;
 //extern const char BRIGHTNESS_MSG[4];// = { 'B','R','G','H' };
 //extern const char OPEN_MSG[4];// = { 'O','P','E','N' };

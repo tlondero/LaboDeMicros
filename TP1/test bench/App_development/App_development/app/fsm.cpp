@@ -765,6 +765,7 @@ state addRoutine(void) {
 			fe_data.animation_en = true;
 			fe_data.id_counter = 0;
 			using_encoder = false;
+			fe_data.animation_en = true;
 			cancel_triggered = false;
 		}
 		else if (back_triggered) {
@@ -775,6 +776,7 @@ state addRoutine(void) {
 		}
 		//ahora hay que fijarse si llego un evento de encoder, si es derecha aumento el numero si es izquierda lo achico si es enter avanzo
 		if (PVencoder_event_avb(my_encoder_id)) {
+			fe_data.animation_en = false;
 			event_t ev = PVencoder_pop_event(my_encoder_id);
 			switch (ev) {
 			case LEFT_TURN:
@@ -799,6 +801,7 @@ state addRoutine(void) {
 				}
 				else {
 					asking_pin = true;
+					fe_data.good_id = true;
 				}
 				break;
 			default:
@@ -807,6 +810,7 @@ state addRoutine(void) {
 		}
 	}
 	if ((PVencoder_event_avb(my_encoder_id)) && asking_pin) {
+		fe_data.animation_en = false;;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);//Reinicio timer
 		event_t ev = PVencoder_pop_event(my_encoder_id);
@@ -834,6 +838,7 @@ state addRoutine(void) {
 			}
 			else {
 				addUser({ transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN), false, true, 0 });
+				fe_data.good_pin = true;
 				updated_state = USERS;
 			}
 			break;
@@ -847,7 +852,6 @@ state addRoutine(void) {
 
 state delRoutine(void) {
 	state updated_state = USERS_DEL;
-	static uint8_t i = 0;
 
 	if (prev_state != USERS_DEL) {
 		fe_data.animation_opt = DEL_SELECTED_ANIMATION;
@@ -858,6 +862,8 @@ state delRoutine(void) {
 		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
 		//activar las interrupciones de cancel y del
+		fe_data.del_user_ptr = (void*)getUsersList();
+		fe_data.del_i = 0;
 	}
 
 	if (cancel_triggered || back_triggered) {
@@ -870,18 +876,35 @@ state delRoutine(void) {
 	}
 
 	if (PVencoder_event_avb(my_encoder_id)) {
+		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);//Reinicio timer
 		event_t ev = PVencoder_pop_event(my_encoder_id);
 		switch (ev) {
 		case LEFT_TURN:
-
+			if (fe_data.del_i == 0) {
+				fe_data.del_i = (MAX_USERS - 1);
+				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) + fe_data.del_i);
+			}
+			else {
+				fe_data.del_i++;
+				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) + 1);
+			}
 			break;
 		case RIGHT_TURN:
-	
+			if (fe_data.del_i == (MAX_USERS - 1)) {
+				fe_data.del_i = 0;
+				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) - (MAX_USERS - 1));
+			}
+			else {
+				fe_data.del_i--;
+				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) - 1);
+			}
 			break;
 		case BUTTON_PRESS:
-			
+			deleteUser(((user_t*)(fe_data.del_user_ptr))->id);
+			fe_data.del_user = true;
+			updated_state = USERS;
 			break;
 		default: break;
 		}
