@@ -21,12 +21,6 @@
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
-/*
- #define PIN_LED_RED     	PORTNUM2PIN(PB,22) // PTB22
- #define PIN_LED_GREEN   	PORTNUM2PIN(PE,26) // PTE26
- #define PIN_LED_BLUE    	PORTNUM2PIN(PB,21) // PTB21
- */
-
 /*******************************************************************************
  * VARIABLES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -68,6 +62,7 @@ void FRDMInit(void) {
 	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
 	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
 
+	//Led init
 	led_init_driver();
 
 	idLedRed = led_init_led(PB, 22, TURNS_ON_WITH_0);
@@ -77,6 +72,7 @@ void FRDMInit(void) {
 	ledOn = false;
 	lastColor = CANT_COLORS;
 
+	//Led default config
 	uint32_t fade = 100;			//ms
 	uint32_t dt = 50;				//%
 	uint8_t flashes = 0;
