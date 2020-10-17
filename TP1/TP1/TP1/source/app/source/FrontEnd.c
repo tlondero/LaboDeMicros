@@ -47,9 +47,14 @@ void drawFrontEnd(FEData data, state st) {
 		if ((!data.good_pin) && (!data.bad_pin)) {
 			for (i = 0; i < 4; i++) {
 				if (data.pin_counter > 3) {
-					PVDisplaySendChar(
-							data.pin_data[data.pin_counter - 3 + i] + '0', i);
+					if(i<3)
+						PVDisplaySendChar('-', i);
+					else
+					PVDisplaySendChar(data.pin_data[data.pin_counter - 3 + i] + '0', i);
 				} else {
+					if(i<3)
+						PVDisplaySendChar('-', i);
+					else
 					PVDisplaySendChar(data.pin_data[i] + '0', i);
 				}
 			}
@@ -123,9 +128,14 @@ void drawFrontEnd(FEData data, state st) {
 		} else if ((data.pin_counter <= PIN_LEN) && (!data.good_pin)) { // en el caso de que este metiendo el pin
 			for (i = 0; i < 4; i++) {
 				if (data.pin_counter > 3) {
-					PVDisplaySendChar(
-							data.pin_data[data.pin_counter - 3 + i] + '0', i);
+					if(i<3)
+						PVDisplaySendChar('-', i);
+					else
+					PVDisplaySendChar(data.pin_data[data.pin_counter - 3 + i] + '0', i);
 				} else {
+					if(i<3)
+						PVDisplaySendChar('-', i);
+					else
 					PVDisplaySendChar(data.pin_data[i] + '0', i);
 				}
 			}
