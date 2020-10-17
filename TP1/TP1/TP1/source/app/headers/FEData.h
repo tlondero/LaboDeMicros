@@ -29,6 +29,7 @@ typedef struct {
 	bool good_pin;
 	bool open;
 }FEData;
+
 const char BRIGHTNESS_MSG[4] = { 'B','R','G','H' };
 const char OPEN_MSG[4] = { 'O','P','E','N' };
 const char USER_MSG[4] = { 'U','S','E','R' };
