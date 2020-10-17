@@ -161,7 +161,7 @@ bool PVDisplaySetBright(uint8_t br) {
 	bool valid = true;
 	if ((br >= 1) && (br <= 100)) {
 		brightness = br;
-		dispBrightness(brightness);
+		PVDisplaySetBright(brightness);
 	} else if (br == 0) {
 		dispClearAll();
 	} else {
