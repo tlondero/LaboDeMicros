@@ -111,7 +111,7 @@ bool PVDisplayShift(PVDirection_t direction);
  * @brief 
  */
 bool PVAnimation(animation_t animation, bool activate);
-
+void PVMarquesina(uint32_t number_to_display);
 /*******************************************************************************
  ******************************************************************************/
 

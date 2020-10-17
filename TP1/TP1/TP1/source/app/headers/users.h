@@ -37,6 +37,8 @@ typedef struct {
 * @brief .initUsers: loads the default users stored in memory
 *
 */
+#define MAX_USERS (15)
+
 void initUsers(void);
 /**
 * @brief .addUser: Adds the user specefied by the usert structure

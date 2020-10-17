@@ -20,8 +20,11 @@ typedef struct {
 	uint8_t pin_counter;
 	bool pin_state;
 
+	uint8_t del_i;
+	void * del_user_ptr;
 	uint8_t brightness;
 
+	bool del_user;
 	bool blocked_user;
 	bool bad_id;
 	bool good_id;
