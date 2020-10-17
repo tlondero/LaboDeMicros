@@ -26,7 +26,7 @@
 * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
 ******************************************************************************/
 
-typedef enum {IDDLE,ASK_PIN,ACCESS,OPEN,USERS,BRIGHTNESS} state;
+typedef enum {IDDLE,ASK_PIN,ACCESS,OPEN,USERS,BRIGHTNESS ,USERS_CLAVE, USERS_ADD , USERS_DEL} state;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
