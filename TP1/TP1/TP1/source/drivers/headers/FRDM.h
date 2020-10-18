@@ -57,7 +57,7 @@ typedef uint8_t FRDMButton_t;
 /**
  * @brief Init Buttons and Leds
  */
-void FRDMInit(void);
+bool FRDMInit(void);
 
 /**
  * @brief Returns the event of the button

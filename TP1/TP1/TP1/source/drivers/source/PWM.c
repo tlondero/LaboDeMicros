@@ -122,7 +122,7 @@ void PWMStartSignal(int8_t pwm_id) {
 		if (INITIALIZED_PWMS[pwm_id] == 1) {
 			PWMS[pwm_id].queried = 1;
 			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
-			FTMSetSWSYNC(pwm_id);
+			FTMSetSWSYNC(PWMS[pwm_id].ftm_id);
 		}
 	}
 }
@@ -144,7 +144,7 @@ void PWMStopSignal(int8_t pwm_id, uint8_t final_state) {
 					FTMSetCnV(PWMS[pwm_id].ftm_id, 0xFFFF);
 				}
 			}
-			FTMSetSWSYNC(pwm_id);
+			FTMSetSWSYNC(PWMS[pwm_id].ftm_id);
 		}
 	}
 }
@@ -174,7 +174,7 @@ uint8_t PWMSetFrequency(uint8_t pwm_id, double new_freq) {
 						(uint16_t) ((PWMS[pwm_id].period
 								/ PSC2DIV(PWMS[pwm_id].PSC)) * ftm_clk - 1));
 				FTMSetPSC(PWMS[pwm_id].ftm_id, new_PSC);
-				FTMSetSWSYNC(pwm_id);
+				FTMSetSWSYNC(PWMS[pwm_id].ftm_id);
 				ok = 1;
 			}
 		}
@@ -198,7 +198,7 @@ uint8_t PWMSetDT(uint8_t pwm_id, double new_dt) {
 									/ PSC2DIV(PWMS[pwm_id].PSC)) * ftm_clk));
 				}
 				FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
-				FTMSetSWSYNC(pwm_id);
+				FTMSetSWSYNC(PWMS[pwm_id].ftm_id);
 				ok = 1;
 			}
 		}
@@ -232,7 +232,7 @@ uint8_t PWMIncrementDT(uint8_t pwm_id, double deltaDT) {
 				}
 			}
 			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
-			FTMSetSWSYNC(pwm_id);
+			FTMSetSWSYNC(PWMS[pwm_id].ftm_id);
 			ok = 1;
 		}
 	}
@@ -264,7 +264,7 @@ uint8_t PWMDecrementDT(uint8_t pwm_id, double deltaDT) {
 				}
 			}
 			FTMSetCnV(PWMS[pwm_id].ftm_id, PWMS[pwm_id].cnv);
-			FTMSetSWSYNC(pwm_id);
+			FTMSetSWSYNC(PWMS[pwm_id].ftm_id);
 			ok = 1;
 		}
 	}

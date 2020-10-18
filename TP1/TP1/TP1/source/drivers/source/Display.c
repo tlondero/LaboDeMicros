@@ -133,7 +133,7 @@ void dispInit(void) {
 	uint8_t i;
 	led_init_driver(); // Initializes the leds driver.
 	for (i = 0; i < SEVEN_SEGMENTS_PINS; i++) {
-		gpioMode(PINES[i], OUTPUT);
+		//gpioMode(PINES[i], OUTPUT);
 		seven_segment_id[i] = led_init_led(PIN2PORT(PINES[i]), PIN2NUM(PINES[i]), TURNS_ON_WITH_1);
 	}
 	gpioMode(SEL_LINE_A, OUTPUT);

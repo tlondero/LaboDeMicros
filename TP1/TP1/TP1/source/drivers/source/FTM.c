@@ -211,14 +211,14 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 				NVIC_EnableIRQ(FTM2_IRQn); 			//nvic-enable
 				break;
 			case 3:
-				SIM->SCGC6 |= SIM_SCGC3_FTM3_MASK;	//clock-gating
+				SIM->SCGC3 |= SIM_SCGC3_FTM3_MASK;	//clock-gating
 				NVIC_EnableIRQ(FTM3_IRQn); 			//nvic-enable
 				break;
 			default:
 				break;
 			}
 
-			FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | 0xFF;//LDOK enable all CH
+			FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | (1<<channel);//LDOK enable CH
 			UserPCR.PCR = false; // seteo en falso por default
 			UserPCR.FIELD.DSE = true; //Drive Streght Enable
 			UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer
