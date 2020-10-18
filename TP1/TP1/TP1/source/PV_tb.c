@@ -40,20 +40,43 @@
  * INTERRUPCIONES
  ****************************************************************************/
 
+static uint8_t br;
+
+uint8_t brightUp(uint8_t b){
+	uint8_t bb = b + 10;
+	if (bb >= 100){
+		bb = 100;
+	}
+	br = bb;
+}
+
+uint8_t brightDown(uint8_t b){
+	uint8_t bb = b - 10;
+	if ((bb > 100) || (bb == 10)){
+		bb = 0;
+	}
+	br = bb;
+}
+
 void App_Init(void) {
 	PVInit();
 	PVSuscribeEvent(ENC_RIGHT, true);
 	PVSuscribeEvent(ENC_LEFT, true);
+	br = 20;
+	PVLedSetBright(PV_LED_1, br);
+	PVLedOn(PV_LED_1);
 }
 
 void App_Run(void) {
 
 	if (PVCheckEvent()) {
 		if (PVGetEv() == ENC_RIGHT) {
-			PVLedFlash(PV_LED_1,0);
+			brightUp(br);
+			PVLedSetBright(PV_LED_1, br);
 		}
 		else if (PVGetEv() == ENC_LEFT) {
-			PVLedOff(PV_LED_1);
+			brightDown(br);
+			PVLedSetBright(PV_LED_1, br);
 		}
 	}
 
