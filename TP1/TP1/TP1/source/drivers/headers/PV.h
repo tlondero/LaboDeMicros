@@ -87,6 +87,11 @@ bool PVLedSetFade(PVLed_t led, uint8_t value);
 bool PVLedSetDt(PVLed_t led, uint8_t value);
 
 /**
+ * @brief LED Set time on
+ */
+bool PVLedSetPeriod(PVLed_t led, uint8_t value);
+
+/**
  * @brief LED  Set amounts of flashes (0 = forever)
  */
 bool PVLedSetFlash(PVLed_t led, uint8_t value);

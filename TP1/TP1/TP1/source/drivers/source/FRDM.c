@@ -92,18 +92,22 @@ bool FRDMInit(void) {
 		uint32_t dt = 50;				//%
 		uint8_t flashes = 0;
 		uint32_t period = 1000;		//ms
+		uint32_t time = 0;		//ms
 
 		led_configure_fade(idLedRed, fade);
+		led_configure_time(idLedRed, time);
 		led_configure_dt(idLedRed, dt);
 		led_configure_flashes(idLedRed, flashes);
 		led_configure_period(idLedRed, period);
 
 		led_configure_fade(idLedBlue, fade);
+		led_configure_time(idLedBlue, time);
 		led_configure_dt(idLedBlue, dt);
 		led_configure_flashes(idLedBlue, flashes);
 		led_configure_period(idLedBlue, period);
 
 		led_configure_fade(idLedGreen, fade);
+		led_configure_time(idLedBlue, time);
 		led_configure_dt(idLedGreen, dt);
 		led_configure_flashes(idLedGreen, flashes);
 		led_configure_period(idLedGreen, period);
@@ -175,6 +179,17 @@ bool FRDMLedSetPeriod(uint8_t value) {
 		led_configure_period(idLedRed, value);
 		led_configure_period(idLedGreen, value);
 		led_configure_period(idLedBlue, value);
+		valid = true;
+	}
+	return valid;
+}
+
+bool FRDMLedSetTime(uint8_t value) {
+	bool valid = false;
+	if ((value >= 0) && (value <= 100)) {
+		led_configure_time(idLedRed, value);
+		led_configure_time(idLedGreen, value);
+		led_configure_time(idLedBlue, value);
 		valid = true;
 	}
 	return valid;

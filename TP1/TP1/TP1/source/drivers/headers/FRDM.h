@@ -104,6 +104,12 @@ void FRDMLedOff(void);
  */
 void FRDMLedPoll(void);
 
+
+/**
+ * @brief Led on time
+ */
+bool FRDMLedSetTime(uint8_t value);
+
 /**
  * @brief Toggle On/Off whit last color set
  */

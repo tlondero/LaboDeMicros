@@ -100,20 +100,24 @@ bool PVInit(void) {
 		uint32_t dt = 50;				//%
 		uint8_t flashes = 0;
 		uint32_t period = 1000;		//ms
+		uint32_t time = 0;		//ms
 
 		led_configure_brightness(idLed1, bright);
+		led_configure_time(idLed1, time);
 		led_configure_fade(idLed1, fade);
 		led_configure_dt(idLed1, dt);
 		led_configure_flashes(idLed1, flashes);
 		led_configure_period(idLed1, period);
 
 		led_configure_brightness(idLed3, bright);
+		led_configure_time(idLed3, time);
 		led_configure_fade(idLed3, fade);
 		led_configure_dt(idLed3, dt);
 		led_configure_flashes(idLed3, flashes);
 		led_configure_period(idLed3, period);
 
 		led_configure_brightness(idLed2, bright);
+		led_configure_time(idLed2, time);
 		led_configure_fade(idLed2, fade);
 		led_configure_dt(idLed2, dt);
 		led_configure_flashes(idLed2, flashes);
@@ -429,6 +433,29 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 		default:
 			valid = false;
 		}
+	}
+	return valid;
+}
+
+bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
+	bool valid = true;
+	switch (led) {
+	case (PV_LED_1):
+		led_configure_time(idLed1, value);
+		break;
+	case (PV_LED_2):
+		led_configure_time(idLed2, value);
+		break;
+	case (PV_LED_3):
+		led_configure_time(idLed3, value);
+		break;
+	case (PV_LED_ALL):
+		led_configure_time(idLed1, value);
+		led_configure_time(idLed2, value);
+		led_configure_time(idLed3, value);
+		break;
+	default:
+		valid = false;
 	}
 	return valid;
 }
