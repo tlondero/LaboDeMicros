@@ -69,6 +69,7 @@ static const FTM_Pinout_t FTM_PINOUT[FTM_PIN_CANT]={{0,0,0,3,37,0,PA,3},
 							 {3,5,0,3,81,27,PC,9},
 							 {3,6,0,3,82,28,PC,10},
 							 {3,7,0,3,83,29,PC,11}};
+#if CALLBACK_MODE == 1
 static const uint8_t MODULE0_ID_START = 0;
 static const uint8_t MODULE0_ID_END = 13;
 static const uint8_t MODULE1_ID_START = 14;
@@ -77,6 +78,7 @@ static const uint8_t MODULE2_ID_START = 18;
 static const uint8_t MODULE2_ID_END = 19;
 static const uint8_t MODULE3_ID_START = 20;
 static const uint8_t MODULE3_ID_END = 29;
+#endif
 
 #endif
 /************************************************************************
@@ -85,21 +87,24 @@ static const uint8_t MODULE3_ID_END = 29;
 
 PCRstr UserPCR;
 static uint8_t FTMX_INIT[4];
+#if CALLBACK_MODE == 1
 static void (*CALLBACK[FTM_PIN_CANT])(void);
 static uint8_t CALLBACK_EN[FTM_PIN_CANT];
 static const uint32_t STATUS_CHF[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20,
 		0x40, 0x80 };
+#endif
 static FTM_Type * const FTM_POINTERS[4] = { FTM0, FTM1, FTM2, FTM3 };
 static PORT_Type * const PORT_SELECTORS[] = {PORTA, PORTB, PORTC, PORTD, PORTE};
 
 __ISR__ FTM0_IRQHandler(void) {
+
+	FTM0->STATUS = 0;	//Limpio todos los flags
+
+#if CALLBACK_MODE == 1
 	uint32_t status;
 	uint8_t i;
 	uint8_t j;
 	status = FTM0->STATUS; //Capturo flags de interrupcion de todos los canales
-	FTM0->STATUS = 0;	//Limpio todos los flags
-
-#if CALLBACK_MODE == 1
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 		if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 			for(j = MODULE0_ID_START; j < MODULE0_ID_END+1; j++){
@@ -112,14 +117,14 @@ __ISR__ FTM0_IRQHandler(void) {
 #endif
 }
 __ISR__ FTM1_IRQHandler(void) {
-	uint32_t status;
-	uint8_t i;
-	uint8_t j;
 
-	status = FTM1->STATUS; //Capturo flags de interrupcion de todos los canales
 	FTM1->STATUS = 0;	//Limpio todos los flags
 
 #if CALLBACK_MODE == 1
+	uint32_t status;
+	uint8_t i;
+	uint8_t j;
+	status = FTM1->STATUS; //Capturo flags de interrupcion de todos los canales
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 				for(j = MODULE1_ID_START; j < MODULE1_ID_END+1; j++){
@@ -132,14 +137,14 @@ __ISR__ FTM1_IRQHandler(void) {
 #endif
 }
 __ISR__ FTM2_IRQHandler(void) {
-	uint32_t status;
-	uint8_t i;
-	uint8_t j;
 
-	status = FTM2->STATUS; //Capturo flags de interrupcion de todos los canales
 	FTM2->STATUS = 0;	//Limpio todos los flags
 
 #if CALLBACK_MODE == 1
+	uint32_t status;
+	uint8_t i;
+	uint8_t j;
+	status = FTM2->STATUS; //Capturo flags de interrupcion de todos los canales
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 				for(j = MODULE2_ID_START; j < MODULE2_ID_END+1; j++){
@@ -152,14 +157,14 @@ __ISR__ FTM2_IRQHandler(void) {
 #endif
 }
 __ISR__ FTM3_IRQHandler(void) {
-	uint32_t status;
-	uint8_t i;
-	uint8_t j;
 
-	status = FTM3->STATUS; //Capturo flags de interrupcion de todos los canales
 	FTM3->STATUS = 0;	//Limpio todos los flags
 
 #if CALLBACK_MODE == 1
+	uint32_t status;
+	uint8_t i;
+	uint8_t j;
+	status = FTM3->STATUS; //Capturo flags de interrupcion de todos los canales
 
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue

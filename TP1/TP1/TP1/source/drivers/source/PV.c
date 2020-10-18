@@ -437,7 +437,7 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 	return valid;
 }
 
-bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
+/*bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 	bool valid = true;
 	switch (led) {
 	case (PV_LED_1):
@@ -459,6 +459,7 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 	}
 	return valid;
 }
+*/
 
 bool PVLedFlash(PVLed_t led, uint8_t color) {
 

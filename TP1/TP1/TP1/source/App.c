@@ -1,4 +1,4 @@
-/*
+
 **************************************************************************
  @file     App.c
  @brief    Application functions
@@ -20,6 +20,7 @@
 #include "drivers/headers/timer.h"
 //#include "drivers/headers/Button.h"
 #include "drivers/headers/FRDM.h"
+#include "drivers/headers/ftm_tb.c"
 
 ******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -73,4 +74,4 @@ void App_Run(void) {
 
 	FRDMLedPoll();
 }
-*/
+
