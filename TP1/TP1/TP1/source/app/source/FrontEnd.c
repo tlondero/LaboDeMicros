@@ -4,6 +4,7 @@
 #include "../headers/FrontEnd.h"
 #include "../headers/users.h"
 #include "../../drivers/headers/PV.h"
+#include "../headers/utility.h"
 #include "../../drivers/headers/FRDM.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -26,8 +27,7 @@ void drawFrontEnd(FEData data, state st) {
 	switch (st) {
 	case IDDLE:
 		if (data.animation_en) {
-			for (i = 0; i < 4; i++)
-				PVDisplaySendChar('-', 0);
+			PVAnimation(IDDLE_ANIMATION, true);
 		} else if ((!data.good_id) && (!data.bad_id)) {
 			for (i = 0; i < 4; i++) {
 				if (data.id_counter > 3) {

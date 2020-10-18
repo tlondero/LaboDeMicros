@@ -53,4 +53,5 @@ state FSMRun(state actual_state);
  * @return FEData, dedicated structure in FEData.h.
  */
 FEData  * const FSMGetFEData(void);
+
 #endif

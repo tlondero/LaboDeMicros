@@ -14,7 +14,7 @@
   /*******************************************************************************
    * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
    ******************************************************************************/
-
+#define MAX_USERS (15)
    /*******************************************************************************
 	   * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
   ******************************************************************************/
@@ -37,7 +37,7 @@ typedef struct {
 * @brief .initUsers: loads the default users stored in memory
 *
 */
-#define MAX_USERS (15)
+
 
 void initUsers(void);
 /**
@@ -82,4 +82,5 @@ bool getBlockedStatus(uint32_t userID);
 bool checkExistance(uint32_t user_ID);
 user_t * getUsersList(void);
 bool checkPassword(uint32_t user_ID, uint32_t user_pin);
+void setPassword(uint32_t user_ID, uint32_t new_pin);
 #endif

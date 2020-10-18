@@ -6,20 +6,20 @@
 #include "../../drivers/headers/PV.h"
 #include "../../drivers/headers/Card.h"
 #include "../../drivers/headers/FRDM.h"
+#include "../headers/utility.h"
 #include "../../app/headers/users.h"
  /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
-#define CLEARED_DIGIT 10
+
  /*******************************************************************************
   * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
   ******************************************************************************/
 enum{OPEN_SEL,BRIGHT_SEL,USER_SEL};
+enum{USERS_CLAVE_SEL, USERS_ADD_SEL, USERS_DEL_SEL};
   /*******************************************************************************
    * VARIABLE PROTOTYPES WITH FILE SCOPE
    ******************************************************************************/
-
-
 
 
 
@@ -60,8 +60,7 @@ static state prev_state = IDDLE;
   * @return state variable with the updated state
   */
 state IDDLERoutine(void);
-//transforms de array to a number 
-uint32_t transformToNum(uint8_t* data, uint8_t count);
+
 uint32_t pwr(uint32_t num, uint32_t exp);
 
 /**
@@ -94,6 +93,24 @@ state usersRoutine(void);
  * @return state variable with the updated state
  */
 state brightnessRoutine(void);
+/***
+ * @brief claveRoutine RELLENAR.
+ *
+ * @return state variable with the updated state
+ */
+state claveRoutine(void);
+/**
+ * @brief delRoutine RELLENAR.
+ *
+ * @return state variable with the updated state
+ */
+state delRoutine(void);
+/**
+ * @brief addRoutine RELLENAR.
+ *
+ * @return state variable with the updated state
+ */
+state addRoutine(void);
 ///////////////////////////
 //     Callbacks        //
 //////////////////////////
@@ -167,6 +184,15 @@ state FSMRun(state actual_state) {
 	case BRIGHTNESS:
 		updated_state = brightnessRoutine();//DONE
 		break;
+	case USERS_CLAVE:
+		updated_state = claveRoutine();
+		break;
+	case USERS_DEL:
+		updated_state = delRoutine();
+		break;
+	case USERS_ADD:
+		updated_state = addRoutine();
+		break;
 	default:
 		break;
 	}
@@ -239,18 +265,6 @@ state IDDLERoutine(void) {
 		}
 		else if (back_triggered) {
 			if (fe_data.id_counter > 0) {
-				//encoder_id_digits[fe_data.id_counter] = CLEARED_DIGIT;
-				//if (fe_data.id_counter < 4)
-				//	PVdispSendChar(' ', fe_data.id_counter);
-				//else {
-				//	uint8_t i;
-				//	for (i = 0; i < 4; i++) {
-				//		PVdispSendChar(encoder_id_digits[fe_data.id_counter - 1 - i] + '0', 3 - i);
-				//	}
-				//}
-				//////////////////////////////////////////////////
-				// ACA HAY QUE VER PARA QUE EN EL DISPLAY NO QUEDE CAGADO //creo que lo hice bien pero estar�a bueno que me lo chequeens
-				//////////////////////////////////////////////////////////
 				fe_data.id_counter--;
 			}
 			back_triggered = false;
@@ -266,13 +280,6 @@ state IDDLERoutine(void) {
 					actual_encoder_number--;
 
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
-//				if (fe_data.id_counter < 4) {
-//
-//					PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habr�a que ver bien el orden de los displays
-//				}
-//				else {
-//					PVdispSendChar(actual_encoder_number + '0', 3);//Aca habr�a que ver bien el orden de los displays
-//				}
 				break;
 			case ENC_RIGHT:
 				if (actual_encoder_number == 9)
@@ -282,12 +289,6 @@ state IDDLERoutine(void) {
 					actual_encoder_number++;
 
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
-				//if (fe_data.id_counter < 4) {
-				//	PVdispSendChar(actual_encoder_number + '0', fe_data.id_counter);//Aca habr�a que ver bien el orden de los displays
-				//}
-				//else {
-				//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habr�a que ver bien el orden de los displays
-				//}
 				break;
 			case BTN_PRESS:
 				if (fe_data.id_counter < ID_LEN-1) {
@@ -346,17 +347,6 @@ state askPinRoutine(void) {
 		timerResume(inactivity_timer_id);
 		if (fe_data.pin_counter > 0) {//osea lease borre el ultimo caracter
 
-			//encoder_pin_digits[fe_data.pin_counter] = CLEARED_DIGIT;
-			//if (fe_data.pin_counter < 4)
-			//	PVdispSendChar(' ', fe_data.pin_counter);
-			//else {
-			//	uint8_t i;
-			//	for (i = 0; i < 3; i++) {
-			//		PVdispSendChar('-', i);
-			//	}
-			//	PVdispSendChar(encoder_pin_digits[fe_data.pin_counter] + '0', 3);//escribo '-' en todos exepto el ultimo
-
-			//}
 			fe_data.pin_counter--;
 			back_triggered = false;
 		}
@@ -374,17 +364,7 @@ state askPinRoutine(void) {
 				actual_encoder_number--;
 
 			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
-			//if (fe_data.pin_counter < 4) {
-			//	uint8_t k = 0;
-			//	for (k = 0; k < fe_data.pin_counter; k++) {
-			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
-			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habr�a que ver bien el orden de los displays
-			//}
-			//else {
-			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habr�a que ver bien el orden de los displays
-			//}
+
 			break;
 		case ENC_RIGHT:
 			if (actual_encoder_number == 9)
@@ -394,17 +374,7 @@ state askPinRoutine(void) {
 				actual_encoder_number++;
 
 			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
-			//if (fe_data.pin_counter < 4) {
-			//	uint8_t k = 0;
-			//	for (k = 0; k < fe_data.pin_counter; k++) {
-			//		PVdispSendChar('-', k);//LE pone simbolo '-' a todos expeto al ultimo que esta escribiendo
-			//	}
-			//	PVdispSendChar(actual_encoder_number + '0', fe_data.pin_counter);//Aca habr�a que ver bien el orden de los displays
-			//}
-			//else {
-			//	PVdispSendChar('-', 2);//a lo sumo el unico que no es '-' es el que antees era el menos sigificativo antes del shid
-			//	PVdispSendChar(actual_encoder_number + '0', 3);//Aca habr�a que ver bien el orden de los displays
-			//}
+
 			break;
 		case BTN_PRESS:
 			if (fe_data.pin_counter < PIN_LEN) {
@@ -530,9 +500,89 @@ state openRoutine(void) {
 }
 
 state usersRoutine(void) {
-	state updated_state = IDDLE;
+	state updated_state = USERS;
+	static uint8_t selection=USERS_CLAVE_SEL;
+
 	if (prev_state != USERS) {
 		fe_data.animation_en = false;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
+	}
+
+	if (cancel_triggered || back_triggered) {
+		updated_state = ACCESS;
+	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if ((updated_state == USERS) && (PVCheckEvent())) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVGetEv();
+		switch (ev) {
+		case ENC_LEFT:
+			if(getAdminStatus(transformToNum(&encoder_id_digits[0], ID_LEN))){
+				if (selection == USERS_CLAVE_SEL)
+					selection = USERS_DEL_SEL;
+				else
+					selection--;
+				fe_data.animation_en = true;
+				switch (selection) {
+				case USERS_CLAVE_SEL :
+					fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
+					break;
+				case USERS_ADD_SEL:
+					fe_data.animation_opt = ADD_SELECTED_ANIMATION;
+					break;
+				case USERS_DEL_SEL:
+					fe_data.animation_opt = DEL_SELECTED_ANIMATION;
+					break;
+				default: break;
+				}
+			}
+			break;
+		case ENC_RIGHT:
+			if(getAdminStatus(transformToNum(&encoder_id_digits[0], ID_LEN))){
+				if (selection == USERS_DEL_SEL)
+					selection = USERS_CLAVE_SEL;
+				else
+					selection++;
+				//fe_data.animation_en = true;
+				switch (selection) {
+				case USERS_CLAVE_SEL:
+					fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
+					break;
+				case USERS_ADD_SEL:
+					fe_data.animation_opt = ADD_SELECTED_ANIMATION;
+					break;
+				case USERS_DEL_SEL:
+					fe_data.animation_opt = DEL_SELECTED_ANIMATION;
+					break;
+				default: break;
+				}
+			}
+			break;
+		case BTN_PRESS:
+			switch (selection) {
+			case USERS_CLAVE_SEL:
+				updated_state = USERS_CLAVE;
+				break;
+			case USERS_ADD_SEL:
+				updated_state= USERS_ADD;
+				break;
+			case USERS_DEL_SEL:
+				updated_state = USERS_DEL;
+				break;
+			default: break;
+			}
+			break;
+		default: break;
+		}
 	}
 	return updated_state;
 }
@@ -572,6 +622,267 @@ state brightnessRoutine(void) {
 	}
 	return updated_state;
 }
+state claveRoutine(void) {
+	state updated_state = USERS_CLAVE;
+	static uint8_t actual_encoder_number = 0;
+
+	if (prev_state != USERS_CLAVE) {
+		fe_data.pin_counter = 0;
+		fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
+		fe_data.animation_en = true;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		//activar las interrupciones de cancel y del
+	}
+
+	if (cancel_triggered || back_triggered) {
+		updated_state = ACCESS;
+	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if ((updated_state == USERS_CLAVE) && (PVCheckEvent())) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVGetEv();
+		switch (ev) {
+		case ENC_LEFT:
+			if (actual_encoder_number == 0)
+				actual_encoder_number = 9;
+			else
+				actual_encoder_number--;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case ENC_RIGHT:
+			if (actual_encoder_number == 9)
+				actual_encoder_number = 0;
+
+			else
+				actual_encoder_number++;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case BTN_PRESS:
+			if (fe_data.pin_counter < PIN_LEN) {
+				fe_data.pin_counter++;
+			}
+			else {
+				setPassword(transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN));
+				fe_data.good_pin = 1;
+				updated_state = USERS;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	return updated_state;
+}
+
+state addRoutine(void) {
+	state updated_state = USERS_ADD;
+	static uint8_t actual_encoder_number = 0;
+	static bool using_encoder = false;
+	uint8_t* card_event = 0;
+	static bool asking_pin = false;
+	user_t my_user;
+
+	if (prev_state != USERS_ADD) {
+		fe_data.animation_opt = ADD_SELECTED_ANIMATION;
+		fe_data.animation_en = true;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		//activar las interrupciones de cancel y del
+	}
+
+	if (cancel_triggered || back_triggered) {
+		updated_state = ACCESS;
+	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if (!using_encoder && !asking_pin) {
+		card_event = cardGetPAN();
+		if (card_event != NULL) {
+			asking_pin = true;
+		}
+	}
+
+	if (PVCheckEvent()) {
+		fe_data.animation_en = false;
+		using_encoder = true;
+	}
+
+	if (using_encoder && updated_state == IDDLE && !asking_pin) {
+		if (cancel_triggered) {
+			fe_data.animation_en = true;
+			fe_data.id_counter = 0;
+			using_encoder = false;
+			fe_data.animation_en = true;
+			cancel_triggered = false;
+		}
+		else if (back_triggered) {
+			if (fe_data.id_counter > 0) {
+				fe_data.id_counter--;
+			}
+			back_triggered = false;
+		}
+		//ahora hay que fijarse si llego un evento de encoder, si es derecha aumento el numero si es izquierda lo achico si es enter avanzo
+		if (PVCheckEvent()) {
+			fe_data.animation_en = false;
+			event_t ev = PVGetEv();
+			switch (ev) {
+			case ENC_LEFT:
+				if (actual_encoder_number == 0)
+					actual_encoder_number = 9;
+				else
+					actual_encoder_number--;
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+
+				break;
+			case ENC_RIGHT:
+				if (actual_encoder_number == 9)
+					actual_encoder_number = 0;
+				else
+					actual_encoder_number++;
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+
+				break;
+			case BTN_PRESS:
+				if (fe_data.id_counter < ID_LEN - 1) {
+					fe_data.id_counter++;
+				}
+				else {
+					asking_pin = true;
+					fe_data.good_id = true;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	if ((PVCheckEvent()) && asking_pin) {
+		fe_data.animation_en = false;;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVGetEv();
+		switch (ev) {
+		case ENC_LEFT:
+			if (actual_encoder_number == 0)
+				actual_encoder_number = 9;
+			else
+				actual_encoder_number--;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case ENC_RIGHT:
+			if (actual_encoder_number == 9)
+				actual_encoder_number = 0;
+
+			else
+				actual_encoder_number++;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case BTN_PRESS:
+			if (fe_data.pin_counter < PIN_LEN) {
+				fe_data.pin_counter++;
+			}
+			else {
+				my_user.id=transformToNum(&encoder_id_digits[0], ID_LEN);
+				my_user.password= transformToNum(&encoder_pin_digits[0], PIN_LEN);
+				my_user.admin = false;
+				my_user.available= true;
+				my_user.blocked= false;
+				my_user.strikes = 0;
+//				addUser({ transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN), false, true,false, 0 });
+				addUser(my_user);
+				fe_data.good_pin = true;
+				updated_state = USERS;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	return updated_state;
+}
+
+state delRoutine(void) {
+	state updated_state = USERS_DEL;
+
+	if (prev_state != USERS_DEL) {
+		fe_data.animation_opt = DEL_SELECTED_ANIMATION;
+		fe_data.pin_counter = 0;
+		fe_data.animation_en = true;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		//activar las interrupciones de cancel y del
+		fe_data.del_user_ptr = (void*)getUsersList();
+		fe_data.del_i = 0;
+	}
+
+	if (cancel_triggered || back_triggered) {
+		updated_state = ACCESS;
+	}
+
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if (PVCheckEvent()) {
+		fe_data.animation_en = false;
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);//Reinicio timer
+		event_t ev = PVGetEv();
+		switch (ev) {
+		case ENC_LEFT:
+			if (fe_data.del_i == 0) {
+				fe_data.del_i = (MAX_USERS - 1);
+				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) + fe_data.del_i);
+			}
+			else {
+				fe_data.del_i++;
+				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) + 1);
+			}
+			break;
+		case ENC_RIGHT:
+			if (fe_data.del_i == (MAX_USERS - 1)) {
+				fe_data.del_i = 0;
+				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) - (MAX_USERS - 1));
+			}
+			else {
+				fe_data.del_i--;
+				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) - 1);
+			}
+			break;
+		case BTN_PRESS:
+			deleteUser(((user_t*)(fe_data.del_user_ptr))->id);
+			fe_data.del_user = true;
+			updated_state = USERS;
+			break;
+		default: break;
+		}
+	}
+
+	return updated_state;
+}
 
 /*******************************************************************************
  * CALLBACKS DEFINITION
@@ -592,24 +903,4 @@ void backCallback(void) {
 	back_triggered = true;
 }
 
-/////////////////utility
-uint32_t transformToNum(uint8_t* data, uint8_t count) {
-	uint32_t ret = 0;
-	uint32_t aux = 0;
-	uint8_t i = 0;
-	for (i = 0; i < count; i++) {
-		aux = 0;
-		aux = data[count - 1 - i] * pwr(10, i);
-		ret += aux;
-	}
-	return ret;
-}
 
-uint32_t pwr(uint32_t num, uint32_t exp) {
-	uint32_t ret = 1;
-	uint8_t i = 0;
-	for (i = 0; i < exp; i++) {
-		ret *= num;
-	}
-	return ret;
-}

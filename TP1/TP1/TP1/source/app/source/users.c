@@ -139,4 +139,12 @@ bool checkPassword(uint32_t user_ID, uint32_t user_pin) {
     }
     return ret;
 }
+void setPassword(uint32_t user_ID, uint32_t new_pin)
+{
+    uint8_t i = 0;
+    while ((user_ID != users[i].id) && (i < MAX_USERS)) {
+        i++;
+    }
+    users[i].password = new_pin;
+}
 
