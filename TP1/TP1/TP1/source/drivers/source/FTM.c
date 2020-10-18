@@ -20,6 +20,9 @@
 #define SC_CLKS_SYSCLK 0x01
 #define FTM_PIN_CANT 30
 
+/************************************************************************
+ * TABLA DE PINES CON MODULOS FTM PARA LA K64F DE 100 PINES
+ ************************************************************************/
 
 typedef struct {
 	uint8_t MODULE;
@@ -32,6 +35,7 @@ typedef struct {
 	uint8_t NUM;
 }FTM_Pinout_t;
 
+#if NXP_K64F_LQFP100 == 1
 // Ports
 enum { PA, PB, PC, PD, PE };
 
@@ -73,6 +77,12 @@ static const uint8_t MODULE2_ID_START = 18;
 static const uint8_t MODULE2_ID_END = 19;
 static const uint8_t MODULE3_ID_START = 20;
 static const uint8_t MODULE3_ID_END = 29;
+
+#endif
+/************************************************************************
+ ************************************************************************
+ ************************************************************************/
+
 PCRstr UserPCR;
 static uint8_t FTMX_INIT[4];
 static void (*CALLBACK[FTM_PIN_CANT])(void);
@@ -89,6 +99,7 @@ __ISR__ FTM0_IRQHandler(void) {
 	status = FTM0->STATUS; //Capturo flags de interrupcion de todos los canales
 	FTM0->STATUS = 0;	//Limpio todos los flags
 
+#if CALLBACK_MODE == 1
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 		if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 			for(j = MODULE0_ID_START; j < MODULE0_ID_END+1; j++){
@@ -98,7 +109,7 @@ __ISR__ FTM0_IRQHandler(void) {
 			}
 		}
 	}
-
+#endif
 }
 __ISR__ FTM1_IRQHandler(void) {
 	uint32_t status;
@@ -108,6 +119,7 @@ __ISR__ FTM1_IRQHandler(void) {
 	status = FTM1->STATUS; //Capturo flags de interrupcion de todos los canales
 	FTM1->STATUS = 0;	//Limpio todos los flags
 
+#if CALLBACK_MODE == 1
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 				for(j = MODULE1_ID_START; j < MODULE1_ID_END+1; j++){
@@ -117,6 +129,7 @@ __ISR__ FTM1_IRQHandler(void) {
 				}
 			}
 		}
+#endif
 }
 __ISR__ FTM2_IRQHandler(void) {
 	uint32_t status;
@@ -126,6 +139,7 @@ __ISR__ FTM2_IRQHandler(void) {
 	status = FTM2->STATUS; //Capturo flags de interrupcion de todos los canales
 	FTM2->STATUS = 0;	//Limpio todos los flags
 
+#if CALLBACK_MODE == 1
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
 				for(j = MODULE2_ID_START; j < MODULE2_ID_END+1; j++){
@@ -135,6 +149,7 @@ __ISR__ FTM2_IRQHandler(void) {
 				}
 			}
 		}
+#endif
 }
 __ISR__ FTM3_IRQHandler(void) {
 	uint32_t status;
@@ -143,6 +158,8 @@ __ISR__ FTM3_IRQHandler(void) {
 
 	status = FTM3->STATUS; //Capturo flags de interrupcion de todos los canales
 	FTM3->STATUS = 0;	//Limpio todos los flags
+
+#if CALLBACK_MODE == 1
 
 	for (i = 0; i < CANT_CHANNELS - 1; i++) {
 			if (status == STATUS_CHF[i]) {	//Me fijo que canal fue
@@ -153,16 +170,29 @@ __ISR__ FTM3_IRQHandler(void) {
 				}
 			}
 		}
+#endif
 }
 
+/* @brief: Continua el clock de FTM para un modulo entero.
+ * @param  module: a que modulo se le quiere parar el clock.
+ */
 void FTMStartClock(uint8_t module) {
 	FTM_POINTERS[module]->SC |= FTM_SC_CLKS(SC_CLKS_SYSCLK);
 }
 
+/* @brief: Para el clock de FTM para un modulo entero.
+ * @param  module: que modulo se le quiere parar el clock.
+ */
 void FTMStopClock(uint8_t module) {
 	FTM_POINTERS[module]->SC |= FTM_SC_CLKS(SC_CLKS_OFF);
 }
 
+/* @brief: Inicializa un pin con las especificaciones pedidas en data.
+ * @param  port: el puerto del pin que se quiere inicializar
+ * @param  num: el numero del puerto  del pin que se quiere inicializar
+ * @param  data: las especificaciones para la inicializacion, ver la estructura FTM_DATA.
+ * @returns: id de la FTM. Si hubo error se retorna el define FTM_NO_SPACE.
+ */
 uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 	int8_t id=0;
 	uint8_t i;
@@ -171,10 +201,10 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 	uint8_t mux;
 	PCRstr UserPCR;
 	PORT_Type * port_ptr;
+
 	/*
 	 * IDENTIFICACION DE MODULO/CANAL
 	 */
-
 	i = 0;
 	while((FTM_PINOUT[i].PORT != port) || (FTM_PINOUT[i].NUM != num)){
 		if(++i ==  FTM_PIN_CANT){
@@ -218,10 +248,10 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 				break;
 			}
 
-			FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | (1<<channel);//LDOK enable CH
+			FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | (1<<channel);//LDOK enable CH para escribir en los buffers de MOD, CNTIN y CNV
 			UserPCR.PCR = false; // seteo en falso por default
 			UserPCR.FIELD.DSE = true; //Drive Streght Enable
-			UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer
+			UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer (guardado en la tabla predefinida)
 			UserPCR.FIELD.IRQC = PORT_eDisabled; //desactivo las interrupciones
 			PORT_Configure2(port_ptr, num, UserPCR);
 		}
@@ -229,14 +259,13 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 		/*
 		 * INICIALIZACION POR CANAL
 		 */
-
 		FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
 		FTM_POINTERS[module]->SC = (FTM_POINTERS[module]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(data.PSC);
 		FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
 		FTM_POINTERS[module]->CNT = data.CNT;							//CNT
 		FTM_POINTERS[module]->MOD = data.MODULO;						//MOD
 
-		//SET MSB:A EN OUTPUT COMPARE
+		//SET MSB:A EN EL MODO PEDIDO
 		FTM_POINTERS[module]->CONTROLS[channel].CnSC = (FTM_POINTERS[module]->CONTROLS[channel].CnSC
 				& ~(FTM_CnSC_MSB_MASK | FTM_CnSC_MSA_MASK))
 				| (FTM_CnSC_MSB((data.MODE >> 1) & 0X01)
@@ -266,7 +295,6 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 									| (FTM_CnSC_ELSB((data.EPWM_LOGIC >> 1) & 0X01)
 											| FTM_CnSC_ELSA((data.EPWM_LOGIC >> 0) & 0X01));
 			FTMSetCnV(id, data.CNV);
-			//FTM_POINTERS[module]->CONTROLS[channel].CnV = FTM_CnV_VAL(data.CNV);
 			break;
 		default:
 			break;
@@ -274,43 +302,65 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 
 		FTMSetInterruptMode(id, 1);
 
+#if CALLBACK_MODE == 1
 		/*
 		 * GUARDO EL CALLBACK PROVISTO
 		 */
 		CALLBACK_EN[id] = data.useCallback;
 		CALLBACK[id] = data.CALLBACK;
+#endif
 
 		/*
 		 * ACTIVO LA SINCRONIZACION POR SOFTWARE DE MOD, CNTIN Y CNV
 		 */
-		FTMSetSoftwareSync(id);
+		FTMSetSoftwareSync(id); //TODO: Cuando se implementen las interrupciones por hardware, hacer que se pueda pedir una u otra.
 
 		if (FTMX_INIT[module] == 0) {
-			FTMStartClock(module);
+			FTMStartClock(module);	//Comienzo clock del FTM.
 			FTMX_INIT[module] = 1;
 		}
 	}
 	return id;
 }
 
+/* @brief: Set del CnV
+ * @param  id: id de la FTM
+ * @param cnv
+ */
 void FTMSetCnV(uint8_t id, uint16_t cnv){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnV = FTM_CnV_VAL(cnv);
 }
 
+/* @brief: Set del prescaler o divisor de frecuencias
+ * @param  id: id de la FTM
+ * @param PSC
+ */
 void FTMSetPSC(uint8_t id, uint16_t PSC){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(PSC);
 }
 
+/* @brief: Set del MODULO
+ * @param  id: id de la FTM
+ * @param MOD
+ */
 void FTMSetMOD(uint8_t id, uint16_t MOD){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->MOD = MOD;
 
 }
 
+/* @brief: Habilita (1) o deshabilita (0) las interrupciones
+ * @param  id: id de la FTM
+ * @param mode: 1 para habilitar, 0 para deshabilitar
+ */
 void FTMSetInterruptMode(uint8_t id, uint8_t mode){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC
 		& ~FTM_CnSC_CHIE_MASK) | FTM_CnSC_CHIE(mode);
 }
 
+/* @brief: configura los registros de SYNC y SYNCONF para poder
+ * realizar la sincronización por software de la escritura en los registros de MOD, CNV y CNTIN
+ * @param  id: id de la FTM
+ */
 void FTMSetSoftwareSync(uint8_t id){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNCONF |= ((FTM_SYNCONF_SYNCMODE(1) | FTM_SYNCONF_SWWRBUF(1) | FTM_SYNCONF_SWRSTCNT(1)));
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_CNTMAX(1);
@@ -339,6 +389,11 @@ void FTMSetSoftwareSync(uint8_t id){
 
 }
 
+/* @brief: Set del bit que comienza la sincronización para la escritura
+ * en los registros de MOD, CNV y CNTIN
+ * @param  id: id de la FTM
+ * @param cnv
+ */
 void FTMSetSWSYNC(uint8_t id){
 	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_SWSYNC(1);
 }
