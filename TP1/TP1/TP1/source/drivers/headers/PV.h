@@ -60,7 +60,7 @@ typedef encoder_id PVEncoder_t;
 /**
  * @brief Init Buttons, Leds, Encoder and Display
  */
-void PVInit(void);
+bool PVInit(void);
 
 void PVSuscribeEvent(PVEv_t ev, bool state);
 
@@ -104,7 +104,7 @@ bool PVLedFlash(PVLed_t led, uint8_t value);
 /**
  * @brief LED COLOR SET
  */
-bool PVLedOn(PVLed_t led, uint8_t value);
+bool PVLedOn(PVLed_t led);
 
 /**
  * @brief Turn off ALL LED (R G B)

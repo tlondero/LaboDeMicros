@@ -22,16 +22,8 @@
 #define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-/*
- #define P_RED
- #define P_RED_NUM
-
- #define P_GREEN
- #define P_GREEN_NUM
-
- #define P_BLUE
- #define P_BLUE_NUM
- */
+#define LED_LINE_A PORTNUM2PIN(PC,0)			//MARRON (ESTA EN FRENTE)
+#define LED_LINE_B PORTNUM2PIN(PA,2)           //ROJO
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -54,10 +46,6 @@ static int8_t idLed1;
 static int8_t idLed2;
 static int8_t idLed3;
 
-static bool ledOn;
-static bool ledFlash;
-static PVLed_t lastLed;
-
 static bool isEvent = false;
 static PVEv_t event = NO_PV_EV;
 static uint8_t listEv[NO_PV_EV] = { 0 };
@@ -65,6 +53,8 @@ static uint8_t listEv[NO_PV_EV] = { 0 };
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
+
+bool PVLedSelect(PVLed_t led);
 
 /*******************************************************************************
  * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
@@ -80,7 +70,7 @@ static uint8_t listEv[NO_PV_EV] = { 0 };
  *******************************************************************************
  ******************************************************************************/
 
-void PVInit(void) {
+bool PVInit(void) {
 
 	//Button init
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
@@ -94,41 +84,47 @@ void PVInit(void) {
 
 	led_init_driver();
 
+	bool okLed = true;
+
 	idLed1 = led_init_led(PB, 22, TURNS_ON_WITH_0);
 	idLed3 = led_init_led(PB, 21, TURNS_ON_WITH_0);
 	idLed2 = led_init_led(PE, 26, TURNS_ON_WITH_0);
 
-	ledOn = false;
-	lastLed = PV_CANT_COLORS;
+	if ((idLed1 == -1) || (idLed2 == -1) || (idLed3 == -1)) {
+		okLed = false;
+	} else {
 
-	//Led default config
-	uint32_t bright = 100;
-	uint32_t fade = 100;			//ms
-	uint32_t dt = 50;				//%
-	uint8_t flashes = 0;
-	uint32_t period = 1000;		//ms
+		//Led default config
+		uint32_t bright = 100;
+		uint32_t fade = 100;			//ms
+		uint32_t dt = 50;				//%
+		uint8_t flashes = 0;
+		uint32_t period = 1000;		//ms
 
-	led_configure_brightness(idLed1, bright);
-	led_configure_fade(idLed1, fade);
-	led_configure_dt(idLed1, dt);
-	led_configure_flashes(idLed1, flashes);
-	led_configure_period(idLed1, period);
+		led_configure_brightness(idLed1, bright);
+		led_configure_fade(idLed1, fade);
+		led_configure_dt(idLed1, dt);
+		led_configure_flashes(idLed1, flashes);
+		led_configure_period(idLed1, period);
 
-	led_configure_brightness(idLed3, bright);
-	led_configure_fade(idLed3, fade);
-	led_configure_dt(idLed3, dt);
-	led_configure_flashes(idLed3, flashes);
-	led_configure_period(idLed3, period);
+		led_configure_brightness(idLed3, bright);
+		led_configure_fade(idLed3, fade);
+		led_configure_dt(idLed3, dt);
+		led_configure_flashes(idLed3, flashes);
+		led_configure_period(idLed3, period);
 
-	led_configure_brightness(idLed2, bright);
-	led_configure_fade(idLed2, fade);
-	led_configure_dt(idLed2, dt);
-	led_configure_flashes(idLed2, flashes);
-	led_configure_period(idLed2, period);
+		led_configure_brightness(idLed2, bright);
+		led_configure_fade(idLed2, fade);
+		led_configure_dt(idLed2, dt);
+		led_configure_flashes(idLed2, flashes);
+		led_configure_period(idLed2, period);
 
-	led_set_state(idLed1, LED_OFF);
-	led_set_state(idLed3, LED_OFF);
-	led_set_state(idLed2, LED_OFF);
+		led_set_state(idLed1, LED_OFF);
+		led_set_state(idLed3, LED_OFF);
+		led_set_state(idLed2, LED_OFF);
+
+	}
+	return okLed;
 }
 
 void PVSuscribeEvent(PVEv_t ev, bool state) {
@@ -440,83 +436,53 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 bool PVLedFlash(PVLed_t led, uint8_t color) {
 
 	bool valid = false;
-	ledOn = true;
 	valid = true;
 	switch (led) {
 	case (PV_LED_1):
 		led_flash(idLed1);
-		lastLed = PV_LED_1;
 		break;
 	case (PV_LED_2):
 		led_flash(idLed2);
-		lastLed = PV_LED_2;
 		break;
 	case (PV_LED_3):
 		led_flash(idLed3);
-		lastLed = PV_LED_3;
 		break;
 	case (PV_LED_ALL):
 		led_flash(idLed1);
 		led_flash(idLed3);
 		led_flash(idLed2);
-		lastLed = PV_LED_ALL;
 		break;
 	default:
-		lastLed = PV_CANT_COLORS;
-		ledOn = false;
 		valid = false;
 		break;
 	}
 	return valid;
 }
 
-bool PVLedOn(PVLed_t led, uint8_t color) {
+bool PVLedOn(PVLed_t led) {
 
 	bool valid = false;
-	ledOn = true;
-	ledFlash = true;
-
 	switch (led) {
 	case (PV_LED_1):
 		led_set_state(idLed1, LED_ON);
-		lastLed = PV_LED_1;
 		break;
 	case (PV_LED_2):
 		led_set_state(idLed2, LED_ON);
-		lastLed = PV_LED_2;
 		break;
 	case (PV_LED_3):
 		led_set_state(idLed3, LED_ON);
-		lastLed = PV_LED_3;
 		break;
 	case (PV_LED_ALL):
 		led_set_state(idLed1, LED_ON);
 		led_set_state(idLed3, LED_ON);
 		led_set_state(idLed2, LED_ON);
-		lastLed = PV_LED_ALL;
 		break;
 	default:
-		lastLed = PV_CANT_COLORS;
-		ledOn = false;
-		ledFlash = false;
 		valid = false;
 		break;
 	}
 	return valid;
 }
-
-/*
-void PVToggleOnOff(void) {
-	if (lastLed != PV_CANT_COLORS) {
-		if (ledOn) {
-			PVLedOff(lastLed);
-		} else if (ledFlash) {
-			PVLedFlash(lastLed);
-		} else {
-			PVLedColor(lastLed);
-		}
-	}
-}*/
 
 void PVLedOff(PVLed_t led) {
 	switch (led) {
@@ -537,7 +503,6 @@ void PVLedOff(PVLed_t led) {
 	default:
 		break;
 	}
-	ledOn = false;
 }
 
 void PVLedPoll(void) {
@@ -549,3 +514,26 @@ void PVLedPoll(void) {
  LOCAL FUNCTION DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
+
+bool PVLedSelect(PVLed_t led) {
+
+	bool valid = false;
+	switch (led) {
+	case (PV_LED_1):
+		gpioWrite(LED_LINE_A, LOW);
+		gpioWrite(LED_LINE_B, HIGH);
+		break;
+	case (PV_LED_2):
+		gpioWrite(LED_LINE_A, LOW);
+		gpioWrite(LED_LINE_B, HIGH);
+		break;
+	case (PV_LED_3):
+		gpioWrite(LED_LINE_A, HIGH);
+		gpioWrite(LED_LINE_B, HIGH);
+		break;
+	default:
+		valid = false;
+		break;
+	}
+	return valid;
+}

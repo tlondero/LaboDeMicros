@@ -62,7 +62,7 @@ static uint8_t listEv[NO_FRDM_EV] = { 0 };
  *******************************************************************************
  ******************************************************************************/
 
-void FRDMInit(void) {
+bool FRDMInit(void) {
 	//Button Init
 	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
 	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
@@ -74,37 +74,46 @@ void FRDMInit(void) {
 	//Led init
 	led_init_driver();
 
+	bool okLed = true;
+
 	idLedRed = led_init_led(PB, 22, TURNS_ON_WITH_0);
-	idLedBlue = led_init_led(PB, 21, TURNS_ON_WITH_0);
 	idLedGreen = led_init_led(PE, 26, TURNS_ON_WITH_0);
+	idLedBlue = led_init_led(PB, 21, TURNS_ON_WITH_0);
 
-	ledOn = false;
-	lastColor = CANT_COLORS;
+	if ((idLedRed == -1) || (idLedGreen == -1) || (idLedBlue == -1)) {
+		okLed = false;
+	} else {
 
-	//Led default config
-	uint32_t fade = 100;			//ms
-	uint32_t dt = 50;				//%
-	uint8_t flashes = 0;
-	uint32_t period = 1000;		//ms
+		ledOn = false;
+		lastColor = CANT_COLORS;
 
-	led_configure_fade(idLedRed, fade);
-	led_configure_dt(idLedRed, dt);
-	led_configure_flashes(idLedRed, flashes);
-	led_configure_period(idLedRed, period);
+		//Led default config
+		uint32_t fade = 100;			//ms
+		uint32_t dt = 50;				//%
+		uint8_t flashes = 0;
+		uint32_t period = 1000;		//ms
 
-	led_configure_fade(idLedBlue, fade);
-	led_configure_dt(idLedBlue, dt);
-	led_configure_flashes(idLedBlue, flashes);
-	led_configure_period(idLedBlue, period);
+		led_configure_fade(idLedRed, fade);
+		led_configure_dt(idLedRed, dt);
+		led_configure_flashes(idLedRed, flashes);
+		led_configure_period(idLedRed, period);
 
-	led_configure_fade(idLedGreen, fade);
-	led_configure_dt(idLedGreen, dt);
-	led_configure_flashes(idLedGreen, flashes);
-	led_configure_period(idLedGreen, period);
+		led_configure_fade(idLedBlue, fade);
+		led_configure_dt(idLedBlue, dt);
+		led_configure_flashes(idLedBlue, flashes);
+		led_configure_period(idLedBlue, period);
 
-	led_set_state(idLedRed, LED_OFF);
-	led_set_state(idLedBlue, LED_OFF);
-	led_set_state(idLedGreen, LED_OFF);
+		led_configure_fade(idLedGreen, fade);
+		led_configure_dt(idLedGreen, dt);
+		led_configure_flashes(idLedGreen, flashes);
+		led_configure_period(idLedGreen, period);
+
+		led_set_state(idLedRed, LED_OFF);
+		led_set_state(idLedBlue, LED_OFF);
+		led_set_state(idLedGreen, LED_OFF);
+
+	}
+	return okLed;
 }
 
 void FRDMToggleOnOff(void) {
