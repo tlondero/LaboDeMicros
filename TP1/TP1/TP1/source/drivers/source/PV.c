@@ -211,7 +211,7 @@ bool PVInit(void) {
 	} else {
 
 		//Led default config
-		uint32_t bright = 100;
+		uint32_t bright = 0.1;
 		uint32_t fade = 100;			//ms
 		uint32_t dt = 50;				//%
 		uint8_t flashes = 0;
@@ -335,7 +335,7 @@ bool PVDisplaySetBright(uint8_t br) {
 	bool valid = true;
 	if ((br >= 1) && (br <= 100)) {
 		dispBright = br;
-		PVDisplaySetBright(dispBright);
+		PVDisplaySetBright(dispBright/100);
 	} else if (br == 0) {
 		dispClearAll();
 	} else {
@@ -351,7 +351,7 @@ bool PVIncreaseBrightness(void) {
 		dispBright = 100;
 		topValue = true;
 	}
-	dispBrightness(dispBright);
+	dispBrightness(dispBright/100);
 	return topValue;
 }
 
@@ -363,7 +363,7 @@ bool PVDecreaseBrightness(void) {
 		bottomValue = true;
 		dispClearAll();
 	} else {
-		dispBrightness(dispBright);
+		dispBrightness(dispBright/100);
 	}
 	return bottomValue;
 }
@@ -409,7 +409,9 @@ bool PVDispSetMess(char *mess) {
 }
 
 void PVDispMessOn(void) {
-	timerResume(timer_id_mrq);
+	if (message != NULL) {
+		timerResume(timer_id_mrq);
+	}
 }
 
 void PVDispMessOff(void) {
