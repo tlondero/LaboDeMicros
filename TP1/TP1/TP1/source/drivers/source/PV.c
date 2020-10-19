@@ -120,17 +120,36 @@ uint8_t checkMessageLength(char *mes) {
 	return i + 1;
 }
 
-char * setMayus(char *mes, uint8_t len) {
+char* setMayus(char *mes, uint8_t len) {
 	uint8_t i = 0;
 	char mayusSt[len];
-	for(i = 0; i < len; i++){
+	for (i = 0; i < len; i++) {
 		char aux = mes[i];
-		if((aux >= 97) && (aux <= 122)){
+		if ((aux >= 97) && (aux <= 122)) {
 			aux -= 32;
 		}
 		mayusSt[i] = aux;
 	}
 	return &mayusSt;
+}
+
+char* addSpaces(char *mes, uint8_t len) {
+
+	char newMes[len + 8];      //2x4 spaces + \0
+	uint8_t i = 0;
+	while (i < len + 7) {
+		if (i < 4) {
+			newMes[i] = 32;
+		} else if (i < 3 + len) {
+			newMes[i] = mes[i - 4];
+		} else {
+			newMes[i] = 32;
+		}
+		i++;
+	}
+	newMes[len + 8] = '\0';
+
+	return &newMes;
 }
 
 /*******************************************************************************
@@ -140,6 +159,9 @@ char * setMayus(char *mes, uint8_t len) {
  ******************************************************************************/
 
 bool PVInit(void) {
+
+	PVDispSetMess("suculento");
+	char * xd = addSpaces(message, length);
 
 	//Button init
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
@@ -338,11 +360,23 @@ bool PVDecreaseBrightness(void) {
 	return bottomValue;
 }
 
+bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
+
+	bool valid = false;
+
+	if (seven_seg_module < 4) {
+		dispSendChar(ch, seven_seg_module);
+		valid = true;
+	}
+
+	return valid;
+}
+
 bool PVDispSetMess(char *mess) {
 	bool valid = true;
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {
-		message = setMayus(mess,l);
+		message = setMayus(mess, l);
 		length = l;
 		countMess = 0;
 	} else {

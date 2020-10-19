@@ -89,6 +89,8 @@ void PVDisplayClear(void);
 
 void PVMarquesina(uint32_t number_to_display);
 
+bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
+
 /**
  * @brief Get encoder or button event
  */
