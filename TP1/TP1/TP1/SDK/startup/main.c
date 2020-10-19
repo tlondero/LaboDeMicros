@@ -12,16 +12,20 @@ void App_Run (void);
 void FRDM_tb_Init(void);
 void FRDM_tb_Run(void);
 
+void PV_tb_Init(void);
+void PV_tb_Run(void);
 
 int main (void)
 {
     hw_Init();
     hw_DisableInterrupts();
     //App_Init(); /* Program-specific setup */
-    FRDM_tb_Init();
+    //FRDM_tb_Init();
+    PV_tb_Init();
     hw_EnableInterrupts();
 
     __FOREVER__
         //App_Run(); /* Program-specific loop  */
-		FRDM_tb_Run();
+		//FRDM_tb_Run();
+		PV_tb_Run();
 }

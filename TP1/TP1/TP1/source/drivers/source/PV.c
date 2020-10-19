@@ -312,18 +312,18 @@ bool PVLedSetBright(PVLed_t led, uint8_t value) {
 		valid = true;
 		switch (led) {
 		case (PV_LED_1):
-			led_configure_fade(idLed1, newVal);
+			led_configure_brightness(idLed1, newVal);
 			break;
 		case (PV_LED_2):
-			led_configure_fade(idLed2, newVal);
+			led_configure_brightness(idLed2, newVal);
 			break;
 		case (PV_LED_3):
-			led_configure_fade(idLed3, newVal);
+			led_configure_brightness(idLed3, newVal);
 			break;
 		case (PV_LED_ALL):
-			led_configure_fade(idLed1, newVal);
-			led_configure_fade(idLed2, newVal);
-			led_configure_fade(idLed3, newVal);
+			led_configure_brightness(idLed1, newVal);
+			led_configure_brightness(idLed2, newVal);
+			led_configure_brightness(idLed3, newVal);
 			break;
 		default:
 			valid = false;
@@ -365,18 +365,18 @@ bool PVLedSetDt(PVLed_t led, uint8_t value) {
 		valid = true;
 		switch (led) {
 		case (PV_LED_1):
-			led_configure_fade(idLed1, realdt);
+			led_configure_dt(idLed1, realdt);
 			break;
 		case (PV_LED_2):
-			led_configure_fade(idLed2, realdt);
+			led_configure_dt(idLed2, realdt);
 			break;
 		case (PV_LED_3):
-			led_configure_fade(idLed3, realdt);
+			led_configure_dt(idLed3, realdt);
 			break;
 		case (PV_LED_ALL):
-			led_configure_fade(idLed1, realdt);
-			led_configure_fade(idLed2, realdt);
-			led_configure_fade(idLed3, realdt);
+			led_configure_dt(idLed1, realdt);
+			led_configure_dt(idLed2, realdt);
+			led_configure_dt(idLed3, realdt);
 			break;
 		default:
 			valid = false;
@@ -391,18 +391,18 @@ bool PVLedSetFlash(PVLed_t led, uint8_t value) {
 		valid = true;
 		switch (led) {
 		case (PV_LED_1):
-			led_configure_fade(idLed1, value);
+			led_configure_flash(idLed1, value);
 			break;
 		case (PV_LED_2):
-			led_configure_fade(idLed2, value);
+			led_configure_flash(idLed2, value);
 			break;
 		case (PV_LED_3):
-			led_configure_fade(idLed3, value);
+			led_configure_flash(idLed3, value);
 			break;
 		case (PV_LED_ALL):
-			led_configure_fade(idLed1, value);
-			led_configure_fade(idLed2, value);
-			led_configure_fade(idLed3, value);
+			led_configure_flash(idLed1, value);
+			led_configure_flash(idLed2, value);
+			led_configure_flash(idLed3, value);
 			break;
 		default:
 			valid = false;
@@ -417,18 +417,18 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 		valid = true;
 		switch (led) {
 		case (PV_LED_1):
-			led_configure_fade(idLed1, value);
+			led_configure_period(idLed1, value);
 			break;
 		case (PV_LED_2):
-			led_configure_fade(idLed2, value);
+			led_configure_period(idLed2, value);
 			break;
 		case (PV_LED_3):
-			led_configure_fade(idLed3, value);
+			led_configure_period(idLed3, value);
 			break;
 		case (PV_LED_ALL):
-			led_configure_fade(idLed1, value);
-			led_configure_fade(idLed2, value);
-			led_configure_fade(idLed3, value);
+			led_configure_period(idLed1, value);
+			led_configure_period(idLed2, value);
+			led_configure_period(idLed3, value);
 			break;
 		default:
 			valid = false;
@@ -437,7 +437,7 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 	return valid;
 }
 
-/*bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
+bool PVLedSetTime(PVLed_t led, uint8_t value) {
 	bool valid = true;
 	switch (led) {
 	case (PV_LED_1):
@@ -459,7 +459,6 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 	}
 	return valid;
 }
-*/
 
 bool PVLedFlash(PVLed_t led, uint8_t color) {
 

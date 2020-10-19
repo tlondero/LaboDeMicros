@@ -99,7 +99,7 @@ bool PVLedSetFlash(PVLed_t led, uint8_t value);
 /**
  * @brief LED  Set flash period
  */
-bool PVLedSetPeriod(PVLed_t led, uint8_t value);
+bool PVLedSetTime(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED  Set flash ON
