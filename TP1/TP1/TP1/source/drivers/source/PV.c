@@ -56,9 +56,6 @@ static int8_t idLed1;
 static int8_t idLed2;
 static int8_t idLed3;
 
-//Intern leds
-static bool leds_st[LED_IN_PV] = { 0 };
-
 //Display
 static int8_t dispBright;
 static PVDirection_t dir;
@@ -66,12 +63,12 @@ static PVDirection_t dir;
 static char *message;
 static uint8_t length;
 static uint8_t countMess;
-static tim_id_t timer_id_mrq;
 static uint32_t mrqtime = 1000;
 
-//Timer
-static tim_id_t timer_id_st;
+//Timers
 static tim_id_t timer_open_st;
+static tim_id_t timer_id_mrq;
+
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -92,22 +89,6 @@ void multiplexLedCallback(void);
  LOCAL FUNCTION DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
-
-void multiplexLedCallback(void) {
-	if (leds_st[0]) {
-		gpioWrite(LED_LINE_A, !HIGH);
-		gpioWrite(LED_LINE_B, !LOW);
-	} else if (leds_st[1]) {
-		gpioWrite(LED_LINE_A, !LOW);
-		gpioWrite(LED_LINE_B, !HIGH);
-	} else if (leds_st[2]) {
-		gpioWrite(LED_LINE_A, !LOW);
-		gpioWrite(LED_LINE_B, !LOW);
-	} else {
-		gpioWrite(LED_LINE_A, LOW);
-		gpioWrite(LED_LINE_B, LOW);
-	}
-}
 
 void dispShowText(void) {
 	uint8_t i = 0;
@@ -266,12 +247,8 @@ bool PVInit(void) {
 
 	//timer init
 	timerInit();
-	timer_id_st = timerGetId();
 	timer_id_mrq = timerGetId();
 	timer_open_st = timerGetId();
-
-	timerStart(timer_id_st, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
-			multiplexLedCallback);
 
 	timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC,
 			open_animation_Callback);
@@ -742,23 +719,31 @@ void PVLedPoll(void) {
 }
 
 void PVStatusLedSelect(PVStatus_t led, bool state) {
-
-	for (uint8_t i = 0; i < LED_IN_PV; i++) {
-		leds_st[i] = false;
-	}
-	switch (led) {
-	case (ON_ST_1):
-		leds_st[0] = state;
-		break;
-	case (ON_ST_2):
-		leds_st[1] = state;
-		break;
-	case (ON_ST_3):
-		leds_st[2] = state;
-		break;
-	case (ON_ST_OFF):
-		break;
-	default:
-		break;
+	if (state) {
+		switch (led) {
+		case (ON_ST_1):
+			gpioWrite(LED_LINE_A, !HIGH);
+			gpioWrite(LED_LINE_B, !LOW);
+			break;
+		case (ON_ST_2):
+			gpioWrite(LED_LINE_A, !LOW);
+			gpioWrite(LED_LINE_B, !HIGH);
+			break;
+		case (ON_ST_3):
+			gpioWrite(LED_LINE_A, !LOW);
+			gpioWrite(LED_LINE_B, !LOW);
+			break;
+		case (ON_ST_OFF):
+			gpioWrite(LED_LINE_A, LOW);
+			gpioWrite(LED_LINE_B, LOW);
+			break;
+		default:
+			gpioWrite(LED_LINE_A, LOW);
+			gpioWrite(LED_LINE_B, LOW);
+			break;
+		}
+	} else {
+		gpioWrite(LED_LINE_A, LOW);
+		gpioWrite(LED_LINE_B, LOW);
 	}
 }
