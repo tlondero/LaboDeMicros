@@ -88,7 +88,12 @@ const static character_t characters[] = {
         {'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
         {'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} },
 		{'-', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} },
-		{' ', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW} }
+		{' ', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW} },
+		//      A    B    C   D    E     F    G   H
+		{'^', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} },
+		{'>', {LOW, LOW, HIGH, LOW, LOW, LOW, LOW, LOW} },
+		{'_', {LOW, LOW, LOW, HIGH, LOW, LOW, LOW, LOW} },
+		{'<', {LOW, LOW, LOW, LOW, HIGH, LOW, LOW, LOW} }
 };
 
 typedef struct {
@@ -146,7 +151,6 @@ void dispInit(void) {
 	timerStart(timer_id, TIMER_MS2TICKS(5), TIM_MODE_PERIODIC,
 			multiplexDiplayCallback);
 	//Cada 15 ms se multiplexea el display ~ cada uno aprox 50fps
-
 }
 
 bool dispSelect(int8_t disp) {
@@ -208,7 +212,6 @@ void dispClearAll(void) {
 }
 
 void dispSendChar(char ch, uint8_t seven_seg_module) {
-
 	if (seven_seg_module < 4) {
 		displays[seven_seg_module].enable = true;
 		displays[seven_seg_module].ch = ch;
@@ -221,5 +224,4 @@ void multiplexDiplayCallback(void) {
 		dispSelect(i % 4);
 		dispSetChar(displays[(i++) % 4].ch);
 	}
-
 }
