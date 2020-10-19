@@ -75,3 +75,35 @@ void App_Run(void) {
 
 }
 
+//                           NO BORRAR                ////
+/////***************************************************************************//**
+//// @file     App.c
+//// @brief    Application functions
+//// @author   MAGT
+//// ******************************************************************************/
+////
+//////////// MAIN DE PROGRAMA//////////////////
+//                           NO BORRAR                ////
+//#include "drivers/headers/Card.h"
+//#include "drivers/headers/FRDM.h"
+//#include "drivers/headers/PV.h"
+//#include "drivers/headers/timer.h"
+//#include "app/headers/fsm.h"
+//#include "app/headers/FEData.h"
+//#include "app/headers/FrontEnd.h"
+//static state st;
+//void App_Init(void) {
+//	timerInit();
+//	FRDMInit();
+//	cardInitDriver(0);
+//	PVInit();
+//	st=FSMInitState();
+//}
+//
+//void App_Run(void) {
+//
+//	st = FSMRun(st);
+//	drawFrontEnd((*(FSMGetFEData())),st);
+//}
+//
+////                           NO BORRAR                ////

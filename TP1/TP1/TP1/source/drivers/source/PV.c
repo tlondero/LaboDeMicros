@@ -29,7 +29,7 @@
 #define LED_IN_PV		3
 #define DEC_IN_PV		2
 
-const uint8_t ST_PIN[LED_IN_PV] = { LED_LINE_A, LED_LINE_B };
+const uint8_t ST_PIN[DEC_IN_PV] = { LED_LINE_A, LED_LINE_B };
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -58,15 +58,16 @@ static int8_t idLed3;
 
 //Intern leds
 static bool leds_st[LED_IN_PV] = { 0 };
-static uint8_t count;
 
 //Display
 static int8_t dispBright;
+static PVDirection_t dir;
 
 static char *message;
 static uint8_t length;
 static uint8_t countMess;
 static tim_id_t timer_id_mrq;
+static uint32_t mrqtime = 1000;
 
 //Timer
 static tim_id_t timer_id_st;
@@ -93,37 +94,56 @@ void multiplexLedCallback(void);
  ******************************************************************************/
 
 void multiplexLedCallback(void) {
-	if (leds_st[0] || leds_st[1] || leds_st[2]) {
-		if ((count == 0) && (leds_st[0])) {
-			gpioWrite(LED_LINE_A, HIGH);
-			gpioWrite(LED_LINE_B, LOW);
-		} else if ((count == 1) && (leds_st[1])) {
-			gpioWrite(LED_LINE_A, LOW);
-			gpioWrite(LED_LINE_B, HIGH);
-		} else if ((count == 2) && (leds_st[2])) {
-			gpioWrite(LED_LINE_A, LOW);
-			gpioWrite(LED_LINE_B, LOW);
-		}
-		if (++count == 4) {
-			count = 0;
-		}
+	if (leds_st[0]) {
+		gpioWrite(LED_LINE_A, HIGH);
+		gpioWrite(LED_LINE_B, LOW);
+	} else if (leds_st[1]) {
+		gpioWrite(LED_LINE_A, LOW);
+		gpioWrite(LED_LINE_B, HIGH);
+	} else if (leds_st[2]) {
+		gpioWrite(LED_LINE_A, LOW);
+		gpioWrite(LED_LINE_B, LOW);
 	} else {
 		gpioWrite(LED_LINE_A, HIGH);
 		gpioWrite(LED_LINE_B, HIGH);
 	}
 }
-void open_animation_Callback(void){
-	static uint8_t i=0,j;
-	static char open_animation[4]={'^','>','_','<'};
-	if(i == OPEN_TRIGGER_TIME/500){
-		timerStop(timer_open_st);
+
+void dispShowText(void) {
+	uint8_t i = 0;
+	for (i = 0; i < 4; i++) {
+		dispSendChar(i, message[i + countMess]);
 	}
-	else{
-		for(j=0;j<4;j++)
-			dispSendChar(open_animation[i%4], j);
+
+	switch (dir) {
+	case (PV_RIGHT):
+		countMess++;
+		break;
+	case (PV_LEFT):
+		countMess--;
+		break;
+	case (PV_NODIR):
+		dir = PV_NODIR;
+		break;
+	}
+
+	if (countMess >= length) {
+		countMess = 0;
+	}
+}
+
+void open_animation_Callback(void) {
+	static uint8_t i = 0, j;
+	static char open_animation[4] = { '^', '>', '_', '<' };
+	if (i == OPEN_TRIGGER_TIME / 500) {
+		timerStop(timer_open_st);
+	} else {
+		for (j = 0; j < 4; j++)
+			dispSendChar(open_animation[i % 4], j);
 	}
 	i++;
 }
+
 uint8_t checkMessageLength(char *mes) {
 	uint8_t i = 0;
 	while (mes[i] != '\0') {
@@ -187,6 +207,7 @@ bool PVInit(void) {
 	//Display init
 	dispInit();
 	dispBright = 20;
+	dir = PV_NODIR;
 
 	led_init_driver();
 	message = NULL;
@@ -197,7 +218,7 @@ bool PVInit(void) {
 	bool okLed = true;
 
 	count = 0;
-	for (uint8_t i = 0; i < LED_IN_PV; i++) {
+	for (uint8_t i = 0; i < DEC_IN_PV; i++) {
 		gpioMode(ST_PIN[i], OUTPUT);
 		gpioWrite(ST_PIN[i], HIGH);
 	}
@@ -249,11 +270,17 @@ bool PVInit(void) {
 	timer_id_st = timerGetId();
 	timer_id_mrq = timerGetId();
 	timer_open_st = timerGetId();
+
 	timerStart(timer_id_st, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
 			multiplexLedCallback);
-	timerStart(timer_open_st,TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC,
+
+	timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC,
 			open_animation_Callback);
 	timerStop(timer_open_st);
+
+	timerStart(timer_id_mrq, TIMER_MS2TICKS(1000), TIM_MODE_PERIODIC,
+			dispShowText);
+	timerStop(timer_id_mrq);
 	return okLed;
 }
 
@@ -395,11 +422,10 @@ bool PVDispSetMess(char *mess) {
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {
 
-		message = placeMayus(mess, l);
+		//message = placeMayus(mess, l);
+		message = addSpaces(placeMayus(mess, l), l);
 
-		message = addSpaces(message, l);
-
-		length = l;
+		length = checkMessageLength(message);
 		countMess = 0;
 	} else {
 		message = NULL;
@@ -408,20 +434,52 @@ bool PVDispSetMess(char *mess) {
 		valid = false;
 	}
 
+	timerReset(timer_id_mrq);
+
 	return valid;
 }
 
-bool PVDisplayShift(PVDirection_t direction) {
+void PVDispMessShiftOn(void) {
+	timerResume(timer_id_mrq);
+}
+
+void PVDispMessShiftOff(void) {
+	timerStop(timer_id_mrq);
+}
+
+bool PVDisplaySetShift(PVDirection_t direction) {
 
 	bool valid = true;
 
-	if (direction == PV_RIGHT) {
-		dispShift(RIGHT);
-	} else if (direction == PV_LEFT) {
-		dispShift(LEFT);
-	} else {
+	switch (direction) {
+	case (PV_RIGHT):
+		dir = PV_RIGHT;
+		break;
+	case (PV_LEFT):
+		dir = PV_LEFT;
+		break;
+	case (PV_NODIR):
+		dir = PV_NODIR;
+		break;
+	default:
+		dir = PV_NODIR;
 		valid = false;
+		break;
 	}
+	return valid;
+}
+
+bool PVDisplaySetTime(uint32_t time) {
+
+	bool valid = false;
+
+	if (time != 0) {
+		mrqtime = time;
+		timerStart(timer_id_mrq, TIMER_MS2TICKS(time), TIM_MODE_PERIODIC,
+				dispShowText);
+		valid = true;
+	}
+
 	return valid;
 }
 
@@ -689,20 +747,19 @@ void PVStatusLedSelect(PVStatus_t led, bool state) {
 	for (uint8_t i = 0; i < LED_IN_PV; i++) {
 		leds_st[i] = false;
 	}
-
-	if ((led == ON_ST_1) || (led == ON_ST_12) || (led == ON_ST_13)
-			|| ON_ST_ALL) {
+	switch (led) {
+	case (ON_ST_1):
 		leds_st[0] = state;
-	}
-
-	if ((led == ON_ST_2) || (led == ON_ST_12) || (led == ON_ST_23)
-			|| ON_ST_ALL) {
+		break;
+	case (ON_ST_2):
 		leds_st[1] = state;
-	}
-
-	if ((led == ON_ST_3) || (led == ON_ST_13) || (led == ON_ST_23)
-			|| ON_ST_ALL) {
+		break;
+	case (ON_ST_3):
 		leds_st[2] = state;
+		break;
+	case (ON_ST_OFF):
+		break;
+	default:
+		break;
 	}
-
 }

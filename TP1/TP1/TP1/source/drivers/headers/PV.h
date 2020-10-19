@@ -44,10 +44,10 @@ typedef enum {
 } PVLed_t;
 
 typedef enum {
-	ON_ST_1, ON_ST_2, ON_ST_3, ON_ST_12, ON_ST_23, ON_ST_13, ON_ST_ALL
+	ON_ST_1, ON_ST_2, ON_ST_3, ON_ST_OFF
 } PVStatus_t;
 
-typedef enum { PV_RIGHT, PV_LEFT } PVDirection_t;
+typedef enum { PV_RIGHT, PV_LEFT, PV_NODIR } PVDirection_t;
 
 //typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION
 //} PVAnimation_t;
@@ -87,7 +87,7 @@ void PVLedPoll(void);
  */
 void PVDisplayClear(void);
 
-void PVMarquesina(uint32_t number_to_display);
+void PVMarquesina(char * number_to_display);
 
 bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
 
@@ -120,7 +120,13 @@ bool PVDispSetMess(char *mess);
  * @brief dispShift: shifts the msg in screen one row to the "direction"
  * @params direction:see the PVDirection for the modes.
  */
-bool PVDisplayShift(PVDirection_t direction);
+bool PVDisplaySetShift(PVDirection_t direction);
+
+bool PVDisplaySetTime(uint32_t time);
+
+void PVDispMessShiftOn(void);
+
+void PVDispMessShiftOff(void);
 
 /**
  * @brief
