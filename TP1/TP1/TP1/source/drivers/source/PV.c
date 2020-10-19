@@ -27,12 +27,9 @@
 #define LED_LINE_B 		PORTNUM2PIN(PA,2)           //ROJO
 
 #define LED_IN_PV		3
+#define DEC_IN_PV		2
 
-#define PIN_1			PORTNUM2PIN(PC,0)
-#define PIN_2			PORTNUM2PIN(PC,0)
-#define PIN_3			PORTNUM2PIN(PC,0)
-
-const uint8_t ST_PIN[LED_IN_PV] = { PIN_1, PIN_2, PIN_3 };
+const uint8_t ST_PIN[LED_IN_PV] = { LED_LINE_A, LED_LINE_B };
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -60,8 +57,8 @@ static PVEv_t event = NO_PV_EV;
 static uint8_t listEv[NO_PV_EV] = { 0 };
 
 static tim_id_t timer_id;
-static int8_t leds_[LED_IN_PV] = { 0 };
 static bool leds_st[LED_IN_PV] = { 0 };
+static uint8_t count;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
@@ -85,21 +82,22 @@ bool PVLedSelect(PVLed_t led);
 
 void multiplexLedCallback(void) {
 	if (leds_st[0] || leds_st[1] || leds_st[2]) {
-		if (leds_st[0]) {
-			gpioWrite(LED_LINE_A, LOW);
-			gpioWrite(LED_LINE_B, HIGH);
-		}
-		if (leds_st[1]) {
-			gpioWrite(LED_LINE_A, LOW);
-			gpioWrite(LED_LINE_B, HIGH);
-		}
-		if (leds_st[2]) {
+		if ((count == 0) && (leds_st[0])) {
 			gpioWrite(LED_LINE_A, HIGH);
+			gpioWrite(LED_LINE_B, LOW);
+		} else if ((count == 1) && (leds_st[1])) {
+			gpioWrite(LED_LINE_A, LOW);
 			gpioWrite(LED_LINE_B, HIGH);
+		} else if ((count == 2) && (leds_st[2])) {
+			gpioWrite(LED_LINE_A, LOW);
+			gpioWrite(LED_LINE_B, LOW);
+		}
+		if(++count == 4){
+			count = 0;
 		}
 	} else {
-		gpioWrite(LED_LINE_A, LOW);
-		gpioWrite(LED_LINE_B, LOW);
+		gpioWrite(LED_LINE_A, HIGH);
+		gpioWrite(LED_LINE_B, HIGH);
 	}
 }
 
@@ -125,17 +123,11 @@ bool PVInit(void) {
 
 	bool okLed = true;
 
-	//LED INIT
-	for (uint8_t i = 0; i < LED_IN_PV; i++) {
-		leds_[i] = led_init_led(PIN2PORT(ST_PIN[i]), PIN2NUM(ST_PIN[i]),
-		TURNS_ON_WITH_1);
-	}
-
-	bool newBoolLed = true;
-	for (uint8_t i = 0; i < LED_IN_PV; i++) {
-		if (!leds_[i]) {
-			newBoolLed = false;
-		}
+	//LED STATUS INIT
+	count = 0;
+	for(uint8_t i = 0; i < LED_IN_PV;i++){
+		gpioMode(ST_PIN[i],OUTPUT);
+		gpioWrite(ST_PIN[i], HIGH);
 	}
 
 	idLed1 = led_init_led(PB, 22, TURNS_ON_WITH_0);
@@ -186,7 +178,7 @@ bool PVInit(void) {
 	timerStart(timer_id, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
 			multiplexLedCallback);
 
-	return (okLed && newBoolLed);
+	return okLed;
 }
 
 void PVSuscribeEvent(PVEv_t ev, bool state) {
@@ -597,7 +589,7 @@ void PVLedPoll(void) {
 void PVStatusLedSelect(PVStatus_t led, bool state) {
 
 	for (uint8_t i = 0; i < LED_IN_PV; i++) {
-		leds_[i] = false;
+		leds_st[i] = false;
 	}
 
 	if ((led == ON_ST_1) || (led == ON_ST_12) || (led == ON_ST_13)
