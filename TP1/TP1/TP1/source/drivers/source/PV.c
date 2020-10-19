@@ -70,7 +70,7 @@ static tim_id_t timer_id_mrq;
 
 //Timer
 static tim_id_t timer_id_st;
-
+static tim_id_t timer_open_st;
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -211,9 +211,12 @@ bool PVInit(void) {
 	timerInit();
 	timer_id_st = timerGetId();
 	timer_id_mrq = timerGetId();
+	timer_open_st = timerGetId();
 	timerStart(timer_id_st, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
 			multiplexLedCallback);
-
+	timerStart(timer_open_st, TIMER_MS2TICKS(500), TIM_MODE_PERIODIC,
+			openMultiplexCallback);
+	timerStop(timer_open_st);
 	return okLed;
 }
 
@@ -380,6 +383,7 @@ bool PVAnimation(animation_t animation, bool activate) {
 		case ACCESS_ANIMATION:
 			break;
 		case OPEN_ANIMATION:
+			if()
 			break;
 		case USERS_ANIMATION:
 			break;
