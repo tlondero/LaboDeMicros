@@ -757,6 +757,8 @@ void PVStatusLedSelect(PVStatus_t led, bool state) {
 	case (ON_ST_3):
 		leds_st[2] = state;
 		break;
+	case (ON_ST_OFF):
+		break;
 	default:
 		break;
 	}
