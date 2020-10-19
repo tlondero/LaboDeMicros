@@ -120,36 +120,42 @@ uint8_t checkMessageLength(char *mes) {
 	return i + 1;
 }
 
-char* setMayus(char *mes, uint8_t len) {
+const char* placeMayus(char *mess, uint8_t l) {
+	//Pongo todo en mayusculas
 	uint8_t i = 0;
-	char mayusSt[len];
-	for (i = 0; i < len; i++) {
-		char aux = mes[i];
+	char mayusSt[l];
+	for (i = 0; i < l; i++) {
+		char aux = mess[i];
 		if ((aux >= 97) && (aux <= 122)) {
 			aux -= 32;
 		}
 		mayusSt[i] = aux;
 	}
-	return &mayusSt;
+
+	const char *p = mayusSt;
+	return p;
 }
 
-char* addSpaces(char *mes, uint8_t len) {
+const char* addSpaces(char *mes, uint8_t l) {
 
-	char newMes[len + 8];      //2x4 spaces + \0
+	//Agrego 4 ' ' al principio y 4 al final
+	char newMes[l + 8];
 	uint8_t i = 0;
-	while (i < len + 7) {
+	while (i < l + 7) {
 		if (i < 4) {
 			newMes[i] = 32;
-		} else if (i < 3 + len) {
+		} else if (i < 3 + l) {
 			newMes[i] = mes[i - 4];
 		} else {
 			newMes[i] = 32;
 		}
 		i++;
 	}
-	newMes[len + 8] = '\0';
+	newMes[l + 7] = '\0';
 
-	return &newMes;
+	const char *p = newMes;
+
+	return p;
 }
 
 /*******************************************************************************
@@ -159,9 +165,6 @@ char* addSpaces(char *mes, uint8_t len) {
  ******************************************************************************/
 
 bool PVInit(void) {
-
-	//PVDispSetMess("suculento");
-	//char * xd = addSpaces(message, length);
 
 	//Button init
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
@@ -236,8 +239,8 @@ bool PVInit(void) {
 	timer_open_st = timerGetId();
 	timerStart(timer_id_st, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
 			multiplexLedCallback);
-	timerStart(timer_open_st, TIMER_MS2TICKS(500), TIM_MODE_PERIODIC,
-			openMultiplexCallback);
+	//timerStart(timer_open_st, TIMER_MS2TICKS(500), TIM_MODE_PERIODIC,
+	//		openMultiplexCallback);
 	timerStop(timer_open_st);
 	return okLed;
 }
@@ -379,7 +382,11 @@ bool PVDispSetMess(char *mess) {
 	bool valid = true;
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {
-		message = setMayus(mess, l);
+
+		message = placeMayus(mess, l);
+
+		message = addSpaces(message, l);
+
 		length = l;
 		countMess = 0;
 	} else {
@@ -417,7 +424,6 @@ bool PVAnimation(animation_t animation, bool activate) {
 		case ACCESS_ANIMATION:
 			break;
 		case OPEN_ANIMATION:
-			if()
 			break;
 		case USERS_ANIMATION:
 			break;
