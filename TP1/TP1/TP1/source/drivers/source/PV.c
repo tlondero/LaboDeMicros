@@ -160,8 +160,8 @@ char* addSpaces(char *mes, uint8_t len) {
 
 bool PVInit(void) {
 
-	PVDispSetMess("suculento");
-	char * xd = addSpaces(message, length);
+	//PVDispSetMess("suculento");
+	//char * xd = addSpaces(message, length);
 
 	//Button init
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
