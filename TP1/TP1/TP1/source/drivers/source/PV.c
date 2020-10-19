@@ -92,7 +92,7 @@ void multiplexLedCallback(void) {
 			gpioWrite(LED_LINE_A, LOW);
 			gpioWrite(LED_LINE_B, LOW);
 		}
-		if(++count == 4){
+		if (++count == 4) {
 			count = 0;
 		}
 	} else {
@@ -125,8 +125,8 @@ bool PVInit(void) {
 
 	//LED STATUS INIT
 	count = 0;
-	for(uint8_t i = 0; i < LED_IN_PV;i++){
-		gpioMode(ST_PIN[i],OUTPUT);
+	for (uint8_t i = 0; i < LED_IN_PV; i++) {
+		gpioMode(ST_PIN[i], OUTPUT);
 		gpioWrite(ST_PIN[i], HIGH);
 	}
 
@@ -441,18 +441,18 @@ bool PVLedSetFlash(PVLed_t led, uint8_t value) {
 		valid = true;
 		switch (led) {
 		case (PV_LED_1):
-			led_configure_flash(idLed1, value);
+			led_configure_flashes(idLed1, value);
 			break;
 		case (PV_LED_2):
-			led_configure_flash(idLed2, value);
+			led_configure_flashes(idLed2, value);
 			break;
 		case (PV_LED_3):
-			led_configure_flash(idLed3, value);
+			led_configure_flashes(idLed3, value);
 			break;
 		case (PV_LED_ALL):
-			led_configure_flash(idLed1, value);
-			led_configure_flash(idLed2, value);
-			led_configure_flash(idLed3, value);
+			led_configure_flashes(idLed1, value);
+			led_configure_flashes(idLed2, value);
+			led_configure_flashes(idLed3, value);
 			break;
 		default:
 			valid = false;
