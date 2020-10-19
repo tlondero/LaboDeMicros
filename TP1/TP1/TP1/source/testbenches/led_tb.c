@@ -76,7 +76,7 @@ void LED_TB_APP_RUN(void){
 
 			break;
 		case SKP:
-			led_flash(ledid);
+			led_configure_brightness(ledid, 0.8);
 			break;
 		default:
 
