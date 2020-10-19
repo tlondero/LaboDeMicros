@@ -25,6 +25,8 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
+#define MAX_MESS_LEN 	511
+
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
@@ -108,13 +110,9 @@ bool PVIncreaseBrightness(void);
 bool PVDecreaseBrightness(void);
 
 /**
- * @brief dispSendChar: sends to the selected 7 seg the character:
- * @param ch : character to be sent coded in ascii.
- * seven_seg_module: numer of seven segment, it ranges from 0 to 3
- * @return bool, false if any paramter was invalid
- *
+ * @brief Decrease brightness
  */
-bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
+bool PVDispSetMess(char *mess);
 
 /**
  * @brief dispShift: shifts the msg in screen one row to the "direction"

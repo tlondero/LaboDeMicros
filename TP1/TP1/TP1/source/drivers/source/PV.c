@@ -43,22 +43,33 @@ const uint8_t ST_PIN[LED_IN_PV] = { LED_LINE_A, LED_LINE_B };
  * VARIABLES WITH LOCAL SCOPE
  ******************************************************************************/
 
+//Button
 static PVButton_t button;
 static PVEncoder_t idEncoder;
-
-static int8_t dispBright;
-
-static int8_t idLed1;
-static int8_t idLed2;
-static int8_t idLed3;
 
 static bool isEvent = false;
 static PVEv_t event = NO_PV_EV;
 static uint8_t listEv[NO_PV_EV] = { 0 };
 
-static tim_id_t timer_id;
+//Extern leds
+static int8_t idLed1;
+static int8_t idLed2;
+static int8_t idLed3;
+
+//Intern leds
 static bool leds_st[LED_IN_PV] = { 0 };
 static uint8_t count;
+
+//Display
+static int8_t dispBright;
+
+static char *message;
+static uint8_t length;
+static uint8_t countMess;
+static tim_id_t timer_id_mrq;
+
+//Timer
+static tim_id_t timer_id_st;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
@@ -101,6 +112,27 @@ void multiplexLedCallback(void) {
 	}
 }
 
+uint8_t checkMessageLength(char *mes) {
+	uint8_t i = 0;
+	while (mes[i] != '\0') {
+		i++;
+	}
+	return i + 1;
+}
+
+char * setMayus(char *mes, uint8_t len) {
+	uint8_t i = 0;
+	char mayusSt[len];
+	for(i = 0; i < len; i++){
+		char aux = mes[i];
+		if((aux >= 97) && (aux <= 122)){
+			aux -= 32;
+		}
+		mayusSt[i] = aux;
+	}
+	return &mayusSt;
+}
+
 /*******************************************************************************
  *******************************************************************************
  GLOBAL FUNCTION DEFINITIONS
@@ -120,10 +152,13 @@ bool PVInit(void) {
 	dispBright = 20;
 
 	led_init_driver();
-
-	bool okLed = true;
+	message = NULL;
+	length = 0;
+	countMess = 0;
 
 	//LED STATUS INIT
+	bool okLed = true;
+
 	count = 0;
 	for (uint8_t i = 0; i < LED_IN_PV; i++) {
 		gpioMode(ST_PIN[i], OUTPUT);
@@ -174,8 +209,9 @@ bool PVInit(void) {
 
 	//timer init
 	timerInit();
-	timer_id = timerGetId();
-	timerStart(timer_id, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
+	timer_id_st = timerGetId();
+	timer_id_mrq = timerGetId();
+	timerStart(timer_id_st, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
 			multiplexLedCallback);
 
 	return okLed;
@@ -302,17 +338,21 @@ bool PVDecreaseBrightness(void) {
 	return bottomValue;
 }
 
-bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
-
-	bool valid = false;
-
-	if (seven_seg_module < 4) {
-		dispSendChar(ch, seven_seg_module);
-		valid = true;
+bool PVDispSetMess(char *mess) {
+	bool valid = true;
+	uint8_t l = checkMessageLength(mess);
+	if (l < MAX_MESS_LEN) {
+		message = setMayus(mess,l);
+		length = l;
+		countMess = 0;
+	} else {
+		message = NULL;
+		length = 0;
+		countMess = 0;
+		valid = false;
 	}
 
 	return valid;
-
 }
 
 bool PVDisplayShift(PVDirection_t direction) {
