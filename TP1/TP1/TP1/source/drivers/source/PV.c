@@ -217,7 +217,6 @@ bool PVInit(void) {
 	//LED STATUS INIT
 	bool okLed = true;
 
-	count = 0;
 	for (uint8_t i = 0; i < DEC_IN_PV; i++) {
 		gpioMode(ST_PIN[i], OUTPUT);
 		gpioWrite(ST_PIN[i], HIGH);
