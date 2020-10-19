@@ -8,6 +8,7 @@ using namespace std;
 void appInit(void);
 void appRun(void);
 void printData(FEData data);
+uint32_t power(uint32_t num, uint32_t exp);
 static state st;
 int main(int argc, char** argv) {
 	appInit();
@@ -20,22 +21,60 @@ int main(int argc, char** argv) {
 
 
 void appInit(void) {
-	timerInit();
-	FRDMInit();
-	dispInit();
-	cardInitDriver(0);
-	PVencoder_init();
-	st=FSMInitState();
+	//timerInit();
+	//FRDMInit();
+	//dispInit();
+	//cardInitDriver(0);
+	//PVencoder_init();
+	//st=FSMInitState();
+	uint8_t ASCII_NUM_BASE = 48;
+	uint8_t DIGIT_MAX_LEN = 8;
+	uint32_t num = 99999999;
+	int8_t i;
+	int8_t j;
+	uint32_t debug;
+	uint32_t id[8];
+	char chars[8];
+	for (i = DIGIT_MAX_LEN; i > 0 ; i--) {
+		uint32_t aux = 0;
+		if (i == DIGIT_MAX_LEN) {
+			id[DIGIT_MAX_LEN - i] = (num / power(10, i - 1));
+		}
+		else {
+			for (j = i; j < DIGIT_MAX_LEN; j++) {
+				aux += id[j-i] * power(10, DIGIT_MAX_LEN - j);
+			}
+			id[DIGIT_MAX_LEN - i] = (num / power(10, i - 1)) - aux;
+		}
+		chars[DIGIT_MAX_LEN - i] = id[DIGIT_MAX_LEN - i] + ASCII_NUM_BASE;
+		cout << chars[DIGIT_MAX_LEN - i];
+	}
 }
 void appRun(void) {
 	
-	st = FSMRun(st);
-	FEData  mydata = *(FSMGetFEData());
+	//st = FSMRun(st);
+	//FEData  mydata = *(FSMGetFEData());
 
-	cout << st << endl;
-	printData(mydata);
+	//cout << st << endl;
+	//printData(mydata);
 }
 
+uint32_t power(uint32_t num, uint32_t exp) {
+	uint32_t ret = 1;
+	uint8_t i = 0;
+	if (exp == 0) {
+		return 1;
+	}
+	else if (num == 0) {
+		return 0;
+	}
+	else {
+		for (i = 0; i < exp; i++) {
+			ret *= num;
+		}
+		return ret;
+	}
+}
 
 
 void printData(FEData data) {
