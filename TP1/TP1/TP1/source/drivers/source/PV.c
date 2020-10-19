@@ -30,6 +30,8 @@
 #define DEC_IN_PV		2
 #define EXTERN_LEDS		3
 
+#define SEV_SEG			4
+
 const uint8_t ST_PIN[DEC_IN_PV] = { LED_LINE_A, LED_LINE_B };
 
 /*******************************************************************************
@@ -91,7 +93,7 @@ void multiplexLedCallback(void);
 
 void dispShowText(void) {
 	uint8_t i = 0;
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < SEV_SEG; i++) {
 		dispSendChar(i, message[i + countMess]);
 	}
 
@@ -151,13 +153,13 @@ char* placeMayus(char *mess, uint8_t l) {
 char* addSpaces(char *mes, uint8_t l) {
 
 	//Agrego 4 ' ' al principio y 4 al final
-	char newMes[l + 8];
+	char newMes[l + 2 * SEV_SEG];
 	uint8_t i = 0;
 	while (i < l + 7) {
-		if (i < 4) {
+		if (i < SEV_SEG) {
 			newMes[i] = 32;
 		} else if (i < 3 + l) {
-			newMes[i] = mes[i - 4];
+			newMes[i] = mes[i - SEV_SEG];
 		} else {
 			newMes[i] = 32;
 		}
@@ -328,6 +330,9 @@ bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 }
 
 void PVDisplayClear(void) {
+	message = NULL;
+	length = 0;
+	countMess = 0;
 	dispClearAll();
 }
 
@@ -335,7 +340,7 @@ bool PVDisplaySetBright(uint8_t br) {
 	bool valid = true;
 	if ((br >= 1) && (br <= 100)) {
 		dispBright = br;
-		PVDisplaySetBright(dispBright/100);
+		PVDisplaySetBright(dispBright / 100);
 	} else if (br == 0) {
 		dispClearAll();
 	} else {
@@ -351,7 +356,7 @@ bool PVIncreaseBrightness(void) {
 		dispBright = 100;
 		topValue = true;
 	}
-	dispBrightness(dispBright/100);
+	dispBrightness(dispBright / 100);
 	return topValue;
 }
 
@@ -363,22 +368,31 @@ bool PVDecreaseBrightness(void) {
 		bottomValue = true;
 		dispClearAll();
 	} else {
-		dispBrightness(dispBright/100);
+		dispBrightness(dispBright / 100);
 	}
 	return bottomValue;
 }
 
 bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 
-	timerReset(timer_id_mrq);
-	timerStop(timer_id_mrq);
-	message = NULL;
-	length = 0;
-	countMess = 0;
+	/*
+	 if (message == NULL) {
+	 char aux[SEV_SEG * 3] = { ' ' };
+	 aux[SEV_SEG + seven_seg_module] = ch;
+	 dir = PV_NODIR;
+	 countMess = SEV_SEG;
+	 message = aux;
+	 } else {
+	 timerReset(timer_id_mrq);
+	 timerStop(timer_id_mrq);
+	 message = NULL;
+	 length = 0;
+	 countMess = 0;
+	 }*/
 
 	bool valid = false;
 
-	if (seven_seg_module < 4) {
+	if (seven_seg_module < SEV_SEG) {
 		dispSendChar(ch, seven_seg_module);
 		valid = true;
 	}
@@ -405,6 +419,28 @@ bool PVDispSetMess(char *mess) {
 
 	timerReset(timer_id_mrq);
 
+	return valid;
+}
+
+bool PVDispManualShift(PVDirection_t direction, uint8_t cant) {
+
+	bool valid = true;
+
+	if ((countMess + cant < length) && (countMess - cant > 0)) {
+		switch (direction) {
+		case (PV_RIGHT):
+			countMess += cant;
+			break;
+		case (PV_LEFT):
+			countMess -= cant;
+			break;
+		default:
+			valid = false;
+			break;
+		}
+	} else {
+		valid = false;
+	}
 	return valid;
 }
 

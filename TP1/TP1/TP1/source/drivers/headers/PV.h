@@ -128,6 +128,8 @@ void PVDispMessOn(void);
 
 void PVDispMessOff(void);
 
+bool PVDispManualShift(PVDirection_t direction, uint8_t cant);
+
 /**
  * @brief
  */
