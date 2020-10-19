@@ -19,7 +19,7 @@
 #include "drivers/headers/timer.h"
 //#include "drivers/headers/Button.h"
 #include "drivers/headers/FRDM.h"
-//#include "drivers/headers/ftm_tb.c"
+#include "testbenches/ftm_tb.c"
 
 /******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -48,18 +48,21 @@ static uint8_t count = 0;
 
 void turn_on_led(void);
 void App_Init(void) {
-
+/*
 	//Interrupciones de pines
 
 	FRDMInit();
 	FRDMSuscribeEvent(PRESS_SW2, true);
 	FRDMSuscribeEvent(PRESS_SW3, true);
+	*/
+
+	FTM_TB_APP_INIT();
 }
 
 //Función que se llama constantemente en un ciclo infinito
 
 void App_Run(void) {
-
+/*
 	if (FRDMCheckEvent()) {
 		if (PVGetEv() == PRESS_SW2) {
 			FRDMLedFlash(PURPLE);
@@ -72,5 +75,8 @@ void App_Run(void) {
 	}
 
 	FRDMLedPoll();
+	*/
+
+	FTM_TB_APP_RUN();
 }
 
