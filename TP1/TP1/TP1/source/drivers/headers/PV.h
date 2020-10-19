@@ -124,9 +124,9 @@ bool PVDisplaySetShift(PVDirection_t direction);
 
 bool PVDisplaySetTime(uint32_t time);
 
-void PVDispMessShiftOn(void);
+void PVDispMessOn(void);
 
-void PVDispMessShiftOff(void);
+void PVDispMessOff(void);
 
 /**
  * @brief

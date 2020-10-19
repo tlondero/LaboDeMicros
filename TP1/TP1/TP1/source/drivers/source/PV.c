@@ -370,6 +370,12 @@ bool PVDecreaseBrightness(void) {
 
 bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 
+	timerReset(timer_id_mrq);
+	timerStop(timer_id_mrq);
+	message = NULL;
+	length = 0;
+	countMess = 0;
+
 	bool valid = false;
 
 	if (seven_seg_module < 4) {
@@ -402,11 +408,11 @@ bool PVDispSetMess(char *mess) {
 	return valid;
 }
 
-void PVDispMessShiftOn(void) {
+void PVDispMessOn(void) {
 	timerResume(timer_id_mrq);
 }
 
-void PVDispMessShiftOff(void) {
+void PVDispMessOff(void) {
 	timerStop(timer_id_mrq);
 }
 
