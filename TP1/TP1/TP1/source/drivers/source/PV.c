@@ -58,7 +58,6 @@ static int8_t idLed3;
 
 //Intern leds
 static bool leds_st[LED_IN_PV] = { 0 };
-static uint8_t count;
 
 //Display
 static int8_t dispBright;
@@ -95,20 +94,15 @@ void multiplexLedCallback(void);
  ******************************************************************************/
 
 void multiplexLedCallback(void) {
-	if (leds_st[0] || leds_st[1] || leds_st[2]) {
-		if ((count == 0) && (leds_st[0])) {
-			gpioWrite(LED_LINE_A, HIGH);
-			gpioWrite(LED_LINE_B, LOW);
-		} else if ((count == 1) && (leds_st[1])) {
-			gpioWrite(LED_LINE_A, LOW);
-			gpioWrite(LED_LINE_B, HIGH);
-		} else if ((count == 2) && (leds_st[2])) {
-			gpioWrite(LED_LINE_A, LOW);
-			gpioWrite(LED_LINE_B, LOW);
-		}
-		if (++count == 4) {
-			count = 0;
-		}
+	if (leds_st[0]) {
+		gpioWrite(LED_LINE_A, HIGH);
+		gpioWrite(LED_LINE_B, LOW);
+	} else if (leds_st[1]) {
+		gpioWrite(LED_LINE_A, LOW);
+		gpioWrite(LED_LINE_B, HIGH);
+	} else if (leds_st[2]) {
+		gpioWrite(LED_LINE_A, LOW);
+		gpioWrite(LED_LINE_B, LOW);
 	} else {
 		gpioWrite(LED_LINE_A, HIGH);
 		gpioWrite(LED_LINE_B, HIGH);
@@ -482,7 +476,7 @@ bool PVDisplaySetTime(uint32_t time) {
 	if (time != 0) {
 		mrqtime = time;
 		timerStart(timer_id_mrq, TIMER_MS2TICKS(time), TIM_MODE_PERIODIC,
-					dispShowText);
+				dispShowText);
 		valid = true;
 	}
 
@@ -753,20 +747,17 @@ void PVStatusLedSelect(PVStatus_t led, bool state) {
 	for (uint8_t i = 0; i < LED_IN_PV; i++) {
 		leds_st[i] = false;
 	}
-
-	if ((led == ON_ST_1) || (led == ON_ST_12) || (led == ON_ST_13)
-			|| ON_ST_ALL) {
+	switch (led) {
+	case (ON_ST_1):
 		leds_st[0] = state;
-	}
-
-	if ((led == ON_ST_2) || (led == ON_ST_12) || (led == ON_ST_23)
-			|| ON_ST_ALL) {
+		break;
+	case (ON_ST_2):
 		leds_st[1] = state;
-	}
-
-	if ((led == ON_ST_3) || (led == ON_ST_13) || (led == ON_ST_23)
-			|| ON_ST_ALL) {
+		break;
+	case (ON_ST_3):
 		leds_st[2] = state;
+		break;
+	default:
+		break;
 	}
-
 }
