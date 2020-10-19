@@ -199,7 +199,7 @@ bool PVInit(void) {
 
 	for (uint8_t i = 0; i < DEC_IN_PV; i++) {
 		gpioMode(ST_PIN[i], OUTPUT);
-		gpioWrite(ST_PIN[i], HIGH);
+		gpioWrite(ST_PIN[i], LOW);
 	}
 
 	idLed[0] = led_init_led(PB, 22, TURNS_ON_WITH_0);
