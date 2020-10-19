@@ -29,7 +29,7 @@
 #define LED_IN_PV		3
 #define DEC_IN_PV		2
 
-const uint8_t ST_PIN[LED_IN_PV] = { LED_LINE_A, LED_LINE_B };
+const uint8_t ST_PIN[DEC_IN_PV] = { LED_LINE_A, LED_LINE_B };
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -68,6 +68,7 @@ static char *message;
 static uint8_t length;
 static uint8_t countMess;
 static tim_id_t timer_id_mrq;
+static uint32_t mrqtime = 1000;
 
 //Timer
 static tim_id_t timer_id_st;
@@ -137,16 +138,14 @@ void dispShowText(void) {
 	}
 }
 
-
-void open_animation_Callback(void){
-	static uint8_t i=0,j;
-	static char open_animation[4]={'^','>','_','<'};
-	if(i == OPEN_TRIGGER_TIME/500){
+void open_animation_Callback(void) {
+	static uint8_t i = 0, j;
+	static char open_animation[4] = { '^', '>', '_', '<' };
+	if (i == OPEN_TRIGGER_TIME / 500) {
 		timerStop(timer_open_st);
-	}
-	else{
-		for(j=0;j<4;j++)
-			dispSendChar(open_animation[i%4], j);
+	} else {
+		for (j = 0; j < 4; j++)
+			dispSendChar(open_animation[i % 4], j);
 	}
 	i++;
 }
@@ -225,7 +224,7 @@ bool PVInit(void) {
 	bool okLed = true;
 
 	count = 0;
-	for (uint8_t i = 0; i < LED_IN_PV; i++) {
+	for (uint8_t i = 0; i < DEC_IN_PV; i++) {
 		gpioMode(ST_PIN[i], OUTPUT);
 		gpioWrite(ST_PIN[i], HIGH);
 	}
@@ -277,11 +276,17 @@ bool PVInit(void) {
 	timer_id_st = timerGetId();
 	timer_id_mrq = timerGetId();
 	timer_open_st = timerGetId();
+
 	timerStart(timer_id_st, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
 			multiplexLedCallback);
-	timerStart(timer_open_st,TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC,
+
+	timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC,
 			open_animation_Callback);
 	timerStop(timer_open_st);
+
+	timerStart(timer_id_mrq, TIMER_MS2TICKS(1000), TIM_MODE_PERIODIC,
+			dispShowText);
+	timerStop(timer_id_mrq);
 	return okLed;
 }
 
@@ -435,7 +440,17 @@ bool PVDispSetMess(char *mess) {
 		valid = false;
 	}
 
+	timerReset(timer_id_mrq);
+
 	return valid;
+}
+
+void PVDispMessShiftOn(void) {
+	timerResume(timer_id_mrq);
+}
+
+void PVDispMessShiftOff(void) {
+	timerStop(timer_id_mrq);
 }
 
 bool PVDisplaySetShift(PVDirection_t direction) {
@@ -462,6 +477,16 @@ bool PVDisplaySetShift(PVDirection_t direction) {
 
 bool PVDisplaySetTime(uint32_t time) {
 
+	bool valid = false;
+
+	if (time != 0) {
+		mrqtime = time;
+		timerStart(timer_id_mrq, TIMER_MS2TICKS(time), TIM_MODE_PERIODIC,
+					dispShowText);
+		valid = true;
+	}
+
+	return valid;
 }
 
 bool PVAnimation(animation_t animation, bool activate) {
