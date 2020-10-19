@@ -1,12 +1,11 @@
 /*
- * ftm_tb.c
+ * led_tb.c
  *
  *  Created on: Oct 19, 2020
  *      Author: Acer
  */
-
-#include "drivers/headers/FTM.h"
 #include "drivers/headers/button.h"
+#include "drivers/headers/led.h"
 
 typedef struct {
 	uint8_t PORT;
@@ -43,47 +42,47 @@ static const FTM_TB_PORTS PORTS[30]={    {FTM_TB_PA,3},		//0 //probado
 										 {FTM_TB_PC,9},		//27 //probado
 										 {FTM_TB_PC,10},	//28
 										 {FTM_TB_PC,11}};	//29
-static int8_t ftmid;
-static int8_t buttonid;
-void FTM_TB_APP_INIT(void){
-	FTM_DATA data;
-	data.CNTIN = 0;
-	data.CNV = 0xFFFF/2;
-	data.EPWM_LOGIC = FTM_lAssertedHigh;
-	data.MODE = FTM_mPulseWidthModulation;
-	data.MODULO = 0xFFFF;
-	data.PSC = FTM_PSC_x1;
-	ftmid = FTMInit(PORTS[10].PORT, PORTS[10].NUM, data);
 
+
+
+static int8_t ledid;
+static int8_t buttonid;
+void LED_TB_APP_INIT(void){
+	led_init_driver();
+	ledid = led_init_led(PORTS[5].PORT, PORTS[5].NUM, TURNS_ON_WITH_1);
+	led_configure_brightness(ledid, 0.2);
+	led_configure_dt(ledid, 80);
+	led_configure_flashes(ledid, 3);
+	led_configure_period(ledid, 150);
+	led_configure_time(ledid, 100);
 	buttonid = ButtonInit(PORTNUM2PIN(PA, 4), INPUT_PULLUP);
 }
 
-void FTM_TB_APP_RUN(void){
+void LED_TB_APP_RUN(void){
 
 	const ButtonEvent * evsw1 = ButtonGetEvent(buttonid);
 
+	while((*evsw1) != EOQ){
+	switch (*evsw1){
+		case LKP:
 
-	    while((*evsw1) != EOQ){
-		switch (*evsw1){
-			case LKP:
+			break;
+		case PRESS:
 
-				break;
-			case PRESS:
+			break;
 
-				break;
-
-			case RELEASE:
+		case RELEASE:
 
 
-				break;
-			case SKP:
-				FTMSetCnV(ftmid, 0x1000);
-				FTMSetSWSYNC(ftmid);
-				break;
-			default:
+			break;
+		case SKP:
+			led_flash(ledid);
+			break;
+		default:
 
-				break;
-			}
-		evsw1++;
-	    }
+			break;
+		}
+	evsw1++;
+	}
+	led_poll();
 }
