@@ -12,7 +12,7 @@
 #include "../headers/board.h"
 #include "../headers/gpio.h"
 #include "../headers/timer.h"
-
+#include "../../app/headers/fsm.h"
 #include <stdbool.h>
 
 /*******************************************************************************
@@ -77,7 +77,8 @@ static tim_id_t timer_open_st;
  ******************************************************************************/
 
 bool PVLedSelect(PVLed_t led);
-
+void open_animation_Callback(void);
+void multiplexLedCallback(void);
 /*******************************************************************************
  * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -134,6 +135,20 @@ void dispShowText(void) {
 	if (countMess >= length) {
 		countMess = 0;
 	}
+}
+
+
+void open_animation_Callback(void){
+	static uint8_t i=0,j;
+	static char open_animation[4]={'^','>','_','<'};
+	if(i == OPEN_TRIGGER_TIME/500){
+		timerStop(timer_open_st);
+	}
+	else{
+		for(j=0;j<4;j++)
+			dispSendChar(open_animation[i%4], j);
+	}
+	i++;
 }
 
 uint8_t checkMessageLength(char *mes) {
@@ -264,8 +279,8 @@ bool PVInit(void) {
 	timer_open_st = timerGetId();
 	timerStart(timer_id_st, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
 			multiplexLedCallback);
-	//timerStart(timer_open_st, TIMER_MS2TICKS(500), TIM_MODE_PERIODIC,
-	//		openMultiplexCallback);
+	timerStart(timer_open_st,TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC,
+			open_animation_Callback);
 	timerStop(timer_open_st);
 	return okLed;
 }
@@ -460,6 +475,8 @@ bool PVAnimation(animation_t animation, bool activate) {
 		case ACCESS_ANIMATION:
 			break;
 		case OPEN_ANIMATION:
+			timerReset(timer_open_st);
+			timerResume(timer_open_st);
 			break;
 		case USERS_ANIMATION:
 			break;

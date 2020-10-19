@@ -27,7 +27,11 @@ void drawFrontEnd(FEData data, state st) {
 	switch (st) {
 	case IDDLE:
 		if (data.animation_en) {
-			PVAnimation(IDDLE_ANIMATION, true);
+//			PVAnimation(IDDLE_ANIMATION, true);
+			for (i = 0; i < 4; i++) {
+				PVDisplaySendChar('-', i);//Por ahora guiones
+			}
+
 		} else if ((!data.good_id) && (!data.bad_id)) {
 			for (i = 0; i < 4; i++) {
 				if (data.id_counter > 3) {
@@ -145,7 +149,7 @@ void drawFrontEnd(FEData data, state st) {
 		}
 		break;
 	case USERS_DEL:
-		PVMarquesina(((user_t *) (data.del_user_ptr))->id);
+		PVMarquesina(num2str(((user_t *) (data.del_user_ptr))->id));
 		if(data.del_user){
 			FRDMLedFlash(BLUE);
 		}
