@@ -44,7 +44,7 @@ typedef enum {
 } PVLed_t;
 
 typedef enum {
-	ON_ST_1, ON_ST_2, ON_ST_3, ON_ST_12, ON_ST_23, ON_ST_13, ON_ST_ALL
+	ON_ST_1, ON_ST_2, ON_ST_3, ON_ST_OFF
 } PVStatus_t;
 
 typedef enum { PV_RIGHT, PV_LEFT, PV_NODIR } PVDirection_t;
@@ -123,6 +123,10 @@ bool PVDispSetMess(char *mess);
 bool PVDisplaySetShift(PVDirection_t direction);
 
 bool PVDisplaySetTime(uint32_t time);
+
+void PVDispMessShiftOn(void);
+
+void PVDispMessShiftOff(void);
 
 /**
  * @brief

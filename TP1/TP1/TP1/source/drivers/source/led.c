@@ -205,21 +205,21 @@ void led_set_state(int8_t led_id, uint8_t norm_state){
 			LEDS[led_id].flashing = 0;
 
 			switch(norm_state){
-			case SET_LOW:
+			case LED_OFF:
 				if(!LEDS[led_id].gpiomode)
 					PWMStopSignal(LEDS[led_id].pwm_id, unnormalize_state(LED_OFF, LEDS[led_id].led_pin_mode));
 				else
 					gpioWrite(LEDS[led_id].led_pin, unnormalize_state(LED_OFF, LEDS[led_id].led_pin_mode));
 				LEDS[led_id].state = LED_OFF;
 				break;
-			case SET_HIGH:
+			case LED_ON:
 				if(!LEDS[led_id].gpiomode)
 					PWMStartSignal(LEDS[led_id].pwm_id);
 				else
 					gpioWrite(LEDS[led_id].led_pin, unnormalize_state(LED_ON, LEDS[led_id].led_pin_mode));
 				LEDS[led_id].state = LED_ON;
 				break;
-			case TOGGLE:
+			case LED_TOGGLE:
 				if(LEDS[led_id].state){
 					if(!LEDS[led_id].gpiomode)
 						PWMStopSignal(LEDS[led_id].pwm_id, unnormalize_state(LED_OFF, LEDS[led_id].led_pin_mode));

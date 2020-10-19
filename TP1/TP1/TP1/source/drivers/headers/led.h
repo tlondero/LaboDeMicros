@@ -22,12 +22,9 @@
 #define MAX_LEDS 16
 #define DEVELOPMENT_MODEE 1
 
-#define SET_HIGH 1
-#define SET_LOW 0
-#define TOGGLE 2
-
 #define LED_ON 1
 #define LED_OFF 0
+#define LED_TOGGLE 2
 
 #define TURNS_ON_WITH_1 0
 #define TURNS_ON_WITH_0	1
