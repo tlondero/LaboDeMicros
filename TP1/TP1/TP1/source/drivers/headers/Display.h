@@ -57,13 +57,6 @@ void dispSendMsg(Message_t msg);
  */
 void dispSendChar(char ch, uint8_t seven_seg_module);
 
-
-/**
- * @brief dispShift: shifts the msg in screen one row to the "direction"
- * @params direction:see the direction_t for the modes.
- */
-void dispShift(direction_t direction);
-
 /**
  * @brief dispClearAll: Clears ALL the display, pretty self explanatory.
  *

@@ -58,7 +58,10 @@ void PV_tb_Run(void) {
 			br -= 5;
 		}
 
-		if ((br >= 10) && (br <= 20)) {
+		if (br <= 10){
+			PVStatusLedSelect(ON_ST_ALL, false);
+		}
+		else if ((br > 10) && (br <= 20)) {
 			PVStatusLedSelect(ON_ST_1, true);
 		} else if ((br > 20) && (br <= 30)) {
 			PVStatusLedSelect(ON_ST_12, true);

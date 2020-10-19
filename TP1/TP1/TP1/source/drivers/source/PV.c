@@ -62,6 +62,7 @@ static uint8_t count;
 
 //Display
 static int8_t dispBright;
+static PVDirection_t dir;
 
 static char *message;
 static uint8_t length;
@@ -109,6 +110,29 @@ void multiplexLedCallback(void) {
 	} else {
 		gpioWrite(LED_LINE_A, HIGH);
 		gpioWrite(LED_LINE_B, HIGH);
+	}
+}
+
+void dispShowText(void) {
+	uint8_t i = 0;
+	for (i = 0; i < 4; i++) {
+		dispSendChar(i, message[i + countMess]);
+	}
+
+	switch (dir) {
+	case (PV_RIGHT):
+		countMess++;
+		break;
+	case (PV_LEFT):
+		countMess--;
+		break;
+	case (PV_NODIR):
+		dir = PV_NODIR;
+		break;
+	}
+
+	if (countMess >= length) {
+		countMess = 0;
 	}
 }
 
@@ -175,6 +199,7 @@ bool PVInit(void) {
 	//Display init
 	dispInit();
 	dispBright = 20;
+	dir = PV_NODIR;
 
 	led_init_driver();
 	message = NULL;
@@ -383,11 +408,10 @@ bool PVDispSetMess(char *mess) {
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {
 
-		message = placeMayus(mess, l);
+		//message = placeMayus(mess, l);
+		message = addSpaces(placeMayus(mess, l), l);
 
-		message = addSpaces(message, l);
-
-		length = l;
+		length = checkMessageLength(message);
 		countMess = 0;
 	} else {
 		message = NULL;
@@ -399,18 +423,30 @@ bool PVDispSetMess(char *mess) {
 	return valid;
 }
 
-bool PVDisplayShift(PVDirection_t direction) {
+bool PVDisplaySetShift(PVDirection_t direction) {
 
 	bool valid = true;
 
-	if (direction == PV_RIGHT) {
-		dispShift(RIGHT);
-	} else if (direction == PV_LEFT) {
-		dispShift(LEFT);
-	} else {
+	switch (direction) {
+	case (PV_RIGHT):
+		dir = PV_RIGHT;
+		break;
+	case (PV_LEFT):
+		dir = PV_LEFT;
+		break;
+	case (PV_NODIR):
+		dir = PV_NODIR;
+		break;
+	default:
+		dir = PV_NODIR;
 		valid = false;
+		break;
 	}
 	return valid;
+}
+
+bool PVDisplaySetTime(uint32_t time) {
+
 }
 
 bool PVAnimation(animation_t animation, bool activate) {
