@@ -23,8 +23,8 @@
 #define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-#define LED_LINE_A		PORTNUM2PIN(PC,0)			//MARRON (ESTA EN FRENTE)
-#define LED_LINE_B 		PORTNUM2PIN(PA,2)           //ROJO
+#define LED_LINE_A		PORTNUM2PIN(PC,11)			//MARRON (ESTA EN FRENTE)
+#define LED_LINE_B 		PORTNUM2PIN(PC,10)           //ROJO
 
 #define LED_IN_PV		3
 #define DEC_IN_PV		2
@@ -95,17 +95,17 @@ void multiplexLedCallback(void);
 
 void multiplexLedCallback(void) {
 	if (leds_st[0]) {
-		gpioWrite(LED_LINE_A, HIGH);
-		gpioWrite(LED_LINE_B, LOW);
+		gpioWrite(LED_LINE_A, !HIGH);
+		gpioWrite(LED_LINE_B, !LOW);
 	} else if (leds_st[1]) {
-		gpioWrite(LED_LINE_A, LOW);
-		gpioWrite(LED_LINE_B, HIGH);
+		gpioWrite(LED_LINE_A, !LOW);
+		gpioWrite(LED_LINE_B, !HIGH);
 	} else if (leds_st[2]) {
+		gpioWrite(LED_LINE_A, !LOW);
+		gpioWrite(LED_LINE_B, !LOW);
+	} else {
 		gpioWrite(LED_LINE_A, LOW);
 		gpioWrite(LED_LINE_B, LOW);
-	} else {
-		gpioWrite(LED_LINE_A, HIGH);
-		gpioWrite(LED_LINE_B, HIGH);
 	}
 }
 
