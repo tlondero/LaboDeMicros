@@ -76,7 +76,7 @@ static tim_id_t timer_open_st;
  ******************************************************************************/
 
 bool PVLedSelect(PVLed_t led);
-void openCallback(void);
+void open_animation_Callback(void);
 void multiplexLedCallback(void);
 /*******************************************************************************
  * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
@@ -112,7 +112,7 @@ void multiplexLedCallback(void) {
 		gpioWrite(LED_LINE_B, HIGH);
 	}
 }
-void openCallback(void){
+void open_animation_Callback(void){
 	static uint8_t i=0,j;
 	static char open_animation[4]={'^','>','_','<'};
 	if(i == OPEN_TRIGGER_TIME/500){
@@ -252,7 +252,7 @@ bool PVInit(void) {
 	timerStart(timer_id_st, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
 			multiplexLedCallback);
 	timerStart(timer_open_st,TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC,
-			openCallback);
+			open_animation_Callback);
 	timerStop(timer_open_st);
 	return okLed;
 }
