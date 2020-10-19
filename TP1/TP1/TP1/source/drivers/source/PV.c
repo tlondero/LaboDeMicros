@@ -11,6 +11,7 @@
 #include "../headers/PV.h"
 #include "../headers/board.h"
 #include "../headers/gpio.h"
+#include "../headers/timer.h"
 
 #include <stdbool.h>
 
@@ -22,8 +23,16 @@
 #define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-#define LED_LINE_A PORTNUM2PIN(PC,0)			//MARRON (ESTA EN FRENTE)
-#define LED_LINE_B PORTNUM2PIN(PA,2)           //ROJO
+#define LED_LINE_A		PORTNUM2PIN(PC,0)			//MARRON (ESTA EN FRENTE)
+#define LED_LINE_B 		PORTNUM2PIN(PA,2)           //ROJO
+
+#define LED_IN_PV		3
+
+#define PIN_1			PORTNUM2PIN(PC,0)
+#define PIN_2			PORTNUM2PIN(PC,0)
+#define PIN_3			PORTNUM2PIN(PC,0)
+
+const uint8_t ST_PIN[LED_IN_PV] = { PIN_1, PIN_2, PIN_3 };
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -50,6 +59,10 @@ static bool isEvent = false;
 static PVEv_t event = NO_PV_EV;
 static uint8_t listEv[NO_PV_EV] = { 0 };
 
+static tim_id_t timer_id;
+static int8_t leds_[LED_IN_PV] = { 0 };
+static bool leds_st[LED_IN_PV] = { 0 };
+
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -63,6 +76,32 @@ bool PVLedSelect(PVLed_t led);
 /*******************************************************************************
  * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
+
+/*******************************************************************************
+ *******************************************************************************
+ LOCAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
+
+void multiplexLedCallback(void) {
+	if (leds_st[0] || leds_st[1] || leds_st[2]) {
+		if (leds_st[0]) {
+			gpioWrite(LED_LINE_A, LOW);
+			gpioWrite(LED_LINE_B, HIGH);
+		}
+		if (leds_st[1]) {
+			gpioWrite(LED_LINE_A, LOW);
+			gpioWrite(LED_LINE_B, HIGH);
+		}
+		if (leds_st[2]) {
+			gpioWrite(LED_LINE_A, HIGH);
+			gpioWrite(LED_LINE_B, HIGH);
+		}
+	} else {
+		gpioWrite(LED_LINE_A, LOW);
+		gpioWrite(LED_LINE_B, LOW);
+	}
+}
 
 /*******************************************************************************
  *******************************************************************************
@@ -85,6 +124,19 @@ bool PVInit(void) {
 	led_init_driver();
 
 	bool okLed = true;
+
+	//LED INIT
+	for (uint8_t i = 0; i < LED_IN_PV; i++) {
+		leds_[i] = led_init_led(PIN2PORT(ST_PIN[i]), PIN2NUM(ST_PIN[i]),
+		TURNS_ON_WITH_1);
+	}
+
+	bool newBoolLed = true;
+	for (uint8_t i = 0; i < LED_IN_PV; i++) {
+		if (!leds_[i]) {
+			newBoolLed = false;
+		}
+	}
 
 	idLed1 = led_init_led(PB, 22, TURNS_ON_WITH_0);
 	idLed3 = led_init_led(PB, 21, TURNS_ON_WITH_0);
@@ -126,9 +178,15 @@ bool PVInit(void) {
 		led_set_state(idLed1, LED_OFF);
 		led_set_state(idLed3, LED_OFF);
 		led_set_state(idLed2, LED_OFF);
-
 	}
-	return okLed;
+
+	//timer init
+	timerInit();
+	timer_id = timerGetId();
+	timerStart(timer_id, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC,
+			multiplexLedCallback);
+
+	return (okLed && newBoolLed);
 }
 
 void PVSuscribeEvent(PVEv_t ev, bool state) {
@@ -536,31 +594,25 @@ void PVLedPoll(void) {
 	led_poll();
 }
 
-/*******************************************************************************
- *******************************************************************************
- LOCAL FUNCTION DEFINITIONS
- *******************************************************************************
- ******************************************************************************/
+void PVStatusLedSelect(PVStatus_t led, bool state) {
 
-bool PVLedSelect(PVLed_t led) {
-
-	bool valid = false;
-	switch (led) {
-	case (PV_LED_1):
-		gpioWrite(LED_LINE_A, LOW);
-		gpioWrite(LED_LINE_B, HIGH);
-		break;
-	case (PV_LED_2):
-		gpioWrite(LED_LINE_A, LOW);
-		gpioWrite(LED_LINE_B, HIGH);
-		break;
-	case (PV_LED_3):
-		gpioWrite(LED_LINE_A, HIGH);
-		gpioWrite(LED_LINE_B, HIGH);
-		break;
-	default:
-		valid = false;
-		break;
+	for (uint8_t i = 0; i < LED_IN_PV; i++) {
+		leds_[i] = false;
 	}
-	return valid;
+
+	if ((led == ON_ST_1) || (led == ON_ST_12) || (led == ON_ST_13)
+			|| ON_ST_ALL) {
+		leds_st[0] = state;
+	}
+
+	if ((led == ON_ST_2) || (led == ON_ST_12) || (led == ON_ST_23)
+			|| ON_ST_ALL) {
+		leds_st[1] = state;
+	}
+
+	if ((led == ON_ST_3) || (led == ON_ST_13) || (led == ON_ST_23)
+			|| ON_ST_ALL) {
+		leds_st[2] = state;
+	}
+
 }

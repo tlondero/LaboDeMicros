@@ -42,41 +42,28 @@
 
 static uint8_t br;
 
-void brightUp1(uint8_t b){
-	uint8_t bb = b + 10;
-	if (bb >= 100){
-		bb = 100;
-	}
-	br = bb;
-}
-
-void brightDown1(uint8_t b){
-	uint8_t bb = b - 10;
-	if ((bb > 100) || (bb == 10)){
-		bb = 0;
-	}
-	br = bb;
-}
-
 void PV_tb_Init(void) {
 	PVInit();
 	PVSuscribeEvent(ENC_RIGHT, true);
 	PVSuscribeEvent(ENC_LEFT, true);
-	br = 20;
-	PVLedSetBright(PV_LED_1, br);
-	PVLedOn(PV_LED_1);
+	br = 0;
 }
 
 void PV_tb_Run(void) {
 
 	if (PVCheckEvent()) {
 		if (PVGetEv() == ENC_RIGHT) {
-			brightUp1(br);
-			PVLedSetBright(PV_LED_1, br);
+			br += 5;
+		} else if (PVGetEv() == ENC_LEFT) {
+			br -= 5;
 		}
-		else if (PVGetEv() == ENC_LEFT) {
-			brightDown1(br);
-			PVLedSetBright(PV_LED_1, br);
+
+		if ((br >= 10) && (br <= 20)) {
+			PVStatusLedSelect(ON_ST_1, true);
+		} else if ((br > 20) && (br <= 30)) {
+			PVStatusLedSelect(ON_ST_12, true);
+		} else {
+			PVStatusLedSelect(ON_ST_ALL, true);
 		}
 	}
 

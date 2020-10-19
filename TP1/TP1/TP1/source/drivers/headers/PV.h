@@ -41,6 +41,10 @@ typedef enum {
 	PV_LED_1, PV_LED_2, PV_LED_3, PV_LED_ALL, PV_CANT_COLORS
 } PVLed_t;
 
+typedef enum {
+	ON_ST_1, ON_ST_2, ON_ST_3, ON_ST_12, ON_ST_23, ON_ST_13, ON_ST_ALL
+} PVStatus_t;
+
 typedef enum { PV_RIGHT, PV_LEFT } PVDirection_t;
 
 //typedef enum { IDDLE_ANIMATION, ASK_PIN_ANIMATION, ACCESS_ANIMATION, OPEN_ANIMATION, USERS_ANIMATION, BRIGHTNESS_ANIMATION,INVALID_ID_ANIMATION
@@ -67,54 +71,9 @@ void PVSuscribeEvent(PVEv_t ev, bool state);
 bool PVCheckEvent(void);
 
 /**
- * @brief Get encoder or button event
+ * @brief Sets button IQR
  */
-PVEv_t PVGetEv(void);
-
-/**
- * @brief LED Set brightnes
- */
-bool PVLedSetBright(PVLed_t led, uint8_t value);
-
-/**
- * @brief LED Set fade time
- */
-bool PVLedSetFade(PVLed_t led, uint8_t value);
-
-/**
- * @brief LED Set DT %
- */
-bool PVLedSetDt(PVLed_t led, uint8_t value);
-
-/**
- * @brief LED Set time on
- */
-bool PVLedSetPeriod(PVLed_t led, uint8_t value);
-
-/**
- * @brief LED  Set amounts of flashes (0 = forever)
- */
-bool PVLedSetFlash(PVLed_t led, uint8_t value);
-
-/**
- * @brief LED  Set flash period
- */
-bool PVLedSetTime(PVLed_t led, uint8_t value);
-
-/**
- * @brief LED  Set flash ON
- */
-bool PVLedFlash(PVLed_t led, uint8_t value);
-
-/**
- * @brief LED COLOR SET
- */
-bool PVLedOn(PVLed_t led);
-
-/**
- * @brief Turn off ALL LED (R G B)
- */
-void PVLedOff(PVLed_t led);
+bool PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) ;
 
 /**
  * @brief Poll LED and pwm
@@ -126,10 +85,12 @@ void PVLedPoll(void);
  */
 void PVDisplayClear(void);
 
+void PVMarquesina(uint32_t number_to_display);
+
 /**
- * @brief Sets button IQR
+ * @brief Get encoder or button event
  */
-bool PVButtonIRQ(uint8_t IRQ_mode, pinIrqFun_t fcallback) ;
+PVEv_t PVGetEv(void);
 
 /**
  * @brief Set brightness
@@ -162,10 +123,57 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
 bool PVDisplayShift(PVDirection_t direction);
 
 /**
- * @brief 
+ * @brief
  */
 bool PVAnimation(animation_t animation, bool activate);
-void PVMarquesina(uint32_t number_to_display);
+
+/**
+ * @brief LED Set brightnes
+ */
+bool PVLedSetBright(PVLed_t led, uint8_t value);
+
+/**
+ * @brief LED Set fade time
+ */
+bool PVLedSetFade(PVLed_t led, uint8_t value);
+
+/**
+ * @brief LED Set DT %
+ */
+bool PVLedSetDt(PVLed_t led, uint8_t value);
+
+/**
+ * @brief LED  Set amounts of flashes (0 = forever)
+ */
+bool PVLedSetFlash(PVLed_t led, uint8_t value);
+
+/**
+ * @brief LED Set time on
+ */
+bool PVLedSetPeriod(PVLed_t led, uint8_t value);
+
+/**
+ * @brief LED  Set flash period
+ */
+bool PVLedSetTime(PVLed_t led, uint8_t value);
+
+/**
+ * @brief LED  Set flash ON
+ */
+bool PVLedFlash(PVLed_t led, uint8_t value);
+
+/**
+ * @brief LED COLOR SET
+ */
+bool PVLedOn(PVLed_t led);
+
+/**
+ * @brief Turn off ALL LED (R G B)
+ */
+void PVLedOff(PVLed_t led);
+
+void PVStatusLedSelect(PVStatus_t led, bool state);
+
 /*******************************************************************************
  ******************************************************************************/
 
