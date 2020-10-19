@@ -31,11 +31,11 @@ uint32_t pwr(uint32_t num, uint32_t exp) {
 	return ret;
 }
 
-char* num2str(num){
+char* num2str(uint32_t num){
 	int8_t i;
 	int8_t j;
-	uint32_t id[8];
-	char chars[9];
+	uint32_t id[DIGIT_MAX_LEN];
+	char chars[DIGIT_MAX_LEN+1];
 
 	for (i = DIGIT_MAX_LEN; i > 0 ; i--) {
 		uint32_t aux = 0;
