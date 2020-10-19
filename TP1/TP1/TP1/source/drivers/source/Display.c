@@ -87,7 +87,8 @@ const static character_t characters[] = {
         {'X', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
         {'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
         {'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} },
-		{'-', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW} }
+		{'-', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} },
+		{' ', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW} }
 };
 
 typedef struct {
