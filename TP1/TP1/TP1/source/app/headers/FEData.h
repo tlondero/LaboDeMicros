@@ -35,11 +35,11 @@ typedef struct {
 	void* del_user_ptr;
 }FEData;
 
-extern const char BRIGHTNESS_MSG[4];// = { 'B','R','G','H' };
+/*extern const char BRIGHTNESS_MSG[4];// = { 'B','R','G','H' };
 extern const char OPEN_MSG[4];// = { 'O','P','E','N' };
 extern const char USER_MSG[4];// = { 'U','S','E','R' };
 
-extern const char PASSWORD_MSG[4];// = { 'P','A','S','S' };
-extern const char ADD_USER_MSG[4];// = { 'A','D','D','U' };
-extern const char DEL_USER_MSG[4];// = { 'D','E','L','U' };
+extern const char CLAVE_MSG[4];// = { 'P','A','S','S' };
+extern const char ADD_MSG[4];// = { 'A','D','D','U' };
+extern const char DEL_MSG[4];// = { 'D','E','L','U' };*/
 #endif
