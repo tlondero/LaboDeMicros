@@ -96,7 +96,7 @@ void ButtonSetIRQ(int8_t id, uint8_t IRQ_mode,pinIrqFun_t fcallback);
  */
 
 const ButtonEvent * ButtonGetEvent(int8_t id);
-
+bool ButtonCheckEvent(int8_t id);
 
 /*******************************************************************************
  ******************************************************************************/
