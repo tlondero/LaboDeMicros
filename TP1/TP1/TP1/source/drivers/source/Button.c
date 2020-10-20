@@ -142,5 +142,5 @@ void ButtonsCheck(void) {
 }
 
 bool ButtonCheckEvent(int8_t id){
-	active_buttons[id].new_info;
+	return active_buttons[id].new_info;
 }

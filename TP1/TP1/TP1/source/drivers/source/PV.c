@@ -225,8 +225,6 @@ void PVSuscribeEvent(PVEv_t ev, bool state) {
 }
 
 bool PVCheckEvent(void) {
-	bool button_ev = ButtonCheckEvent(button);
-
 	if ((EncoderEventAVB(idEncoder) == EVENT_AVB)
 			&& (ButtonCheckEvent(button) == true))
 		isEvent = true;
