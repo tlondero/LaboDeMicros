@@ -135,8 +135,8 @@ state FSMInitState(void) {
 	timerStop(open_timer_id);
 
 	//Tengo que activar las interrupciones de cancel y delete
-	FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-	FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+	FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+	FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 	FRDMLedSetFlash(3);
 
 	initUsers();
@@ -223,8 +223,8 @@ state IDDLERoutine(void) {
 		fe_data.id_counter = 0;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
 
@@ -243,6 +243,9 @@ state IDDLERoutine(void) {
 					updated_state = ASK_PIN;
 					fe_data.good_id = true;
 					fe_data.animation_en = false;
+					int i = 0;
+					for( i = 0; i<ID_LEN; i++)
+						encoder_id_digits[i] = card_event[i];
 				}
 			}
 			else {
@@ -332,8 +335,8 @@ state askPinRoutine(void) {
 		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
 
@@ -421,8 +424,8 @@ state accessRoutine(void) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		//desactivar las interrupciones de cancel y del
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_DISABLE, backCallback);
 	}
 
 	if (PVCheckEvent()) {
@@ -521,8 +524,8 @@ state usersRoutine(void) {
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_DISABLE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_DISABLE, backCallback);
 	}
 
 	if (cancel_triggered || back_triggered) {
@@ -648,8 +651,8 @@ state claveRoutine(void) {
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
 
@@ -718,8 +721,8 @@ state addRoutine(void) {
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
 
@@ -850,8 +853,8 @@ state delRoutine(void) {
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 		fe_data.del_user_ptr = (void*)getUsersList();
 		fe_data.del_i = 0;
