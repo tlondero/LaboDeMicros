@@ -5,7 +5,7 @@
  *      Author: Acer
  */
 #include "drivers/headers/button.h"
-#include "drivers/headers/led.h"
+#include "drivers/headers/led_old.h"
 
 typedef struct {
 	uint8_t PORT;
@@ -49,7 +49,7 @@ static int8_t ledid;
 static int8_t buttonid;
 void LED_TB_APP_INIT(void){
 	led_init_driver();
-	ledid = led_init_led(PORTS[5].PORT, PORTS[5].NUM, TURNS_ON_WITH_1);
+	ledid = led_init_led(PORTNUM2PIN(PORTS[5].PORT,PORTS[5].NUM), TURNS_ON_WITH_1);
 	led_configure_brightness(ledid, 0.2);
 	led_configure_dt(ledid, 80);
 	led_configure_flashes(ledid, 3);

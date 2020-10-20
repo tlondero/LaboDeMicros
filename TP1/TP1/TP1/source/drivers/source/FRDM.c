@@ -76,9 +76,9 @@ bool FRDMInit(void) {
 
 	bool okLed = true;
 
-	idLedRed = led_init_led(PB, 22, TURNS_ON_WITH_0);
-	idLedGreen = led_init_led(PE, 26, TURNS_ON_WITH_0);
-	idLedBlue = led_init_led(PB, 21, TURNS_ON_WITH_0);
+	idLedRed = led_init_led(PORTNUM2PIN(PB,22), TURNS_ON_WITH_0);
+	idLedGreen = led_init_led(PORTNUM2PIN(PE,26) , TURNS_ON_WITH_0);
+	idLedBlue = led_init_led(PORTNUM2PIN(PB,21), TURNS_ON_WITH_0);
 
 	if ((idLedRed == -1) || (idLedGreen == -1) || (idLedBlue == -1)) {
 		okLed = false;
