@@ -47,7 +47,7 @@ static const FTM_Pinout_t FTM_PINOUT[FTM_PIN_CANT]={{0,0,0,3,37,0,PA,3},
 							 {0,2,1,4,73,5,PC,3},
 							 {0,3,0,4,76,6,PC,4},
 							 {0,4,0,4,97,7,PD,4},
-							 {0,5,0,4,34,8,PA,0},
+							 {0,5,0,3,34,8,PA,0}, //{0,5,0,4,34,8,PA,0},
 							 {0,5,1,4,98,9,PD,5},
 							 {0,6,0,3,35,10,PA,1},
 							 {0,6,1,4,99,11,PD,6},
@@ -250,7 +250,6 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 				break;
 			}
 
-			FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | (1<<channel);//LDOK enable CH para escribir en los buffers de MOD, CNTIN y CNV
 			UserPCR.PCR = false; // seteo en falso por default
 			UserPCR.FIELD.DSE = true; //Drive Streght Enable
 			UserPCR.FIELD.MUX = mux; // pongo la alterniativa de mux de mi flex timer (guardado en la tabla predefinida)
@@ -258,6 +257,7 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 			PORT_Configure2(port_ptr, num, UserPCR);
 		}
 
+		FTM_POINTERS[module]->PWMLOAD = FTM_PWMLOAD_LDOK_MASK | (1<<channel);//LDOK enable CH para escribir en los buffers de MOD, CNTIN y CNV
 		/*
 		 * INICIALIZACION POR CANAL
 		 */

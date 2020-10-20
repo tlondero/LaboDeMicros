@@ -239,7 +239,7 @@ bool PVInit(void) {
 	timer_id_mrq = timerGetId();
 	timer_open_st = timerGetId();
 
-	timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC,
+	timerStart(timer_open_st, TIMER_MS2TICKS((5)), TIM_MODE_PERIODIC,
 			open_animation_Callback);
 	timerStop(timer_open_st);
 
