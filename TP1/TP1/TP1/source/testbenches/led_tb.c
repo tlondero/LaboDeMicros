@@ -55,7 +55,7 @@ void LED_TB_APP_INIT(void){
 	led_configure_flashes(ledid, 3);
 	led_configure_period(ledid, 150);
 	led_configure_time(ledid, 100);
-	buttonid = ButtonInit(PORTNUM2PIN(PA, 4), INPUT_PULLUP);
+	buttonid = ButtonInit(PORTNUM2PIN(PA, 4), INPUT_PULLUP,LOW_WHEN_PRESSED);
 }
 
 void LED_TB_APP_RUN(void){

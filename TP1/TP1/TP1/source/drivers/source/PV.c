@@ -100,15 +100,20 @@ void dispShowText(void) {
 	switch (dir) {
 	case (PV_LEFT):
 		countMess++;
+		if ((countMess + SEV_SEG) > length) {
+			countMess = 0;
+		}
 		break;
 	case (PV_RIGHT):
 		countMess--;
+		if ((countMess - SEV_SEG) < 0) {
+			countMess = length - SEV_SEG;
+		}
 		break;
 	case (PV_NODIR):
 		dir = PV_NODIR;
 		break;
 	}
-
 }
 
 void open_animation_Callback(void) {
@@ -357,6 +362,7 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 		message[0] = '\0';
 		length = 0;
 		countMess = 0;
+		dir = PV_NODIR;
 	}
 
 	bool valid = false;
@@ -369,7 +375,7 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 	return valid;
 }
 
-bool PVMarquesina(char * mess) {
+bool PVMarquesina(char *mess) {
 	bool valid = true;
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {

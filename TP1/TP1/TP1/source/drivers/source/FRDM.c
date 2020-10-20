@@ -52,6 +52,8 @@ static bool ledOn;
 static bool ledFlash;
 static uint8_t lastColor;
 
+static bool eventOnSW2;
+
 static bool isEvent = false;
 static FRDMEv_t event = NO_FRDM_EV;
 static uint8_t listEv[NO_FRDM_EV] = { 0 };
@@ -64,23 +66,23 @@ static uint8_t listEv[NO_FRDM_EV] = { 0 };
 
 bool FRDMInit(void) {
 	//Button Init
-	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
-	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
+	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP, LOW_WHEN_PRESSED);
+	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP, LOW_WHEN_PRESSED);
 
 	isEvent = false;
 	ledFlash = false;
 	event = NO_FRDM_EV;
+
+	eventOnSW2 = false;
 
 	//Led init
 	led_init_driver();
 
 	bool okLed = true;
 
-
-	idLedRed = led_init_led(PORTNUM2PIN(PB,22), TURNS_ON_WITH_0);
-	idLedGreen = led_init_led(PORTNUM2PIN(PE,26) , TURNS_ON_WITH_0);
-	idLedBlue = led_init_led(PORTNUM2PIN(PB,21), TURNS_ON_WITH_0);
-
+	idLedRed = led_init_led(PORTNUM2PIN(PB, 22), TURNS_ON_WITH_0);
+	idLedGreen = led_init_led(PORTNUM2PIN(PE, 26), TURNS_ON_WITH_0);
+	idLedBlue = led_init_led(PORTNUM2PIN(PB, 21), TURNS_ON_WITH_0);
 
 	if ((idLedRed == -1) || (idLedGreen == -1) || (idLedBlue == -1)) {
 		okLed = false;
@@ -343,9 +345,29 @@ void FRDMSuscribeEvent(FRDMEv_t ev, bool state) {
 }
 
 bool FRDMCheckEvent(void) {
-	ButtonEvent ev = *ButtonGetEvent(sw2);
-	ButtonEvent ev2 = *ButtonGetEvent(sw3);
-	if ((ev != NO_EV) && (ev != EOQ)) {
+
+	if (ButtonCheckEvent(sw2) || ButtonCheckEvent(sw2)) {
+		isEvent = true;
+
+	} else {
+		isEvent = false;
+	}
+	return isEvent;
+}
+
+FRDMEv_t FRDMGetEv(void) {
+
+	ButtonEvent ev;
+
+	if (isEvent){
+		if (eventOnSW2){
+			ev = *ButtonGetEvent(sw2);
+		} else {
+			ev = *ButtonGetEvent(sw3);
+		}
+	}
+
+	if ((ev != NO_EV) && (ev != EOQ) && eventOnSW2) {
 		if ((ev == PRESS) && (listEv[PRESS_SW2])) {
 			event = PRESS_SW2;
 		} else if ((ev == RELEASE) && (listEv[RELEASE_SW2])) {
@@ -358,14 +380,14 @@ bool FRDMCheckEvent(void) {
 			event = NO_FRDM_EV;
 		}
 
-	} else if ((ev2 != NO_EV) && (ev2 != EOQ)) {
-		if ((ev2 == PRESS) && (listEv[PRESS_SW3])) {
+	} else if ((ev != NO_EV) && (ev != EOQ) && !eventOnSW2) {
+		if ((ev == PRESS) && (listEv[PRESS_SW3])) {
 			event = PRESS_SW3;
-		} else if ((ev2 == RELEASE) && (listEv[RELEASE_SW3])) {
+		} else if ((ev == RELEASE) && (listEv[RELEASE_SW3])) {
 			event = RELEASE_SW3;
-		} else if ((ev2 == LKP) && (listEv[LKP_SW3])) {
+		} else if ((ev == LKP) && (listEv[LKP_SW3])) {
 			event = LKP_SW3;
-		} else if ((ev2 == SKP) && (listEv[SKP_SW3])) {
+		} else if ((ev == SKP) && (listEv[SKP_SW3])) {
 			event = SKP_SW3;
 		} else {
 			event = NO_FRDM_EV;
@@ -374,15 +396,8 @@ bool FRDMCheckEvent(void) {
 		event = NO_FRDM_EV;
 	}
 
-	if (event != NO_FRDM_EV) {
-		isEvent = true;
-	} else {
-		isEvent = false;
-	}
-	return isEvent;
-}
+	eventOnSW2 = false;
 
-FRDMEv_t FRDMGetEv(void) {
 	return event;
 }
 

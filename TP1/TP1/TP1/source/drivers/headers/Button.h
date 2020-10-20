@@ -22,7 +22,8 @@
 #define BUTTON_REFRESH_PERIOD 100
 //THIS TRESHOLDS ARE NOT IN MS
 //THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD
-
+#define HIGH_WHEN_PRESSED 1
+#define LOW_WHEN_PRESSED 0
 
 
 #define LKP_THRESHOLD 50
@@ -64,7 +65,7 @@ typedef uint8_t ButtonEvent ;//instant events such as PRESS and RELEASE
  * @return  the ID for the switch -1 if the you reached the max switches
  */
 
-int8_t ButtonInit(pin_t pin ,uint8_t mode);
+int8_t ButtonInit(pin_t pin ,uint8_t mode, uint8_t active_low_or_high);
 
 /**
  * @brief  ButtonSetIRQ: if you desire to use a dedicated interruption
@@ -95,7 +96,7 @@ void ButtonSetIRQ(int8_t id, uint8_t IRQ_mode,pinIrqFun_t fcallback);
  */
 
 const ButtonEvent * ButtonGetEvent(int8_t id);
-
+bool ButtonCheckEvent(int8_t id);
 
 /*******************************************************************************
  ******************************************************************************/
