@@ -55,7 +55,7 @@ void FTM_TB_APP_INIT(void){
 	data.PSC = FTM_PSC_x1;
 	ftmid = FTMInit(PORTS[10].PORT, PORTS[10].NUM, data);
 
-	buttonid = ButtonInit(PORTNUM2PIN(PA, 4), INPUT_PULLUP);
+	buttonid = ButtonInit(PORTNUM2PIN(PA, 4), INPUT_PULLUP,LOW_WHEN_PRESSED);
 }
 
 void FTM_TB_APP_RUN(void){
