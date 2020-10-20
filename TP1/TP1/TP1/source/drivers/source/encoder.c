@@ -153,11 +153,9 @@ event_t EncoderPopEvent(encoder_id id)
 		event_t ev;
 		ev = encoders[id].event_queue[encoders[id].out_pointer];
 		encoders[id].out_pointer = (++encoders[id].out_pointer) % (LEN(encoders[id].event_queue));
-
+		if(encoders[id].out_pointer == encoders[id].in_pointer){
+			encoders[id].event_flag = EVENT_NOT_AVB;
+		}
 		return ev;
-	}
-	else
-	{
-		encoders[id].event_flag = EVENT_NOT_AVB;
 	}
 }

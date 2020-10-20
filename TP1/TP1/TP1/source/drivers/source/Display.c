@@ -234,3 +234,5 @@ void multiplexDiplayCallback(void) {
 	}
 	i++;
 }
+
+void dispBrightness(uint8_t brightness){}

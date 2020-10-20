@@ -147,7 +147,7 @@ state FSMInitState(void) {
 	fe_data.id_data = &encoder_id_digits[0];
 	fe_data.pin_data = &encoder_pin_digits[0];
 	//me suscribo a los eventos de encoder
-	PVSuscribeEvent(BTN_PRESS, true);
+	//PVSuscribeEvent(BTN_PRESS, true);
 	PVSuscribeEvent(ENC_LEFT, true);
 	PVSuscribeEvent(ENC_RIGHT, true);
 	return IDDLE;

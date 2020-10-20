@@ -19,7 +19,7 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define	PV_BUTTON		PORTNUM2PIN(PB,20)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define	PV_BUTTON		PORTNUM2PIN(PB,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -220,19 +220,31 @@ void PVSuscribeEvent(PVEv_t ev, bool state) {
 }
 
 bool PVCheckEvent(void) {
+	bool button_ev = ButtonCheckEvent(button);
 
-	if (EncoderEventAVB(idEncoder)) {
-		event_t ev = EncoderPopEvent(idEncoder);
-		if ((ev == RIGHT_TURN) && (listEv[ENC_RIGHT])) {
-			event = ENC_RIGHT;
-		} else if ((ev == LEFT_TURN) && (listEv[ENC_LEFT])) {
-			event = ENC_LEFT;
-		} else {
-			event = NO_PV_EV;
-		}
-	} else {
+	if ((EncoderEventAVB(idEncoder) == EVENT_AVB)
+			&& (ButtonCheckEvent(button) == true))
+		isEvent = true;
+	else
+		isEvent = false;
+
+	return isEvent;
+}
+
+PVEv_t PVGetEv(void) {
+	if (isEvent == true) {
 		uint8_t btnev = *ButtonGetEvent(button);
-		if ((btnev != NO_EV) && (btnev != EOQ)) {
+
+		if (EncoderEventAVB(idEncoder)) {
+			event_t ev = EncoderPopEvent(idEncoder);
+			if ((ev == RIGHT_TURN) && (listEv[ENC_RIGHT])) {
+				event = ENC_RIGHT;
+			} else if ((ev == LEFT_TURN) && (listEv[ENC_LEFT])) {
+				event = ENC_LEFT;
+			} else {
+				event = NO_PV_EV;
+			}
+		} else if ((btnev != NO_EV) && (btnev != EOQ)) {
 			if ((btnev == PRESS) && (listEv[BTN_PRESS])) {
 				event = BTN_PRESS;
 			} else if ((btnev == RELEASE) && (listEv[BTN_RELEASE])) {
@@ -247,16 +259,10 @@ bool PVCheckEvent(void) {
 				event = NO_PV_EV;
 			}
 		}
-	}
-	if (event != NO_PV_EV) {
-		isEvent = true;
 	} else {
-		isEvent = false;
+		event = NO_PV_EV;
 	}
-	return isEvent;
-}
 
-PVEv_t PVGetEv(void) {
 	return event;
 }
 
