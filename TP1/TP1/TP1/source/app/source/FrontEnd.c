@@ -66,11 +66,12 @@ void drawFrontEnd(FEData data, state st) {
 			}
 		} else if (data.bad_id) {
 			FRDMLedFlash(RED); //aca le digo que titile 3 veces rojo
-		} else if (data.good_id) {
-			FRDMLedFlash(GREEN); //aca le digo que titile 3 veces verde
 		}
 		break;
 	case ASK_PIN:
+		if (data.good_id) {
+			FRDMLedFlash(BLUE); //aca le digo que titile 3 veces verde
+		}
 		if ((!data.good_pin) && (!data.bad_pin)) {
 			for (i = 0; i < 4; i++) {
 				if (data.pin_counter > 3) {
@@ -78,19 +79,16 @@ void drawFrontEnd(FEData data, state st) {
 						PVDisplaySendChar('-', i);
 					else
 						PVDisplaySendChar(
-								data.pin_data[data.pin_counter - 3 + i] + '0',
-								i);
+								data.pin_data[data.pin_counter - 3 + i] + '0', i);
 				} else {
-					if (i < 3)
-						PVDisplaySendChar('-', i);
-					else
+					if (i <= 3 && i == data.pin_counter)
 						PVDisplaySendChar(data.pin_data[i] + '0', i);
+					else
+						PVDisplaySendChar('-', i);
 				}
 			}
 		} else if (data.bad_pin) {
 			FRDMLedFlash(RED);	//aca le digo que titile 3 veces rojo
-		} else if (data.good_pin) {
-			FRDMLedFlash(GREEN);	//aca le digo que titile 3 veces verde
 		}
 		for (i = 0; i < getStrikes(transformToNum(data.pin_data, PIN_LEN));
 				i++) {
@@ -101,6 +99,10 @@ void drawFrontEnd(FEData data, state st) {
 		}
 		break;
 	case ACCESS:
+		if (data.good_pin) {
+			FRDMLedFlash(GREEN);	//aca le digo que titile 3 veces verde
+		}
+
 		if (data.animation_en) {
 			switch (data.animation_opt) {
 			case OPEN_ANIMATION:

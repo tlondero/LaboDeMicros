@@ -378,8 +378,9 @@ state askPinRoutine(void) {
 
 			break;
 		case BTN_PRESS:
-			if (fe_data.pin_counter < PIN_LEN) {
+			if (fe_data.pin_counter < PIN_LEN-1) {
 				fe_data.pin_counter++;
+				actual_encoder_number = 0;
 			}
 			else {
 				if (checkPassword(transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN))) {
