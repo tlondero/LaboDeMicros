@@ -89,7 +89,7 @@ void PVLedPoll(void);
  */
 void PVDisplayClear(void);
 
-void PVMarquesina(char * number_to_display);
+bool PVMarquesina(char * mess);
 
 bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
 
