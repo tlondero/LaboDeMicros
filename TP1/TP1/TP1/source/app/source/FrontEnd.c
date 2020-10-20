@@ -125,7 +125,22 @@ void drawFrontEnd(FEData data, state st) {
 
 		break;
 	case USERS:
-//TODO
+		if (data.animation_en) {
+			switch (data.animation_opt) {
+			case CLAVE_SELECTED_ANIMATION:
+				for (i = 0; i < 4; i++)
+					PVDisplaySendChar(CLAVE_MSG[i], i);
+				break;
+			case ADD_SELECTED_ANIMATION:
+				for (i = 0; i < 4; i++)
+					PVDisplaySendChar(ADD_MSG[i], i);
+				break;
+			case DEL_SELECTED_ANIMATION:
+				for (i = 0; i < 4; i++)
+					PVDisplaySendChar(DEL_MSG[i], i);
+				break;
+			}
+		}
 		break;
 	case BRIGHTNESS:
 		for (i = 0; i < 4; i++)
@@ -187,10 +202,10 @@ void drawFrontEnd(FEData data, state st) {
 /*******************************************************************************
  * FUNCTION DEFINITION WITH FILE SCOPE
  ******************************************************************************/
-const char BRIGHTNESS_MSG[4];			// = { 'B','R','G','H' };
-const char OPEN_MSG[4];			// = { 'O','P','E','N' };
-const char USER_MSG[4];			// = { 'U','S','E','R' };
+const char BRIGHTNESS_MSG[4] = { 'B','R','G','H' };
+const char OPEN_MSG[4] = { 'O','P','E','N' };
+const char USER_MSG[4] = { 'U','S','E','R' };
 
-const char PASSWORD_MSG[4];			// = { 'P','A','S','S' };
-const char ADD_USER_MSG[4];			// = { 'A','D','D','U' };
-const char DEL_USER_MSG[4];			// = { 'D','E','L','U' };
+const char PASSWORD_MSG[4] = { 'P','A','S','S' };
+const char ADD_USER_MSG[4] = { ' ','A','D','D' };
+const char DEL_USER_MSG[4] = { ' ','D','E','L' };

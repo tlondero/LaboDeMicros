@@ -505,7 +505,7 @@ state usersRoutine(void) {
 	static uint8_t selection=USERS_CLAVE_SEL;
 
 	if (prev_state != USERS) {
-		fe_data.animation_en = false;
+		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
 		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
@@ -532,7 +532,6 @@ state usersRoutine(void) {
 					selection = USERS_DEL_SEL;
 				else
 					selection--;
-				fe_data.animation_en = true;
 				switch (selection) {
 				case USERS_CLAVE_SEL :
 					fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
@@ -553,7 +552,6 @@ state usersRoutine(void) {
 					selection = USERS_CLAVE_SEL;
 				else
 					selection++;
-				//fe_data.animation_en = true;
 				switch (selection) {
 				case USERS_CLAVE_SEL:
 					fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
