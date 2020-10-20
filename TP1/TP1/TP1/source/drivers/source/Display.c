@@ -29,19 +29,21 @@
 
  ***********************/
 
-#define PIN_A PORTNUM2PIN(PC,9) //NEGRO
-#define PIN_B PORTNUM2PIN(PC, 8) //BLANCO
-#define PIN_C PORTNUM2PIN(PC, 1) //GRIS
-#define PIN_D PORTNUM2PIN(PB, 19) //VIOLETA
+#define PIN_A PORTNUM2PIN(PC, 1) //NEGRO
+#define PIN_B PORTNUM2PIN(PC, 3) //BLANCO
+#define PIN_C PORTNUM2PIN(PC, 16) //GRIS
+#define PIN_D PORTNUM2PIN(PA, 1) //VIOLETA
 #define PIN_E PORTNUM2PIN(PB, 18)  //AZUL
-#define PIN_F PORTNUM2PIN(PC, 3) //VERDE
-#define PIN_G PORTNUM2PIN(PC, 4)		//AMARILLO
-#define PIN_DOT PORTNUM2PIN(PA, 0) //NARANJA
+#define PIN_F PORTNUM2PIN(PD, 0) //VERDE
+#define PIN_G PORTNUM2PIN(PD, 3)        //AMARILLO
+#define PIN_DOT PORTNUM2PIN(PC, 9) //NARANJA
 
 #define SEL_LINE_A PORTNUM2PIN(PC,0)			//MARRON (ESTA EN FRENTE)
 #define SEL_LINE_B PORTNUM2PIN(PA,2)           //ROJO
 
 #define SEVEN_SEGMENTS_PINS 8
+
+#define REFRESH_RATE 5//ms
 const uint8_t PINES[SEVEN_SEGMENTS_PINS] = { PIN_A, PIN_B, PIN_C, PIN_D, PIN_E,
 PIN_F, PIN_G, PIN_DOT };
 
@@ -61,9 +63,9 @@ const static character_t characters[] = {
 		{'5', { HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
 		{'6', { HIGH, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
 		{'7', { HIGH, HIGH, HIGH, LOW, LOW, LOW, LOW, LOW} },
-		{'8', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH} },
+		{'8', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
 		{'9', { HIGH, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
-		{'A', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW, LOW} },
+		{'A', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
         {'B', {LOW, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},
         {'C', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
         {'D', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, HIGH, LOW} },
@@ -77,7 +79,7 @@ const static character_t characters[] = {
         {'L', {LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
         {'M', {HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW, LOW} },
         {'N', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW, LOW} },
-        {'O', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+        {'O', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
         {'P', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
         {'Q', {HIGH, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
         {'R', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
@@ -144,6 +146,7 @@ void dispInit(void) {
 	for (i = 0; i < SEVEN_SEGMENTS_PINS; i++) {
 		//gpioMode(PINES[i], OUTPUT);
 		seven_segment_id[i] = led_init_led(PINES[i], TURNS_ON_WITH_1);
+		//led_configure_brightness(seven_segment_id[i], 10);
 	}
 
 	gpioMode(SEL_LINE_A, OUTPUT);
@@ -152,7 +155,7 @@ void dispInit(void) {
 	gpioWrite(SEL_LINE_B, LOW);
 	timerInit();
 	timer_id = timerGetId();
-	timerStart(timer_id, TIMER_MS2TICKS(5000), TIM_MODE_PERIODIC,
+	timerStart(timer_id, TIMER_MS2TICKS(REFRESH_RATE), TIM_MODE_PERIODIC,
 			multiplexDiplayCallback);
 	//Cada 15 ms se multiplexea el display ~ cada uno aprox 50fps
 }
@@ -226,8 +229,8 @@ void multiplexDiplayCallback(void) {
 
 	static uint8_t i = 0;
 	if (displays[i % 4].enable) {
-		dispSelect(i % 4);
 		dispSetChar(displays[(i) % 4].ch);
+		dispSelect(i % 4);
 	}
 	i++;
 }
