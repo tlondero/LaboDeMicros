@@ -47,18 +47,21 @@ void PV_tb_Init(void) {
 	PVSuscribeEvent(ENC_RIGHT, true);
 	PVSuscribeEvent(ENC_LEFT, true);
 	br = 0;
-}
-
-void PV_tb_Run(void) {
-
 	/*
 	//PVDisplaySetTime(1000);
 	PVDispSetMess("Esto no funciona ni a ganchos");
 	PVDisplaySetShift(PV_RIGHT);
-	PVDispMessShiftOn();
 	*/
+	PVDisplaySendChar('8', 0);
+}
+
+void PV_tb_Run(void) {
+
+	//PVDispMessOn();
 
 
+
+	/*
 	if (PVCheckEvent()) {
 		if (PVGetEv() == ENC_RIGHT) {
 			br += 5;
@@ -66,10 +69,9 @@ void PV_tb_Run(void) {
 			br -= 5;
 		}
 
-		if (br <= 10){
+		if (br <= 10) {
 			PVStatusLedSelect(ON_ST_OFF, false);
-		}
-		else if ((br > 10) && (br <= 20)) {
+		} else if ((br > 10) && (br <= 20)) {
 			PVStatusLedSelect(ON_ST_1, true);
 		} else if ((br > 20) && (br <= 30)) {
 			PVStatusLedSelect(ON_ST_2, true);
@@ -77,6 +79,7 @@ void PV_tb_Run(void) {
 			PVStatusLedSelect(ON_ST_3, true);
 		}
 	}
+	*/
 
 	PVLedPoll();
 
