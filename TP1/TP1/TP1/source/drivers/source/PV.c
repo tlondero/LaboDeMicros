@@ -49,6 +49,7 @@ const uint8_t ST_PIN[DEC_IN_PV] = { LED_LINE_A, LED_LINE_B };
 //Button
 static PVButton_t button;
 static PVEncoder_t idEncoder;
+static bool button_is_pressed  = false;
 
 static bool isEvent = false;
 static PVEv_t event = NO_PV_EV;
@@ -135,7 +136,9 @@ uint8_t checkMessageLength(char *mes) {
 	}
 	return i + 1;
 }
-
+void PVButtonPressedCallback(void){
+	button_is_pressed = true;
+}
 /*******************************************************************************
  *******************************************************************************
  GLOBAL FUNCTION DEFINITIONS
@@ -145,8 +148,8 @@ uint8_t checkMessageLength(char *mes) {
 bool PVInit(void) {
 
 	//Button init
-	button = ButtonInit(PV_BUTTON, INPUT_PULLUP, HIGH_WHEN_PRESSED);
-
+	button = ButtonInit(PV_BUTTON, INPUT_PULLUP, LOW_WHEN_PRESSED);
+	ButtonSetIRQ(button, GPIO_IRQ_MODE_FALLING_EDGE, PVButtonPressedCallback);
 	//Encoder init
 	idEncoder = EncoderRegister(PIN_C2_EN, PIN_C7_EN);
 
@@ -225,8 +228,7 @@ void PVSuscribeEvent(PVEv_t ev, bool state) {
 }
 
 bool PVCheckEvent(void) {
-	if ((EncoderEventAVB(idEncoder) == EVENT_AVB)
-			&& (ButtonCheckEvent(button) == true))
+	if ((button_is_pressed == true) || (EncoderEventAVB(idEncoder) == EVENT_AVB))
 		isEvent = true;
 	else
 		isEvent = false;
@@ -236,7 +238,6 @@ bool PVCheckEvent(void) {
 
 PVEv_t PVGetEv(void) {
 	if (isEvent == true) {
-		uint8_t btnev = *ButtonGetEvent(button);
 
 		if (EncoderEventAVB(idEncoder)) {
 			event_t ev = EncoderPopEvent(idEncoder);
@@ -247,20 +248,9 @@ PVEv_t PVGetEv(void) {
 			} else {
 				event = NO_PV_EV;
 			}
-		} else if ((btnev != NO_EV) && (btnev != EOQ)) {
-			if ((btnev == PRESS) && (listEv[BTN_PRESS])) {
-				event = BTN_PRESS;
-			} else if ((btnev == RELEASE) && (listEv[BTN_RELEASE])) {
-				event = BTN_RELEASE;
-			} else if ((btnev == LKP) && (listEv[BTN_LKP])) {
-				event = BTN_LKP;
-			} else if ((btnev == SKP) && (listEv[BTN_SKP])) {
-				event = BTN_SKP;
-			} else if ((btnev == NO_EV) && (listEv[NO_PV_EV])) {
-				event = NO_PV_EV;
-			} else {
-				event = NO_PV_EV;
-			}
+		} else if (button_is_pressed == true) {
+			event = BTN_PRESS;
+			button_is_pressed = false;
 		}
 	} else {
 		event = NO_PV_EV;
