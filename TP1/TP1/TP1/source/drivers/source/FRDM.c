@@ -381,13 +381,13 @@ FRDMEv_t FRDMGetEv(void) {
 		}
 
 	} else if ((ev != NO_EV) && (ev != EOQ) && !eventOnSW2) {
-		if ((ev2 == PRESS) && (listEv[PRESS_SW3])) {
+		if ((ev == PRESS) && (listEv[PRESS_SW3])) {
 			event = PRESS_SW3;
-		} else if ((ev2 == RELEASE) && (listEv[RELEASE_SW3])) {
+		} else if ((ev == RELEASE) && (listEv[RELEASE_SW3])) {
 			event = RELEASE_SW3;
-		} else if ((ev2 == LKP) && (listEv[LKP_SW3])) {
+		} else if ((ev == LKP) && (listEv[LKP_SW3])) {
 			event = LKP_SW3;
-		} else if ((ev2 == SKP) && (listEv[SKP_SW3])) {
+		} else if ((ev == SKP) && (listEv[SKP_SW3])) {
 			event = SKP_SW3;
 		} else {
 			event = NO_FRDM_EV;
