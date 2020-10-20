@@ -20,7 +20,6 @@
 #define NO_FADE 0
 #define LED_NO_SPACE -1
 #define MAX_LEDS 16
-#define DEVELOPMENT_MODEE 1
 
 #define LED_ON 1
 #define LED_OFF 0
