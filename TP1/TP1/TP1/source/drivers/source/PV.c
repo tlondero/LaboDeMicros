@@ -204,9 +204,16 @@ bool PVInit(void) {
 		gpioWrite(ST_PIN[i], LOW);
 	}
 
-	idLed[0] = led_init_led(PB, 22, TURNS_ON_WITH_0);
-	idLed[2] = led_init_led(PB, 21, TURNS_ON_WITH_0);
-	idLed[1] = led_init_led(PE, 26, TURNS_ON_WITH_0);
+	//PORTNUM2PIN(p,n)
+	idLed[0] = led_init_led(PORTNUM2PIN(PB, 22), TURNS_ON_WITH_0);
+	idLed[2] = led_init_led(PORTNUM2PIN(PB, 21), TURNS_ON_WITH_0);
+	idLed[1] = led_init_led(PORTNUM2PIN(PE, 26), TURNS_ON_WITH_0);
+
+	/*
+	 idLed[0] = led_init_led(PB, 22, TURNS_ON_WITH_0);
+	 idLed[2] = led_init_led(PB, 21, TURNS_ON_WITH_0);
+	 idLed[1] = led_init_led(PE, 26, TURNS_ON_WITH_0);
+	 */
 
 	if ((idLed[0] == -1) || (idLed[1] == -1) || (idLed[2] == -1)) {
 		okLed = false;
@@ -230,7 +237,7 @@ bool PVInit(void) {
 			led_configure_flashes(idLed[i], flashes);
 			led_configure_period(idLed[i], period);
 
-			led_set_state(idLed[i], LED_OFF);
+			led_set_state(idLed[i], LOW);
 		}
 	}
 
@@ -463,7 +470,6 @@ bool PVDispMessOn(void) {
 
 	return valid;
 }
-
 
 bool PVDisplaySetShift(PVDirection_t direction) {
 
@@ -715,17 +721,17 @@ bool PVLedOn(PVLed_t led) {
 	bool valid = false;
 	switch (led) {
 	case (PV_LED_1):
-		led_set_state(idLed[0], LED_ON);
+		led_set_state(idLed[0], HIGH);
 		break;
 	case (PV_LED_2):
-		led_set_state(idLed[1], LED_ON);
+		led_set_state(idLed[1], HIGH);
 		break;
 	case (PV_LED_3):
-		led_set_state(idLed[2], LED_ON);
+		led_set_state(idLed[2], HIGH);
 		break;
 	case (PV_LED_ALL):
 		for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
-			led_set_state(idLed[i], LED_ON);
+			led_set_state(idLed[i], HIGH);
 		}
 		break;
 	default:
@@ -738,17 +744,17 @@ bool PVLedOn(PVLed_t led) {
 void PVLedOff(PVLed_t led) {
 	switch (led) {
 	case (PV_LED_1):
-		led_set_state(idLed[0], LED_OFF);
+		led_set_state(idLed[0], LOW);
 		break;
 	case (PV_LED_2):
-		led_set_state(idLed[1], LED_OFF);
+		led_set_state(idLed[1], LOW);
 		break;
 	case (PV_LED_3):
-		led_set_state(idLed[2], LED_OFF);
+		led_set_state(idLed[2], LOW);
 		break;
 	case (PV_LED_ALL):
 		for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
-			led_set_state(idLed[i], LED_OFF);
+			led_set_state(idLed[i], LOW);
 		}
 		break;
 	default:
