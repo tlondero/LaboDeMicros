@@ -312,4 +312,5 @@ void led_poll(void){
 			}
 		}
 	}
+	pwm_poll();
 }

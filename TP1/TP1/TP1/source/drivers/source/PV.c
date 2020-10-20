@@ -70,7 +70,7 @@ static uint32_t mrqtime = 1000;
 //Timers
 static tim_id_t timer_open_st;
 static tim_id_t timer_id_mrq;
-
+static tim_id_t timer_id_button; //Para evitar rebotes
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
@@ -136,9 +136,17 @@ uint8_t checkMessageLength(char *mes) {
 	}
 	return i + 1;
 }
+
 void PVButtonPressedCallback(void){
-	button_is_pressed = true;
+	if(timerExpired(timer_id_button))
+	{
+		button_is_pressed = true;
+		timerReset(timer_id_button);
+	}else{
+		button_is_pressed = false;
+	}
 }
+
 /*******************************************************************************
  *******************************************************************************
  GLOBAL FUNCTION DEFINITIONS
@@ -148,6 +156,9 @@ void PVButtonPressedCallback(void){
 bool PVInit(void) {
 
 	//Button init
+	timer_id_button = timerGetId();
+	timerStart(timer_id_button, 200, TIM_MODE_SINGLESHOT, NULL);
+
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP, LOW_WHEN_PRESSED);
 	ButtonSetIRQ(button, GPIO_IRQ_MODE_FALLING_EDGE, PVButtonPressedCallback);
 	//Encoder init

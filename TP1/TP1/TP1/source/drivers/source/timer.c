@@ -25,7 +25,7 @@
 #error Las frecuencias no coinciden!!
 #endif // TIMER_TICK_MS != (1000U/SYSTICK_ISR_FREQUENCY_HZ)
 
-#define TIMERS_MAX_CANT 16
+#define TIMERS_MAX_CANT 35
 
 #define TIMER_RUNNING 1
 #define TIMER_STOPED 0

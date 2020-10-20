@@ -293,6 +293,7 @@ state IDDLERoutine(void) {
 			case BTN_PRESS:
 				if (fe_data.id_counter < ID_LEN-1) {
 					fe_data.id_counter++;
+					actual_encoder_number = 0;
 				}
 				else {
 					if (checkExistance(transformToNum(&encoder_id_digits[0], ID_LEN))) {

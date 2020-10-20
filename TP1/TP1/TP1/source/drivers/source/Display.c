@@ -146,7 +146,7 @@ void dispInit(void) {
 	for (i = 0; i < SEVEN_SEGMENTS_PINS; i++) {
 		//gpioMode(PINES[i], OUTPUT);
 		seven_segment_id[i] = led_init_led(PINES[i], TURNS_ON_WITH_1);
-		//led_configure_brightness(seven_segment_id[i], 10);
+		led_configure_brightness(seven_segment_id[i], 99);
 	}
 
 	gpioMode(SEL_LINE_A, OUTPUT);

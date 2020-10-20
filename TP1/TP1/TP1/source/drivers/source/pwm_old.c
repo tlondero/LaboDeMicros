@@ -16,6 +16,8 @@ static uint8_t INITIALIZED_PWMS[MAX_PWMS];
 static pwm_t PWMS[MAX_PWMS];
 static uint8_t init;
 
+
+
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE
  ******************************************************************************/

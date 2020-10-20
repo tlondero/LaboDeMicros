@@ -73,6 +73,12 @@ void pwm_unquery(int8_t id, uint8_t final_state);
  * the queried pwms.
  */
 void pwm_poll(void);
+
+/**
+ * @brief
+ *
+ */
+void pwm_destroy(uint8_t pwm_id);
 /*******************************************************************************
  ******************************************************************************/
 

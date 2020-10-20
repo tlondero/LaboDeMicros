@@ -9,6 +9,7 @@ typedef enum {
 } animation_t;
 
 typedef struct {
+
 	animation_t animation_opt;
 	bool animation_en;
 
