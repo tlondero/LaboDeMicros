@@ -76,9 +76,11 @@ bool FRDMInit(void) {
 
 	bool okLed = true;
 
+
 	idLedRed = led_init_led(PORTNUM2PIN(PB,22), TURNS_ON_WITH_0);
 	idLedGreen = led_init_led(PORTNUM2PIN(PE,26) , TURNS_ON_WITH_0);
 	idLedBlue = led_init_led(PORTNUM2PIN(PB,21), TURNS_ON_WITH_0);
+
 
 	if ((idLedRed == -1) || (idLedGreen == -1) || (idLedBlue == -1)) {
 		okLed = false;
@@ -112,9 +114,9 @@ bool FRDMInit(void) {
 		led_configure_flashes(idLedGreen, flashes);
 		led_configure_period(idLedGreen, period);
 
-		led_set_state(idLedRed, LED_OFF);
-		led_set_state(idLedBlue, LED_OFF);
-		led_set_state(idLedGreen, LED_OFF);
+		led_set_state(idLedRed, LOW);
+		led_set_state(idLedBlue, LOW);
+		led_set_state(idLedGreen, LOW);
 
 	}
 	return okLed;
@@ -133,9 +135,9 @@ void FRDMToggleOnOff(void) {
 }
 
 void FRDMLedOff(void) {
-	led_set_state(idLedRed, LED_OFF);
-	led_set_state(idLedBlue, LED_OFF);
-	led_set_state(idLedGreen, LED_OFF);
+	led_set_state(idLedRed, LOW);
+	led_set_state(idLedBlue, LOW);
+	led_set_state(idLedGreen, LOW);
 	ledOn = false;
 }
 
@@ -203,36 +205,36 @@ void FRDMLedColor(uint8_t color) {
 
 	switch (color) {
 	case (RED):
-		led_set_state(idLedRed, LED_ON);
+		led_set_state(idLedRed, HIGH);
 		lastColor = RED;
 		break;
 	case (YELLOW):
-		led_set_state(idLedRed, LED_ON);
-		led_set_state(idLedGreen, LED_ON);
+		led_set_state(idLedRed, HIGH);
+		led_set_state(idLedGreen, HIGH);
 		lastColor = YELLOW;
 		break;
 	case (GREEN):
-		led_set_state(idLedGreen, LED_ON);
+		led_set_state(idLedGreen, HIGH);
 		lastColor = GREEN;
 		break;
 	case (BLUE):
-		led_set_state(idLedBlue, LED_ON);
+		led_set_state(idLedBlue, HIGH);
 		lastColor = BLUE;
 		break;
 	case (CYAN):
-		led_set_state(idLedGreen, LED_ON);
-		led_set_state(idLedBlue, LED_ON);
+		led_set_state(idLedGreen, HIGH);
+		led_set_state(idLedBlue, HIGH);
 		lastColor = CYAN;
 		break;
 	case (PURPLE):
-		led_set_state(idLedRed, LED_ON);
-		led_set_state(idLedBlue, LED_ON);
+		led_set_state(idLedRed, HIGH);
+		led_set_state(idLedBlue, HIGH);
 		lastColor = PURPLE;
 		break;
 	case (WHITE):
-		led_set_state(idLedRed, LED_ON);
-		led_set_state(idLedBlue, LED_ON);
-		led_set_state(idLedGreen, LED_ON);
+		led_set_state(idLedRed, HIGH);
+		led_set_state(idLedBlue, HIGH);
+		led_set_state(idLedGreen, HIGH);
 		lastColor = WHITE;
 		break;
 	default:
