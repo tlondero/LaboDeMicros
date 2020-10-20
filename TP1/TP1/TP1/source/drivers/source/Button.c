@@ -27,6 +27,7 @@ typedef struct {
 	bool enable;
 	bool new_info; //flag for the callback to announce new information
 	uint8_t gpio_buffer[BUFF_LEN];
+	uint8_t active_with;
 } Btn;
 
 static Btn active_buttons[MAX_BUTTONS];
@@ -45,7 +46,7 @@ static void ButtonsCheck(void);
 //
 //
 
-int8_t ButtonInit(pin_t pin, uint8_t mode) {
+int8_t ButtonInit(pin_t pin ,uint8_t mode, uint8_t active_low_or_high) {
 	static int first = 0, i;
 	if (active_buttons_cant++ < MAX_BUTTONS) {
 		gpioMode(pin, mode); //Inits the gpio for the pin
@@ -60,6 +61,7 @@ int8_t ButtonInit(pin_t pin, uint8_t mode) {
 		for (i = 0; i < BUFF_LEN; i++) {
 			active_buttons[active_buttons_cant].gpio_buffer[i] = 0; //The gpio buffer starts with zeros
 		}
+		active_buttons[active_buttons_cant].active_with= active_low_or_high;
 		active_buttons[active_buttons_cant].enable = true;
 		active_buttons[active_buttons_cant].pin = pin;
 		return active_buttons_cant;
@@ -74,7 +76,7 @@ const ButtonEvent * ButtonGetEvent(int8_t id) {
 		for (i = 0; i < selector[id]; i++) { // for every state in the GPIO buffer
 			if (active_buttons[id].gpio_buffer[i + 1]
 					== active_buttons[id].gpio_buffer[i]) {  //if they are equal  you could get a typemattic event or a LKP event
-				if (active_buttons[id].gpio_buffer[i + 1] == 0) {
+				if (active_buttons[id].gpio_buffer[i + 1] == active_buttons[id].active_with) {
 					time_counter[id] = time_counter[id] + 1;
 					if (((time_counter[id] > TYPEMATIC_THRESHOLD)
 							&& (time_counter[id] % TYPEMATIC_PERIOD))) {//evert TYPEMATIC_PERIOD you get a press event if you satisfy the time criteria
@@ -89,13 +91,13 @@ const ButtonEvent * ButtonGetEvent(int8_t id) {
 					time_counter[id] = 0;
 				}
 			} else {
-				if (active_buttons[id].gpio_buffer[i + 1] == 0) {
+				if (active_buttons[id].gpio_buffer[i + 1] == active_buttons[id].active_with) {
 					ev_buffer[id][ev_counter++] = PRESS; //if went from down to up
 				} else {
 					ev_buffer[id][ev_counter++] = RELEASE; //if went from up to down
 				}
 				if ((time_counter[id] > 0)
-						&& (time_counter[id] < LKP_THRESHOLD) && (active_buttons[id].gpio_buffer[i + 1] == 1))
+						&& (time_counter[id] < LKP_THRESHOLD) && (active_buttons[id].gpio_buffer[i + 1] == !active_buttons[id].active_with))
 					ev_buffer[id][ev_counter++] = SKP; // up to down in a time shorter than LKP_THRESHOLD
 				//one could change this define to a SKP_THRESHOLD and diffirentiate more levels.
 				time_counter[id] = 0; //reset the time_counter for the hold events.

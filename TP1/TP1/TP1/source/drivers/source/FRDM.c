@@ -64,8 +64,8 @@ static uint8_t listEv[NO_FRDM_EV] = { 0 };
 
 bool FRDMInit(void) {
 	//Button Init
-	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP);
-	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP);
+	sw2 = ButtonInit(BUTTON_SW2, INPUT_PULLUP,LOW_WHEN_PRESSED);
+	sw3 = ButtonInit(BUTTON_SW3, INPUT_PULLUP,LOW_WHEN_PRESSED);
 
 	isEvent = false;
 	ledFlash = false;

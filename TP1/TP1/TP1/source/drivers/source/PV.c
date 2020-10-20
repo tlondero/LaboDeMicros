@@ -145,8 +145,8 @@ uint8_t checkMessageLength(char *mes) {
 bool PVInit(void) {
 
 	//Button init
-	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
-
+	button = ButtonInit(PV_BUTTON, INPUT_PULLUP,HIGH_WHEN_PRESSED);
+// CREEMOS que es 1 cuando está activo
 	//Encoder init
 	idEncoder = EncoderRegister(PIN_C2_EN, PIN_C7_EN);
 
