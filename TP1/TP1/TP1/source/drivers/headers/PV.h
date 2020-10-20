@@ -27,7 +27,7 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define MAX_MESS_LEN 	511
+#define MAX_MESS_LEN 	100
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS

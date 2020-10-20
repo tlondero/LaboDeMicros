@@ -134,44 +134,6 @@ uint8_t checkMessageLength(char *mes) {
 	return i + 1;
 }
 
-char* placeMayus(char *mess, uint8_t l) {
-	//Pongo todo en mayusculas
-	uint8_t i = 0;
-	char mayusSt[l];
-	for (i = 0; i < l; i++) {
-		char aux = mess[i];
-		if ((aux >= 97) && (aux <= 122)) {
-			aux -= 32;
-		}
-		mayusSt[i] = aux;
-	}
-
-	char *p = mayusSt;
-	return p;
-}
-
-char* addSpaces(char *mes, uint8_t l) {
-
-	//Agrego 4 ' ' al principio y 4 al final
-	char newMes[l + 2 * SEV_SEG];
-	uint8_t i = 0;
-	while (i < l + 7) {
-		if (i < SEV_SEG) {
-			newMes[i] = 32;
-		} else if (i < 3 + l) {
-			newMes[i] = mes[i - SEV_SEG];
-		} else {
-			newMes[i] = 32;
-		}
-		i++;
-	}
-	newMes[l + 7] = '\0';
-
-	char *p = newMes;
-
-	return p;
-}
-
 /*******************************************************************************
  *******************************************************************************
  GLOBAL FUNCTION DEFINITIONS
@@ -422,13 +384,39 @@ bool PVDispSetMess(char *mess) {
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {
 
-		//message = placeMayus(mess, l);
-		message = addSpaces(placeMayus(mess, l), l);
+		//Pongo todo en mayusculas
+		uint8_t i;
+		char tempString1[l];
+		char tempString2[l + 2 * SEV_SEG];
 
-		length = checkMessageLength(message);
+		for (i = 0; i < l; i++) {
+			char aux = mess[i];
+			if ((aux >= 97) && (aux <= 122)) {
+				aux -= 32;
+			}
+			tempString1[i] = aux;
+		}
+
+		//Agrego 4 ' ' al principio y 4 al final
+		for(i = 0; i < l + 7; i++) {
+			if (i < SEV_SEG) {
+				tempString2[i] = 32;
+			} else if (i < 3 + l) {
+				tempString2[i] = tempString1[i - SEV_SEG];
+			} else {
+				tempString2[i] = 32;
+			}
+		}
+		tempString2[l + 7] = '\0';
+
+		for (i = 0; i < l + 2 * SEV_SEG; i++) {
+			message[i] = tempString2[i];
+		}
+
+		length = l + 2 * SEV_SEG;
 		countMess = 0;
 	} else {
-		message = NULL;
+		message[0] = '\0';
 		length = 0;
 		countMess = 0;
 		valid = false;
