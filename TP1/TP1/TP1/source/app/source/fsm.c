@@ -337,12 +337,7 @@ state askPinRoutine(void) {
 		//activar las interrupciones de cancel y del
 	}
 
-	if (cancel_triggered) {
-		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
-		fe_data.pin_counter = 0;
-		cancel_triggered = false;
-	}
+
 	if (back_triggered) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
@@ -402,7 +397,13 @@ state askPinRoutine(void) {
 			break;
 		}
 	}
-
+	if (cancel_triggered) {
+		timerReset(inactivity_timer_id);
+		timerResume(inactivity_timer_id);
+		fe_data.pin_counter = 0;
+		updated_state= IDDLE;
+		cancel_triggered = false;
+	}
 	if (inactivity_triggered) {
 		updated_state = IDDLE;
 		inactivity_triggered = false;
@@ -420,9 +421,10 @@ state accessRoutine(void) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		//desactivar las interrupciones de cancel y del
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
+		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
 	}
+
 	if (PVCheckEvent()) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);//Reinicio timer
@@ -482,6 +484,16 @@ state accessRoutine(void) {
 			break;
 		default: break;
 		}
+	}
+	if (cancel_triggered) {
+			timerReset(inactivity_timer_id);
+			timerStop(inactivity_timer_id);
+			cancel_triggered = false;
+			updated_state = IDDLE;
+		}
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
 	}
 	return updated_state;
 }
@@ -586,6 +598,10 @@ state usersRoutine(void) {
 		default: break;
 		}
 	}
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
 	return updated_state;
 }
 
@@ -683,6 +699,10 @@ state claveRoutine(void) {
 		default:
 			break;
 		}
+	}
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
 	}
 	return updated_state;
 }
@@ -882,7 +902,10 @@ state delRoutine(void) {
 		default: break;
 		}
 	}
-
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
 	return updated_state;
 }
 
