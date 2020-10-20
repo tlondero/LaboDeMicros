@@ -47,17 +47,19 @@ void PV_tb_Init(void) {
 	PVSuscribeEvent(ENC_RIGHT, true);
 	PVSuscribeEvent(ENC_LEFT, true);
 	br = 0;
-	/*
-	//PVDisplaySetTime(1000);
+
+	PVDisplaySetTime(500);
 	PVDispSetMess("Esto no funciona ni a ganchos");
-	PVDisplaySetShift(PV_RIGHT);
-	*/
-	PVDisplaySendChar('8', 0);
+	PVDisplaySetShift(PV_LEFT);
+	PVDispMessOn();
+
+	/*PVDisplaySendChar('8', 0);
+	PVDisplaySendChar('E', 1);*/
 }
 
 void PV_tb_Run(void) {
 
-	//PVDispMessOn();
+
 
 
 

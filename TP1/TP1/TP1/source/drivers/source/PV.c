@@ -19,7 +19,7 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define	PV_BUTTON		PORTNUM2PIN(PC,0)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define	PV_BUTTON		PORTNUM2PIN(PB,20)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -63,7 +63,7 @@ static PVDirection_t dir;
 
 static char *message;
 static uint8_t length;
-static uint8_t countMess;
+static int8_t countMess;
 static uint32_t mrqtime = 1000;
 
 //Timers
@@ -90,18 +90,20 @@ void multiplexLedCallback(void);
  LOCAL FUNCTION DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
+static char mensaje[] = "    OPEN 24 HS    ";
+#define LEN(x) sizeof(x)/sizeof(x[0])
 
 void dispShowText(void) {
 	uint8_t i = 0;
 	for (i = 0; i < SEV_SEG; i++) {
-		dispSendChar(i, message[i + countMess]);
+		dispSendChar(mensaje[ (i + countMess) % LEN(mensaje) ], i);
 	}
 
 	switch (dir) {
-	case (PV_RIGHT):
+	case (PV_LEFT):
 		countMess++;
 		break;
-	case (PV_LEFT):
+	case (PV_RIGHT):
 		countMess--;
 		break;
 	case (PV_NODIR):
@@ -109,9 +111,6 @@ void dispShowText(void) {
 		break;
 	}
 
-	if (countMess >= length) {
-		countMess = 0;
-	}
 }
 
 void open_animation_Callback(void) {
@@ -362,12 +361,13 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 	 length = 0;
 	 countMess = 0;
 	 }*/
-
-	timerReset(timer_id_mrq);
-	timerStop(timer_id_mrq);
-	message = NULL;
-	length = 0;
-	countMess = 0;
+	/*if(message != NULL){
+		timerReset(timer_id_mrq);
+		timerStop(timer_id_mrq);
+		message = NULL;
+		length = 0;
+		countMess = 0;
+	}*/
 
 	bool valid = false;
 
@@ -433,10 +433,10 @@ bool PVDispManualShift(PVDirection_t direction, uint8_t cant) {
 
 	if ((countMess + cant < length) && (countMess - cant > 0)) {
 		switch (direction) {
-		case (PV_RIGHT):
+		case (PV_LEFT):
 			countMess += cant;
 			break;
-		case (PV_LEFT):
+		case (PV_RIGHT):
 			countMess -= cant;
 			break;
 		default:
