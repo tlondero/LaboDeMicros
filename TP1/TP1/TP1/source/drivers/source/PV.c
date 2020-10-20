@@ -213,7 +213,7 @@ bool PVInit(void) {
 	} else {
 
 		//Led default config
-		uint32_t bright = 0.1;
+		double bright = 0.1;
 		uint32_t fade = 100;			//ms
 		uint32_t dt = 50;				//%
 		uint8_t flashes = 0;
@@ -333,6 +333,10 @@ void PVDisplayClear(void) {
 	message = NULL;
 	length = 0;
 	countMess = 0;
+
+	timerReset(timer_id_mrq);
+	timerStop(timer_id_mrq);
+
 	dispClearAll();
 }
 
@@ -390,6 +394,12 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 	 countMess = 0;
 	 }*/
 
+	timerReset(timer_id_mrq);
+	timerStop(timer_id_mrq);
+	message = NULL;
+	length = 0;
+	countMess = 0;
+
 	bool valid = false;
 
 	if (seven_seg_module < SEV_SEG) {
@@ -444,15 +454,16 @@ bool PVDispManualShift(PVDirection_t direction, uint8_t cant) {
 	return valid;
 }
 
-void PVDispMessOn(void) {
+bool PVDispMessOn(void) {
+	bool valid = false;
 	if (message != NULL) {
 		timerResume(timer_id_mrq);
+		valid = true;
 	}
+
+	return valid;
 }
 
-void PVDispMessOff(void) {
-	timerStop(timer_id_mrq);
-}
 
 bool PVDisplaySetShift(PVDirection_t direction) {
 
