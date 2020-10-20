@@ -49,7 +49,7 @@ void PV_tb_Init(void) {
 	br = 0;
 
 	PVDisplaySetTime(500);
-	PVDispSetMess("Esto no funciona ni a ganchos");
+	PVMarquesina("Esto no funciona ni a ganchos");
 	PVDisplaySetShift(PV_LEFT);
 	PVDispMessOn();
 
@@ -58,10 +58,6 @@ void PV_tb_Init(void) {
 }
 
 void PV_tb_Run(void) {
-
-
-
-
 
 	/*
 	if (PVCheckEvent()) {

@@ -89,7 +89,7 @@ void PVLedPoll(void);
  */
 void PVDisplayClear(void);
 
-void PVMarquesina(char * number_to_display);
+bool PVMarquesina(char * mess);
 
 bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
 
@@ -112,11 +112,6 @@ bool PVIncreaseBrightness(void);
  * @brief Decrease brightness
  */
 bool PVDecreaseBrightness(void);
-
-/**
- * @brief Decrease brightness
- */
-bool PVDispSetMess(char *mess);
 
 /**
  * @brief dispShift: shifts the msg in screen one row to the "direction"
