@@ -145,7 +145,7 @@ uint8_t checkMessageLength(char *mes) {
 bool PVInit(void) {
 
 	//Button init
-	button = ButtonInit(PV_BUTTON, INPUT_PULLUP);
+	button = ButtonInit(PV_BUTTON, INPUT_PULLUP, HIGH_WHEN_PRESSED);
 
 	//Encoder init
 	idEncoder = EncoderRegister(PIN_C2_EN, PIN_C7_EN);
