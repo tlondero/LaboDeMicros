@@ -219,7 +219,7 @@ bool PVInit(void) {
 	} else {
 
 		//Led default config
-		double bright = 0.1;
+		uint8_t bright = 10;
 		uint32_t fade = 100;			//ms
 		uint32_t dt = 50;				//%
 		uint8_t flashes = 0;
@@ -350,7 +350,7 @@ bool PVDisplaySetBright(uint8_t br) {
 	bool valid = true;
 	if ((br >= 1) && (br <= 100)) {
 		dispBright = br;
-		dispBrightness(dispBright / 100.0);
+		dispBrightness(dispBright);
 	} else if (br == 0) {
 		dispClearAll();
 	} else {
@@ -366,7 +366,7 @@ bool PVIncreaseBrightness(void) {
 		dispBright = 100;
 		topValue = true;
 	}
-	dispBrightness(dispBright / 100.0);
+	dispBrightness(dispBright);
 	return topValue;
 }
 
@@ -378,7 +378,7 @@ bool PVDecreaseBrightness(void) {
 		bottomValue = true;
 		dispClearAll();
 	} else {
-		dispBrightness(dispBright / 100.0);
+		dispBrightness(dispBright);
 	}
 	return bottomValue;
 }
@@ -538,7 +538,7 @@ bool PVAnimation(animation_t animation, bool activate) {
 bool PVLedSetBright(PVLed_t led, uint8_t value) {
 	bool valid = false;
 	if ((value >= 0) && (value <= 100)) {
-		double newVal = value / 100.0;
+		double newVal = value;
 		valid = true;
 		switch (led) {
 		case (PV_LED_1):
