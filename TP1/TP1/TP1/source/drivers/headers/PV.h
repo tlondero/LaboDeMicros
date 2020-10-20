@@ -114,11 +114,6 @@ bool PVIncreaseBrightness(void);
 bool PVDecreaseBrightness(void);
 
 /**
- * @brief Decrease brightness
- */
-bool PVDispSetMess(char *mess);
-
-/**
  * @brief dispShift: shifts the msg in screen one row to the "direction"
  * @params direction:see the PVDirection for the modes.
  */

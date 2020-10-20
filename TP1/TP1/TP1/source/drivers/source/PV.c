@@ -61,7 +61,7 @@ static int8_t idLed[EXTERN_LEDS] = { 0 };
 static int8_t dispBright;
 static PVDirection_t dir;
 
-static char *message;
+static char message[MAX_MESS_LEN];
 static uint8_t length;
 static int8_t countMess;
 static uint32_t mrqtime = 1000;
@@ -90,13 +90,11 @@ void multiplexLedCallback(void);
  LOCAL FUNCTION DEFINITIONS
  *******************************************************************************
  ******************************************************************************/
-static char mensaje[] = "    OPEN 24 HS    ";
-#define LEN(x) sizeof(x)/sizeof(x[0])
 
 void dispShowText(void) {
 	uint8_t i = 0;
 	for (i = 0; i < SEV_SEG; i++) {
-		dispSendChar(mensaje[ (i + countMess) % LEN(mensaje) ], i);
+		dispSendChar(message[(i + countMess) % length], i);
 	}
 
 	switch (dir) {
@@ -153,7 +151,7 @@ bool PVInit(void) {
 	dir = PV_NODIR;
 
 	led_init_driver();
-	message = NULL;
+	message[0] = '\0';
 	length = 0;
 	countMess = 0;
 
@@ -298,7 +296,7 @@ bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 }
 
 void PVDisplayClear(void) {
-	message = NULL;
+	message[0] = '\0';
 	length = 0;
 	countMess = 0;
 
@@ -347,27 +345,13 @@ bool PVDecreaseBrightness(void) {
 
 bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 
-	/*
-	 if (message == NULL) {
-	 char aux[SEV_SEG * 3] = { ' ' };
-	 aux[SEV_SEG + seven_seg_module] = ch;
-	 dir = PV_NODIR;
-	 countMess = SEV_SEG;
-	 message = aux;
-	 } else {
-	 timerReset(timer_id_mrq);
-	 timerStop(timer_id_mrq);
-	 message = NULL;
-	 length = 0;
-	 countMess = 0;
-	 }*/
-	/*if(message != NULL){
+	if (message[0] != '\0') {
 		timerReset(timer_id_mrq);
 		timerStop(timer_id_mrq);
-		message = NULL;
+		message[0] = '\0';
 		length = 0;
 		countMess = 0;
-	}*/
+	}
 
 	bool valid = false;
 
@@ -379,7 +363,7 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 	return valid;
 }
 
-bool PVDispSetMess(char *mess) {
+bool PVMarquesina(char *mess) {
 	bool valid = true;
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {
@@ -398,7 +382,7 @@ bool PVDispSetMess(char *mess) {
 		}
 
 		//Agrego 4 ' ' al principio y 4 al final
-		for(i = 0; i < l + 7; i++) {
+		for (i = 0; i < l + 7; i++) {
 			if (i < SEV_SEG) {
 				tempString2[i] = 32;
 			} else if (i < 3 + l) {
@@ -451,7 +435,7 @@ bool PVDispManualShift(PVDirection_t direction, uint8_t cant) {
 
 bool PVDispMessOn(void) {
 	bool valid = false;
-	if (message != NULL) {
+	if (message[0] != '\0') {
 		timerResume(timer_id_mrq);
 		valid = true;
 	}
