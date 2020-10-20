@@ -52,13 +52,14 @@ void PV_tb_Init(void) {
 	PVDispSetMess("Esto no funciona ni a ganchos");
 	PVDisplaySetShift(PV_RIGHT);
 	*/
+	PVDisplaySendChar('8', 0);
 }
 
 void PV_tb_Run(void) {
 
 	//PVDispMessOn();
 
-	PVDisplaySendChar('A', 0);
+
 
 	/*
 	if (PVCheckEvent()) {
