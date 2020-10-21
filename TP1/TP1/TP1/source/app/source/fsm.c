@@ -681,7 +681,7 @@ state brightnessRoutine(void) {
 
 	if (back_triggered) {
 		back_triggered = false;
-		updated_state = USERS;
+		updated_state = ACCESS;
 		timerStop(inactivity_timer_id);
 	}
 	if (cancel_triggered) {
@@ -711,11 +711,15 @@ state claveRoutine(void) {
 		//activar las interrupciones de cancel y del
 	}
 
-	if (cancel_triggered || back_triggered) {
-		cancel_triggered = false;
+	if (back_triggered) {
 		back_triggered = false;
-		updated_state = ACCESS;
+		updated_state = USERS;
+		timerStop(inactivity_timer_id);
 	}
+	if (cancel_triggered) {
+		cancel_triggered = false;
+		updated_state = IDDLE;
+		timerStop(inactivity_timer_id);
 
 
 	if ((updated_state == USERS_CLAVE) && (PVCheckEvent())) {
@@ -780,11 +784,15 @@ state addRoutine(void) {
 		//activar las interrupciones de cancel y del
 	}
 
-	if (cancel_triggered || back_triggered) {
-		cancel_triggered = false;
+	if (back_triggered) {
 		back_triggered = false;
-		updated_state = ACCESS;
+		updated_state = USERS;
+		timerStop(inactivity_timer_id);
 	}
+	if (cancel_triggered) {
+		cancel_triggered = false;
+		updated_state = IDDLE;
+		timerStop(inactivity_timer_id);
 
 	if (inactivity_triggered) {
 		updated_state = IDDLE;
@@ -932,11 +940,15 @@ state delRoutine(void) {
 		}
 	}
 
-	if (cancel_triggered || back_triggered) {
-		updated_state = ACCESS;
-		cancel_triggered = false;
+	if (back_triggered) {
 		back_triggered = false;
+		updated_state = USERS;
+		timerStop(inactivity_timer_id);
 	}
+	if (cancel_triggered) {
+		cancel_triggered = false;
+		updated_state = IDDLE;
+		timerStop(inactivity_timer_id);
 
 	if (inactivity_triggered) {
 		updated_state = IDDLE;
