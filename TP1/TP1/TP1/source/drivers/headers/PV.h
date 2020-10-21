@@ -113,6 +113,12 @@ bool PVIncreaseBrightness(void);
  */
 bool PVDecreaseBrightness(void);
 
+int8_t PVGetBrightness(void);
+
+bool PVSetDeltaBright(uint8_t br);
+
+int8_t PVGetDeltaBright(void);
+
 /**
  * @brief dispShift: shifts the msg in screen one row to the "direction"
  * @params direction:see the PVDirection for the modes.

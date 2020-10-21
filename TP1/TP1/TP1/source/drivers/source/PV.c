@@ -60,6 +60,7 @@ static int8_t idLed[EXTERN_LEDS] = { 0 };
 
 //Display
 static int8_t dispBright;
+static int8_t deltaBright;
 static PVDirection_t dir;
 
 static char message[MAX_MESS_LEN];
@@ -169,6 +170,7 @@ bool PVInit(void) {
 	//Display init
 	dispInit();
 	dispBright = 20;
+	deltaBright = 20;
 	dir = PV_LEFT;
 
 	led_init_driver();
@@ -336,7 +338,7 @@ bool PVDisplaySetBright(uint8_t br) {
 
 bool PVIncreaseBrightness(void) {
 	bool topValue = false;
-	dispBright += 20;
+	dispBright += deltaBright;
 	if (dispBright >= 100) {
 		dispBright = 100;
 		topValue = true;
@@ -347,7 +349,7 @@ bool PVIncreaseBrightness(void) {
 
 bool PVDecreaseBrightness(void) {
 	bool bottomValue = false;
-	dispBright -= 20;
+	dispBright -= deltaBright;
 	if (dispBright <= 0) {
 		dispBright = 0;
 		bottomValue = true;
@@ -356,6 +358,23 @@ bool PVDecreaseBrightness(void) {
 		dispBrightness(dispBright);
 	}
 	return bottomValue;
+}
+
+int8_t PVGetBrightness(void) {
+	return dispBright;
+}
+
+int8_t PVGetDeltaBright(void) {
+	return deltaBright;
+}
+
+bool PVSetDeltaBright(uint8_t br) {
+	bool valid = false;
+	if ((br >= 0) && (br <= 100)) {
+		deltaBright = br;
+		valid = true;
+	}
+	return valid;
 }
 
 bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
