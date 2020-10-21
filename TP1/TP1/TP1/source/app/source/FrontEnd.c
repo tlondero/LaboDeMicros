@@ -135,7 +135,8 @@ void drawFrontEnd(FEData data, state st) {
 		break;
 	case OPEN:
 		if (data.open) {
-			PVAnimation(OPEN_ANIMATION, true);
+
+			PVMarquesina("OPEN DOOR", 300);
 		}
 
 		break;
@@ -207,9 +208,10 @@ void drawFrontEnd(FEData data, state st) {
 	case USERS_DEL:
 		if ( (((user_t *) (data.del_user_ptr)) !=  NULL)  && (prev_del_id != data.del_i)){
 			char *p = 	num2str(((user_t *) (data.del_user_ptr))->id);
-			PVMarquesina(p);
+			PVMarquesina(p, 500);
 			prev_del_id = data.del_i;
 		}
+
 		if (data.del_user) {
 			FRDMLedFlash(BLUE);
 		}

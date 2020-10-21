@@ -517,11 +517,14 @@ state accessRoutine(void) {
 
 state openRoutine(void) {
 	state updated_state = OPEN;
+
 	if (prev_state != OPEN) {
+		timerStop(inactivity_timer_id);
 		fe_data.animation_en = true;
 		fe_data.open = true;
 		timerReset(open_timer_id);
 		timerResume(open_timer_id);
+
 	}
 	if (open_triggered) {
 		updated_state = IDDLE;
