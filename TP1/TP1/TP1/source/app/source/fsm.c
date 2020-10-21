@@ -435,10 +435,11 @@ state accessRoutine(void) {
 
 	if (prev_state != ACCESS) {
 		int i = 0;
+		/*
 		for (i = 0; i < ID_LEN; i++)
 			encoder_id_digits[i] = 0;
 		for (i = 0; i < PIN_LEN; i++)
-			encoder_pin_digits[i] = 0;
+			encoder_pin_digits[i] = 0;*/
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
@@ -548,12 +549,14 @@ state usersRoutine(void) {
 		fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
-		FRDMButtonIRQ(cancel_switch, BT_DISABLE, cancelCallback);
-		FRDMButtonIRQ(back_switch, BT_DISABLE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 	}
 
 	if (cancel_triggered || back_triggered) {
 		updated_state = ACCESS;
+		cancel_triggered = false;
+		back_triggered = false;
 	}
 
 
@@ -623,6 +626,16 @@ state usersRoutine(void) {
 		updated_state = IDDLE;
 		inactivity_triggered = false;
 	}
+	if (back_triggered) {
+			back_triggered = false;
+			updated_state = ACCESS;
+			timerStop(inactivity_timer_id);
+	}
+	if (cancel_triggered) {
+		cancel_triggered = false;
+		updated_state = IDDLE;
+		timerStop(inactivity_timer_id);
+	}
 	return updated_state;
 }
 
@@ -660,10 +673,12 @@ state brightnessRoutine(void) {
 	}
 
 	if (back_triggered) {
+		back_triggered = false;
 		updated_state = USERS;
 		timerStop(inactivity_timer_id);
 	}
 	if (cancel_triggered) {
+		cancel_triggered = false;
 		updated_state = IDDLE;
 		timerStop(inactivity_timer_id);
 	}
@@ -690,6 +705,8 @@ state claveRoutine(void) {
 	}
 
 	if (cancel_triggered || back_triggered) {
+		cancel_triggered = false;
+		back_triggered = false;
 		updated_state = ACCESS;
 	}
 
@@ -757,6 +774,8 @@ state addRoutine(void) {
 	}
 
 	if (cancel_triggered || back_triggered) {
+		cancel_triggered = false;
+		back_triggered = false;
 		updated_state = ACCESS;
 	}
 
@@ -905,6 +924,8 @@ state delRoutine(void) {
 
 	if (cancel_triggered || back_triggered) {
 		updated_state = ACCESS;
+		cancel_triggered = false;
+		back_triggered = false;
 	}
 
 	if (inactivity_triggered) {
