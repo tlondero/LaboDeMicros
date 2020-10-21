@@ -153,7 +153,6 @@ void dispInit(void) {
 	uint8_t i;
 	led_init_driver(); // Initializes the leds driver.
 	for (i = 0; i < SEVEN_SEGMENTS_PINS; i++) {
-		//gpioMode(PINES[i], OUTPUT);
 		seven_segment_id[i] = led_init_led(PINES[i], TURNS_ON_WITH_1);
 		led_configure_brightness(seven_segment_id[i], 99);
 	}
@@ -243,6 +242,10 @@ void multiplexDiplayCallback(void) {
 	}
 	i++;
 }
-
+//brightness: 0 a 100
 void dispBrightness(uint8_t brightness) {
+	uint8_t i;
+	for (i = 0; i < SEVEN_SEGMENTS_PINS; i++) {
+			led_configure_brightness(seven_segment_id[i], brightness);
+		}
 }
