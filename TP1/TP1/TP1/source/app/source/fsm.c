@@ -913,7 +913,7 @@ state addRoutine(void) {
 			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
 			break;
 		case BTN_PRESS:
-			if (fe_data.pin_counter < PIN_LEN) {
+			if (fe_data.pin_counter < PIN_LEN-1) {
 				fe_data.pin_counter++;
 			}
 			else {

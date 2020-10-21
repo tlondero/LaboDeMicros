@@ -208,7 +208,9 @@ void drawFrontEnd(FEData data, state st) {
 			}
 		} else if (data.good_id) {
 			FRDMLedFlash(BLUE);
-		} else if ((data.pin_counter <= PIN_LEN) && (!data.good_pin)) { // en el caso de que este metiendo el pin
+		}
+
+		if ((data.pin_counter <= PIN_LEN) && (!data.good_pin)) { // en el caso de que este metiendo el pin
 			for (i = 0; i < 4; i++) {
 				if (data.pin_counter > 3) {
 					if (i < 3)
