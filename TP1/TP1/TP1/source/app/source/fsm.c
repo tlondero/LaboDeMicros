@@ -48,6 +48,10 @@ static bool cancel_triggered;
 static const uint8_t back_switch = BUTTON_SW3;
 static bool back_triggered;
 
+//del_user
+static void* aux_ptr;
+static int8_t aux_i;
+
 //Fsm
 static state prev_state = IDDLE;
 
@@ -135,8 +139,8 @@ state FSMInitState(void) {
 	timerStop(open_timer_id);
 
 	//Tengo que activar las interrupciones de cancel y delete
-	FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-	FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+	FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+	FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 	FRDMLedSetFlash(3);
 
 	initUsers();
@@ -223,8 +227,8 @@ state IDDLERoutine(void) {
 		fe_data.id_counter = 0;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
 
@@ -243,6 +247,9 @@ state IDDLERoutine(void) {
 					updated_state = ASK_PIN;
 					fe_data.good_id = true;
 					fe_data.animation_en = false;
+					int i = 0;
+					for( i = 0; i<ID_LEN; i++)
+						encoder_id_digits[i] = card_event[i];
 				}
 			}
 			else {
@@ -332,8 +339,8 @@ state askPinRoutine(void) {
 		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
 
@@ -421,8 +428,8 @@ state accessRoutine(void) {
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		//desactivar las interrupciones de cancel y del
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_DISABLE, backCallback);
 	}
 
 	if (PVCheckEvent()) {
@@ -521,8 +528,8 @@ state usersRoutine(void) {
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_DISABLE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_DISABLE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_DISABLE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_DISABLE, backCallback);
 	}
 
 	if (cancel_triggered || back_triggered) {
@@ -648,8 +655,8 @@ state claveRoutine(void) {
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
 
@@ -718,8 +725,8 @@ state addRoutine(void) {
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 	}
 
@@ -850,11 +857,23 @@ state delRoutine(void) {
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
-		FRDMButtonIRQ(cancel_switch, GPIO_IRQ_MODE_FALLING_EDGE, cancelCallback);
-		FRDMButtonIRQ(back_switch, GPIO_IRQ_MODE_FALLING_EDGE, backCallback);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
-		fe_data.del_user_ptr = (void*)getUsersList();
-		fe_data.del_i = 0;
+		aux_ptr = (void*)getUsersList();
+
+		for(aux_i = 0; aux_i < MAX_USERS; aux_i++){
+			if(!(((user_t*)aux_ptr)[aux_i]).admin && (((user_t*)aux_ptr)[aux_i]).available){
+				break;
+			}
+		}
+		if(aux_i < MAX_USERS){
+			fe_data.del_user_ptr = ((user_t*)aux_ptr)+aux_i;
+			fe_data.del_i = aux_i;
+		}
+		else{
+			fe_data.del_user_ptr = 0;
+		}
 	}
 
 	if (cancel_triggered || back_triggered) {
@@ -874,22 +893,48 @@ state delRoutine(void) {
 		switch (ev) {
 		case ENC_LEFT:
 			if (fe_data.del_i == 0) {
-				fe_data.del_i = (MAX_USERS - 1);
-				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) + fe_data.del_i);
+
+				for(aux_i = MAX_USERS-1; aux_i >= 0; aux_i--){
+					if(!(((user_t*)aux_ptr)[aux_i]).admin && (((user_t*)aux_ptr)[aux_i]).available){
+						break;
+					}
+				}
+				if(aux_i >= 0){
+					fe_data.del_user_ptr = (void*)(((user_t*)aux_ptr)+aux_i);
+					fe_data.del_i = aux_i;
+				}
+				else{
+					fe_data.del_user_ptr = 0;
+				}
+
 			}
 			else {
-				fe_data.del_i++;
-				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) + 1);
+				aux_i--;
+				fe_data.del_i = aux_i;
+				fe_data.del_user_ptr = (void*)(((user_t*)aux_ptr)+aux_i);
 			}
 			break;
 		case ENC_RIGHT:
-			if (fe_data.del_i == (MAX_USERS - 1)) {
-				fe_data.del_i = 0;
-				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) - (MAX_USERS - 1));
+			if (fe_data.del_i == MAX_USERS-1) {
+
+				for(aux_i = 0; aux_i < MAX_USERS; aux_i++){
+					if((!(((user_t*)aux_ptr)[aux_i]).admin) && ((((user_t*)aux_ptr)[aux_i]).available)){
+						break;
+					}
+				}
+				if(aux_i < MAX_USERS){
+					fe_data.del_user_ptr = (void*)(((user_t*)aux_ptr)+aux_i);
+					fe_data.del_i = aux_i;
+				}
+				else{
+					fe_data.del_user_ptr = 0;
+				}
+
 			}
 			else {
-				fe_data.del_i--;
-				fe_data.del_user_ptr = (void*)((user_t*)(fe_data.del_user_ptr) - 1);
+				aux_i++;
+				fe_data.del_i = aux_i;
+				fe_data.del_user_ptr = (void*)(((user_t*)aux_ptr)+aux_i);
 			}
 			break;
 		case BTN_PRESS:

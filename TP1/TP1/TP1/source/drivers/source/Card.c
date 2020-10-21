@@ -19,9 +19,9 @@
 #define SS 0b01011
 #define ES 0b11111
 #define LOW_NYBBLE_MASK (0b00001111)
-#define CARD_EN_PIN PORTNUM2PIN(PB, 11)	  //Amarillo
-#define CARD_DATA_PIN PORTNUM2PIN(PC, 11) //Azul
-#define CARD_CLK_PIN PORTNUM2PIN(PC, 10)  //Verde
+#define CARD_EN_PIN PORTNUM2PIN(PC, 17) //Amarillo
+#define CARD_DATA_PIN PORTNUM2PIN(PB, 11) //Azul
+#define CARD_CLK_PIN PORTNUM2PIN(PB, 3) //Verde
 #define DEVELOPMENT_MODE 1
 
 #define LEN(array) sizeof(array) / sizeof(array[0])
