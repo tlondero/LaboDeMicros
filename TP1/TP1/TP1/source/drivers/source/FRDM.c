@@ -331,7 +331,14 @@ bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback) {
 		}
 
 		if (correct_mode) {
-			ButtonSetIRQ(button, IRQ, fcallback);
+			switch (button){
+			case (BUTTON_SW2):
+				ButtonSetIRQ(sw2, IRQ, fcallback);
+				break;
+			case (BUTTON_SW3):
+				ButtonSetIRQ(sw3, IRQ, fcallback);
+				break;
+			}
 			return true;
 		} else {
 			return false;
