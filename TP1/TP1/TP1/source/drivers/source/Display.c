@@ -66,39 +66,48 @@ const static character_t characters[] = {
 		{'8', { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
 		{'9', { HIGH, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
 		{'A', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
-        {'B', {LOW, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},
-        {'C', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
-        {'D', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, HIGH, LOW} },
-        {'E', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, HIGH, LOW} },
-        {'F', {HIGH, LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
-        {'G', {HIGH, LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
-        {'H', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
-        {'I', {LOW, LOW, LOW, LOW, HIGH, HIGH, LOW, LOW} },
-        {'J', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW, LOW} },
-        {'K', {LOW, LOW, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
-        {'L', {LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
-        {'M', {HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW, LOW} },
-        {'N', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW, LOW} },
-        {'O', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
-        {'P', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
-        {'Q', {HIGH, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
-        {'R', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
-        {'S', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
-        {'T', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
-        {'U', {LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
-        {'V', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, LOW, LOW} },
-        {'W', {LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW} },
-        {'X', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
-        {'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
-        {'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} },
+		{'B', {LOW, LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW}},
+		{'C', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
+		{'D', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, HIGH, LOW} },
+		{'E', {HIGH, LOW, LOW, HIGH, HIGH, HIGH, HIGH, LOW} },
+		{'F', {HIGH, LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+		{'G', {HIGH, LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+		{'H', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+		{'I', {LOW, LOW, LOW, LOW, HIGH, HIGH, LOW, LOW} },
+		{'J', {LOW, HIGH, HIGH, HIGH, HIGH, LOW, LOW, LOW} },
+		{'K', {LOW, LOW, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+		{'L', {LOW, LOW, LOW, HIGH, HIGH, HIGH, LOW, LOW} },
+		{'M', {HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW, LOW} },
+		{'N', {HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW, LOW} },
+		{'O', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+		{'P', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+		{'Q', {HIGH, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
+		{'R', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
+		{'S', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+		{'T', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
+		{'U', {LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
+		{'V', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, LOW, LOW} },
+		{'W', {LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW} },
+		{'X', {LOW, HIGH, HIGH, LOW, HIGH, HIGH, HIGH, LOW} },
+		{'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
+		{'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} },
+
 		{'-', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} },
 		{' ', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW} },
-		//      A    B    C   D    E     F    G   H
 		{'^', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} },
 		{'>', {LOW, LOW, HIGH, LOW, LOW, LOW, LOW, LOW} },
 		{'_', {LOW, LOW, LOW, HIGH, LOW, LOW, LOW, LOW} },
 		{'<', {LOW, LOW, LOW, LOW, HIGH, LOW, LOW, LOW} },
-		{'.', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, HIGH} }
+		{'.', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, HIGH} },
+
+		//Prueba tomi
+		{'a', {HIGH, LOW, LOW, LOW, LOW, LOW, LOW, LOW} },
+		{'b', {LOW, HIGH, LOW, LOW, LOW, LOW, LOW, LOW} },
+		{'c', {LOW, LOW, HIGH, LOW, LOW, LOW, LOW, LOW} },
+		{'d', {LOW, LOW, LOW, HIGH, LOW, LOW, LOW, LOW} },
+		{'e', {LOW, LOW, LOW, LOW, HIGH, LOW, LOW, LOW} },
+		{'f', {LOW, LOW, LOW, LOW, LOW, HIGH, LOW, LOW} },
+		{'g', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} }
 };
 
 typedef struct {
@@ -235,4 +244,5 @@ void multiplexDiplayCallback(void) {
 	i++;
 }
 
-void dispBrightness(uint8_t brightness){}
+void dispBrightness(uint8_t brightness) {
+}

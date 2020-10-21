@@ -536,6 +536,7 @@ state usersRoutine(void) {
 
 	if (prev_state != USERS) {
 		fe_data.animation_en = true;
+		fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
 		FRDMButtonIRQ(cancel_switch, BT_DISABLE, cancelCallback);
@@ -733,6 +734,7 @@ state addRoutine(void) {
 	if (prev_state != USERS_ADD) {
 		fe_data.animation_opt = ADD_SELECTED_ANIMATION;
 		fe_data.animation_en = true;
+		using_encoder = false;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
