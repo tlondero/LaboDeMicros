@@ -22,6 +22,7 @@ typedef struct {
 	bool pin_state;
 
 	uint8_t brightness;
+	bool br; //Controla que se cambie el brillo si y solo si hubo un cambio por parte del usuario
 
 	bool blocked_user;
 	bool bad_id;
@@ -30,6 +31,8 @@ typedef struct {
 	bool good_pin;
 	bool open;
 	bool del_user;
+
+
 
 	uint8_t del_i;
 	void* del_user_ptr;

@@ -161,7 +161,9 @@ void drawFrontEnd(FEData data, state st) {
 	case BRIGHTNESS:
 		for (i = 0; i < 4; i++)
 			PVDisplaySendChar(BRIGHTNESS_MSG[i], i);
-		PVDisplaySetBright(data.brightness);
+		if(data.br == true)
+			PVDisplaySetBright(data.brightness);
+
 		break;
 	case USERS_CLAVE:
 		for (i = 0; i < 4; i++) {

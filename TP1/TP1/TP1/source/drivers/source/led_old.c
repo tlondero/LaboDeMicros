@@ -132,7 +132,7 @@ void led_configure_brightness(int8_t led_id, uint8_t brightness){
 			if(brightness >= 0 && brightness <= 100){
 				LEDS[led_id].brightness = brightness;
 				if(LEDS[led_id].state){
-					pwm_query(LEDS[i].pwm_id, PWM_FREQ, LEDS[i].brightness, HIGH);
+					pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
 
 				}
 			}
