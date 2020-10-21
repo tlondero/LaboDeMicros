@@ -100,7 +100,7 @@ const static character_t characters[] = {
 		{'<', {LOW, LOW, LOW, LOW, HIGH, LOW, LOW, LOW} },
 		{'.', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, HIGH} },
 
-		//Prueba tomi
+		//Prueba tomi (EL SUICIDIOS)
 		{'a', {HIGH, LOW, LOW, LOW, LOW, LOW, LOW, LOW} },
 		{'b', {LOW, HIGH, LOW, LOW, LOW, LOW, LOW, LOW} },
 		{'c', {LOW, LOW, HIGH, LOW, LOW, LOW, LOW, LOW} },
