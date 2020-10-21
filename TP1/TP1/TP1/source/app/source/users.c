@@ -18,7 +18,12 @@
     * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
     ******************************************************************************/
 //Usuarios default://          
-user_t defaults[DEFAULT_USERS] = { {15,12345,true, true,false,0},{1,1234,false, true,false,0},{52586004,37722,true, true,false,0},{37779700,27273,false, true,false,0},{4,1234,false, true,false,0} };
+									//ID		PASS	ADMIN	AVB		BLOCk	STRK
+user_t defaults[DEFAULT_USERS] = { {15,			12345,	true, 	true,	false,	0},
+								   {1,			1234,	false, 	true,	false,	0},
+								   {52586004,	37722,	true, 	true,	false,	0},
+								   {37779700,	27273,	false, 	true,	false,	0},
+								   {4,			1234,	false, 	true,	false,	0} };
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
