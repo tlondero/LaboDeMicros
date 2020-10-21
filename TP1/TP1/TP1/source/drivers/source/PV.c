@@ -168,7 +168,7 @@ bool PVInit(void) {
 	//Display init
 	dispInit();
 	dispBright = 20;
-	dir = PV_NODIR;
+	dir = PV_LEFT;
 
 	led_init_driver();
 	message[0] = '\0';
@@ -307,7 +307,10 @@ bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 }
 
 void PVDisplayClear(void) {
-	message[0] = '\0';
+	uint8_t i;
+	for(i=0; i < MAX_MESS_LEN; i++){
+		message[i] = '\0';
+	}
 	length = 0;
 	countMess = 0;
 
@@ -411,6 +414,7 @@ bool PVMarquesina(char *mess) {
 
 		length = l + 2 * SEV_SEG;
 		countMess = 0; //4?
+		dir = PV_LEFT;
 	} else {
 		message[0] = '\0';
 		length = 0;
