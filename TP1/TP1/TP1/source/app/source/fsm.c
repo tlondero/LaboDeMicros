@@ -52,7 +52,7 @@ static bool back_triggered;
 
 //del_user
 static void* aux_ptr;
-static int8_t aux_i;
+static uint8_t aux_i;
 
 //Fsm
 static state prev_state = IDDLE;
@@ -868,6 +868,7 @@ state addRoutine(void) {
 }
 
 state delRoutine(void) {
+	int8_t counter = 0;
 	state updated_state = USERS_DEL;
 
 	if (prev_state != USERS_DEL) {
@@ -880,18 +881,18 @@ state delRoutine(void) {
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
 		aux_ptr = (void*) getUsersList();
-
-		for (aux_i = 0; aux_i < MAX_USERS; aux_i++) {
-			if (!(((user_t*) aux_ptr)[aux_i]).admin
-					&& (((user_t*) aux_ptr)[aux_i]).available) {
+		aux_i = 0;
+		counter = 0;
+		while(true){
+			if(counter == MAX_USERS){
 				break;
 			}
-		}
-		if (aux_i < MAX_USERS) {
-			fe_data.del_user_ptr = ((user_t*) aux_ptr) + aux_i;
-			fe_data.del_i = aux_i;
-		} else {
-			fe_data.del_user_ptr = 0;
+			else if (!(((user_t*) aux_ptr)[aux_i%MAX_USERS]).admin && (((user_t*) aux_ptr)[aux_i%MAX_USERS]).available) {
+				fe_data.del_user_ptr = &(((user_t*) aux_ptr)[aux_i%MAX_USERS]);
+				break;
+			}
+			aux_i++;
+			counter++;
 		}
 	}
 
@@ -911,67 +912,31 @@ state delRoutine(void) {
 		event_t ev = PVGetEv();
 		switch (ev) {
 		case ENC_LEFT:
-			if (fe_data.del_i == 0) {
-
-				for (aux_i = MAX_USERS - 1; aux_i >= 0; aux_i--) {
-					if (!(((user_t*) aux_ptr)[aux_i]).admin
-							&& (((user_t*) aux_ptr)[aux_i]).available) {
-						break;
-					}
+			counter = 0;
+			while(true){
+				if(counter == MAX_USERS){
+					break;
 				}
-				if (aux_i >= 0) {
-					fe_data.del_user_ptr =
-							(void*) (((user_t*) aux_ptr) + aux_i);
-					fe_data.del_i = aux_i;
-				} else {
-					fe_data.del_user_ptr = 0;
+				else if (!(((user_t*) aux_ptr)[aux_i%MAX_USERS]).admin && (((user_t*) aux_ptr)[aux_i%MAX_USERS]).available) {
+					fe_data.del_user_ptr = &(((user_t*) aux_ptr)[aux_i%MAX_USERS]);
+					break;
 				}
-
-			} else {
-
-				for (; aux_i >= 0; aux_i--) {
-					if (!(((user_t*) aux_ptr)[aux_i]).admin
-							&& (((user_t*) aux_ptr)[aux_i]).available) {
-						break;
-					}
-				}
-				if (aux_i >= 0) {
-					fe_data.del_user_ptr =
-							(void*) (((user_t*) aux_ptr) + aux_i);
-					fe_data.del_i = aux_i;
-				} else {
-					fe_data.del_user_ptr = 0;
-				}
-
-				//TODO
 				aux_i--;
-				fe_data.del_i = aux_i;
-				fe_data.del_user_ptr = (void*) (((user_t*) aux_ptr) + aux_i);
-
+				counter++;
 			}
 			break;
 		case ENC_RIGHT:
-			if (fe_data.del_i == MAX_USERS - 1) {
-
-				for (aux_i = 0; aux_i < MAX_USERS; aux_i++) {
-					if ((!(((user_t*) aux_ptr)[aux_i]).admin)
-							&& ((((user_t*) aux_ptr)[aux_i]).available)) {
-						break;
-					}
+			counter = 0;
+			while(true){
+				if(counter == MAX_USERS){
+					break;
 				}
-				if (aux_i < MAX_USERS) {
-					fe_data.del_user_ptr =
-							(void*) (((user_t*) aux_ptr) + aux_i);
-					fe_data.del_i = aux_i;
-				} else {
-					fe_data.del_user_ptr = 0;
+				else if (!(((user_t*) aux_ptr)[aux_i%MAX_USERS]).admin && (((user_t*) aux_ptr)[aux_i%MAX_USERS]).available) {
+					fe_data.del_user_ptr = &(((user_t*) aux_ptr)[aux_i%MAX_USERS]);
+					break;
 				}
-
-			} else {
-				//TODO
 				aux_i++;
-				fe_data.del_i = aux_i;
-				fe_data.del_user_ptr = (void*) (((user_t*) aux_ptr) + aux_i);
+				counter++;
 			}
 			break;
 		case BTN_PRESS:
