@@ -18,6 +18,7 @@
 
 #define MAX_BUTTONS 10
 #define BUFF_LEN 50
+#define POLLING_MODE 1
 /*******************************************************************************/
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -53,8 +54,12 @@ int8_t ButtonInit(pin_t pin ,uint8_t mode, uint8_t active_low_or_high) {
 		if (!first) { //if is the first time intis the timer and the periodic interruption for polling
 			timerInit();
 			tim_id_t Bt_timmer = timerGetId();
+
+#if POLLING_MODE
 			timerStart(Bt_timmer, TIMER_MS2TICKS(BUTTON_REFRESH_PERIOD),
 					TIM_MODE_PERIODIC, ButtonsCheck);
+#endif
+
 			first = 1;
 		}
 
