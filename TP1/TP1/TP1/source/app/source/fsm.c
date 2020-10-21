@@ -643,6 +643,8 @@ state brightnessRoutine(void) {
 		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 	}
 	if (PVCheckEvent()) {
 		timerReset(inactivity_timer_id);
@@ -658,9 +660,18 @@ state brightnessRoutine(void) {
 		}
 	}
 
+	if (back_triggered) {
+		updated_state = USERS;
+		timerStop(inactivity_timer_id);
+	}
+	if (cancel_triggered) {
+		updated_state = IDDLE;
+		timerStop(inactivity_timer_id);
+	}
 	if (inactivity_triggered) {
 		updated_state = IDDLE;
 		inactivity_triggered = false;
+		timerStop(inactivity_timer_id);
 	}
 	return updated_state;
 }
