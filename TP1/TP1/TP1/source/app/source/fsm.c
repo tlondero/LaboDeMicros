@@ -245,11 +245,12 @@ state IDDLERoutine(void) {
 	* STATE INIT
 	*/
 	if (prev_state != IDDLE) {
+
 		fe_data.animation_en = true;
 		fe_data.animation_opt = IDDLE_ANIMATION;
 		fe_data.id_counter = 0;
+		fe_data.pin_counter = 0;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 
@@ -312,7 +313,6 @@ state IDDLERoutine(void) {
 		if (PVCheckEvent()) {
 			event_t ev = PVGetEv();
 			timerReset(inactivity_timer_id);
-			timerResume(inactivity_timer_id);//Reinicio timer
 			switch (ev) {
 			case ENC_LEFT:
 				if (actual_encoder_number == 0)
@@ -377,7 +377,6 @@ state askPinRoutine(void) {
 		fe_data.pin_counter = 0;
 		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
@@ -386,7 +385,6 @@ state askPinRoutine(void) {
 
 	if (back_triggered) {
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		if (fe_data.pin_counter > 0) {//osea lease borre el ultimo caracter
 
 			fe_data.pin_counter--;
@@ -396,7 +394,6 @@ state askPinRoutine(void) {
 	//ahora hay que fijarse si llego un evento de encoder, si es derecha aumento el numero si es izquierda lo achico si es enter avanzo
 	if (PVCheckEvent()) {
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);//Reinicio timer
 		event_t ev = PVGetEv();
 		switch (ev) {
 		case ENC_LEFT:
@@ -445,7 +442,6 @@ state askPinRoutine(void) {
 	}
 	if (cancel_triggered) {
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		fe_data.pin_counter = 0;
 		updated_state= IDDLE;
 		cancel_triggered = false;
@@ -471,7 +467,6 @@ state accessRoutine(void) {
 			encoder_pin_digits[i] = 0;*/
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		fe_data.animation_opt = OPEN_SELECTED_ANIMATION;
 		//desactivar las interrupciones de cancel y del
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
@@ -480,7 +475,6 @@ state accessRoutine(void) {
 
 	if (PVCheckEvent()) {
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);//Reinicio timer
 		event_t ev = PVGetEv();
 		switch (ev) {
 		case ENC_LEFT:
@@ -559,7 +553,6 @@ state openRoutine(void) {
 		fe_data.animation_en = true;
 		fe_data.open = true;
 		timerReset(open_timer_id);
-		timerResume(open_timer_id);
 
 	}
 	if (open_triggered) {
@@ -577,7 +570,6 @@ state usersRoutine(void) {
 		fe_data.animation_en = true;
 		fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);	//desactivar las interrupciones de cancel y del
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 	}
@@ -591,7 +583,6 @@ state usersRoutine(void) {
 
 	if ((updated_state == USERS) && (PVCheckEvent())) {
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);//Reinicio timer
 		event_t ev = PVGetEv();
 		switch (ev) {
 		case ENC_LEFT:
@@ -679,13 +670,11 @@ state brightnessRoutine(void) {
 		//desactivar interrupciones de cancel y back
 		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 	}
 	if (PVCheckEvent()) {
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		event_t ev = PVGetEv();
 		if ((ev == ENC_LEFT) && (fe_data.brightness > 0)) {
 			fe_data.brightness--;
@@ -727,7 +716,6 @@ state claveRoutine(void) {
 		fe_data.animation_opt = CLAVE_SELECTED_ANIMATION;
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
@@ -746,7 +734,6 @@ state claveRoutine(void) {
 
 	if ((updated_state == USERS_CLAVE) && (PVCheckEvent())) {
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);//Reinicio timer
 		event_t ev = PVGetEv();
 		switch (ev) {
 		case ENC_LEFT:
@@ -801,7 +788,6 @@ state addRoutine(void) {
 		fe_data.animation_en = true;
 		using_encoder = false;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		fe_data.id_counter = 0;
@@ -833,6 +819,7 @@ state addRoutine(void) {
 				encoder_id_digits[i] = card_event[i];
 			fe_data.good_pin = true;
 			fe_data.id_counter= ID_LEN;
+			fe_data.animation_en = false;
 		}
 	}
 
@@ -859,6 +846,7 @@ state addRoutine(void) {
 		if (PVCheckEvent()) {
 			fe_data.animation_en = false;
 			event_t ev = PVGetEv();
+			timerReset(inactivity_timer_id);
 			switch (ev) {
 			case ENC_LEFT:
 				if (actual_encoder_number == 0)
@@ -877,7 +865,7 @@ state addRoutine(void) {
 
 				break;
 			case BTN_PRESS:
-				if (fe_data.id_counter < ID_LEN - 1) {
+				if (fe_data.id_counter < ID_LEN ) {
 					fe_data.id_counter++;
 				}
 				else {
@@ -893,7 +881,6 @@ state addRoutine(void) {
 	if ((PVCheckEvent()) && asking_pin) {
 		fe_data.animation_en = false;;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);//Reinicio timer
 		event_t ev = PVGetEv();
 		switch (ev) {
 		case ENC_LEFT:
@@ -914,7 +901,7 @@ state addRoutine(void) {
 			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
 			break;
 		case BTN_PRESS:
-			if (fe_data.pin_counter < PIN_LEN-1) {
+			if (fe_data.pin_counter < PIN_LEN) {
 				fe_data.pin_counter++;
 			}
 			else {
@@ -951,7 +938,6 @@ state delRoutine(void) {
 		fe_data.pin_counter = 0;
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
 		//activar las interrupciones de cancel y del
@@ -992,7 +978,6 @@ state delRoutine(void) {
 	if (PVCheckEvent()) {
 		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
-		timerResume(inactivity_timer_id);//Reinicio timer
 		event_t ev = PVGetEv();
 		switch (ev) {
 		case ENC_LEFT:
