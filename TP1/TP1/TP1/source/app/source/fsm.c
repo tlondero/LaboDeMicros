@@ -781,6 +781,8 @@ state addRoutine(void) {
 		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
+		fe_data.id_counter = 0;
+		fe_data.pin_counter = 0;
 		//activar las interrupciones de cancel y del
 	}
 
