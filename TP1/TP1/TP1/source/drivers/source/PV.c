@@ -230,7 +230,7 @@ bool PVInit(void) {
 	//timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC, open_animation_Callback);
 	timerStop(timer_open_st);
 
-	timerStart(timer_id_mrq, TIMER_MS2TICKS(750), TIM_MODE_PERIODIC,
+	timerStart(timer_id_mrq, TIMER_MS2TICKS(1000), TIM_MODE_PERIODIC,
 			dispShowText);
 	timerStop(timer_id_mrq);
 	return okLed;
@@ -378,11 +378,12 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 	return valid;
 }
 
-bool PVMarquesina(char *mess) {
+bool PVMarquesina(char *mess, uint8_t time_per_char) {
 	bool valid = true;
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {
 
+		PVDisplaySetTime(time_per_char);
 		//Pongo todo en mayusculas
 		uint8_t i;
 		char tempString1[l];
