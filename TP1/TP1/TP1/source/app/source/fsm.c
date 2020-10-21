@@ -918,10 +918,13 @@ state delRoutine(void) {
 		counter = 0;
 		while(true){
 			if(counter == MAX_USERS){
+				fe_data.del_user_ptr = 0;
+				fe_data.del_i = MAX_USERS;
 				break;
 			}
 			else if (!(((user_t*) aux_ptr)[aux_i%MAX_USERS]).admin && (((user_t*) aux_ptr)[aux_i%MAX_USERS]).available) {
 				fe_data.del_user_ptr = &(((user_t*) aux_ptr)[aux_i%MAX_USERS]);
+				fe_data.del_i = aux_i%MAX_USERS;
 				break;
 			}
 			aux_i++;
@@ -951,10 +954,13 @@ state delRoutine(void) {
 			while(true){
 				aux_i--;
 				if(counter == MAX_USERS){
+					fe_data.del_user_ptr = 0;
+					fe_data.del_i = MAX_USERS;
 					break;
 				}
 				else if (!(((user_t*) aux_ptr)[aux_i%MAX_USERS]).admin && (((user_t*) aux_ptr)[aux_i%MAX_USERS]).available) {
 					fe_data.del_user_ptr = &(((user_t*) aux_ptr)[aux_i%MAX_USERS]);
+					fe_data.del_i = aux_i%MAX_USERS;
 					break;
 				}
 				counter++;
@@ -965,10 +971,13 @@ state delRoutine(void) {
 			while(true){
 				aux_i++;
 				if(counter == MAX_USERS){
+					fe_data.del_user_ptr = 0;
+					fe_data.del_i = MAX_USERS;
 					break;
 				}
 				else if (!(((user_t*) aux_ptr)[aux_i%MAX_USERS]).admin && (((user_t*) aux_ptr)[aux_i%MAX_USERS]).available) {
 					fe_data.del_user_ptr = &(((user_t*) aux_ptr)[aux_i%MAX_USERS]);
+					fe_data.del_i = aux_i%MAX_USERS;
 					break;
 				}
 				counter++;
