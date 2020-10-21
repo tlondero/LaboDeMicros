@@ -949,6 +949,7 @@ state delRoutine(void) {
 		case ENC_LEFT:
 			counter = 0;
 			while(true){
+				aux_i--;
 				if(counter == MAX_USERS){
 					break;
 				}
@@ -956,13 +957,13 @@ state delRoutine(void) {
 					fe_data.del_user_ptr = &(((user_t*) aux_ptr)[aux_i%MAX_USERS]);
 					break;
 				}
-				aux_i--;
 				counter++;
 			}
 			break;
 		case ENC_RIGHT:
 			counter = 0;
 			while(true){
+				aux_i++;
 				if(counter == MAX_USERS){
 					break;
 				}
@@ -970,7 +971,6 @@ state delRoutine(void) {
 					fe_data.del_user_ptr = &(((user_t*) aux_ptr)[aux_i%MAX_USERS]);
 					break;
 				}
-				aux_i++;
 				counter++;
 			}
 			break;
