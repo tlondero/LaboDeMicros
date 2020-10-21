@@ -165,13 +165,19 @@ void drawFrontEnd(FEData data, state st) {
 		break;
 	case USERS_CLAVE:
 		for (i = 0; i < 4; i++) {
-			if (data.pin_counter > 3) {
-				PVDisplaySendChar(data.pin_data[data.pin_counter - 3 + i] + '0',
-						i);
-			} else {
-				PVDisplaySendChar(data.pin_data[i] + '0', i);
-			}
-		}
+						if (data.pin_counter > 3) {
+							if (i < 3)
+								PVDisplaySendChar('-', i);
+							else
+								PVDisplaySendChar(
+										data.pin_data[data.pin_counter - 3 + i] + '0', i);
+						} else {
+							if (i <= 3 && i == data.pin_counter)
+								PVDisplaySendChar(data.pin_data[i] + '0', i);
+							else
+								PVDisplaySendChar('-', i);
+						}
+					}
 		break;
 	case USERS_ADD:
 		if ((data.id_counter <= ID_LEN) && (!data.good_id)) {//Aca entra mientras ic_counter < 7 y no hayas dado al ok

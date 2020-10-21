@@ -433,6 +433,11 @@ state accessRoutine(void) {
 	static uint8_t selection = OPEN_SEL;
 
 	if (prev_state != ACCESS) {
+		int i = 0;
+		for (i = 0; i < ID_LEN; i++)
+			encoder_id_digits[i] = 0;
+		for (i = 0; i < PIN_LEN; i++)
+			encoder_pin_digits[i] = 0;
 		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
