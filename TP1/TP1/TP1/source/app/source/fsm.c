@@ -25,9 +25,12 @@ enum{USERS_CLAVE_SEL, USERS_ADD_SEL, USERS_DEL_SEL};
 
 //Pin buffer
 static uint8_t encoder_pin_digits[PIN_LEN];
+static uint8_t encoder_pin_digits_mirror[PIN_LEN];
 
 //Id Buffer
 static uint8_t encoder_id_digits[ID_LEN];
+static uint8_t encoder_id_digits_mirror[ID_LEN];
+
 //Frond-end data
 static FEData fe_data;
 static FEData* const fe_data_ptr = &fe_data;
@@ -125,7 +128,26 @@ void openCallback(void);
 /*******************************************************************************
  * FUNCTION DEFINITION WITH GLOBAL SCOPE
  ******************************************************************************/
+static void FSMPushState(void){
+	int i = 0;
+	for(i = 0; i<PIN_LEN; i++){
+		encoder_pin_digits_mirror[i] = encoder_pin_digits[i];
+		encoder_pin_digits[i] = 0;
+	}
+	for(i = 0; i<ID_LEN; i++){
+			encoder_id_digits_mirror[i] = encoder_id_digits[i];
+			encoder_id_digits[i] = 0;
+	}
+}
+static void FSMPullState(void){
+	int i = 0;
+	for(i = 0; i<PIN_LEN; i++)
+		encoder_pin_digits[i] = encoder_pin_digits_mirror[i];
 
+	for(i = 0; i<ID_LEN; i++)
+		encoder_id_digits[i] =  encoder_id_digits_mirror[i];
+
+}
 state FSMInitState(void) {
 
 	//Pido ids de todos los servicios
@@ -720,7 +742,7 @@ state claveRoutine(void) {
 		cancel_triggered = false;
 		updated_state = IDDLE;
 		timerStop(inactivity_timer_id);
-
+	}
 
 	if ((updated_state == USERS_CLAVE) && (PVCheckEvent())) {
 		timerReset(inactivity_timer_id);
@@ -774,6 +796,7 @@ state addRoutine(void) {
 	user_t my_user;
 
 	if (prev_state != USERS_ADD) {
+		FSMPushState();
 		fe_data.animation_opt = ADD_SELECTED_ANIMATION;
 		fe_data.animation_en = true;
 		using_encoder = false;
@@ -795,7 +818,7 @@ state addRoutine(void) {
 		cancel_triggered = false;
 		updated_state = IDDLE;
 		timerStop(inactivity_timer_id);
-
+	}
 	if (inactivity_triggered) {
 		updated_state = IDDLE;
 		inactivity_triggered = false;
@@ -890,6 +913,7 @@ state addRoutine(void) {
 				fe_data.pin_counter++;
 			}
 			else {
+
 				my_user.id=transformToNum(&encoder_id_digits[0], ID_LEN);
 				my_user.password= transformToNum(&encoder_pin_digits[0], PIN_LEN);
 				my_user.admin = false;
@@ -906,6 +930,9 @@ state addRoutine(void) {
 			break;
 		}
 	}
+
+	if(updated_state != USERS_ADD)
+		FSMPullState();
 
 	return updated_state;
 }
@@ -951,7 +978,7 @@ state delRoutine(void) {
 		cancel_triggered = false;
 		updated_state = IDDLE;
 		timerStop(inactivity_timer_id);
-
+	}
 	if (inactivity_triggered) {
 		updated_state = IDDLE;
 		inactivity_triggered = false;
