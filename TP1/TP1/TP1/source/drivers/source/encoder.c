@@ -158,4 +158,5 @@ event_t EncoderPopEvent(encoder_id id)
 		}
 		return ev;
 	}
+	else return 0;//
 }
