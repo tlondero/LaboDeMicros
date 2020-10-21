@@ -189,7 +189,7 @@ void drawFrontEnd(FEData data, state st) {
 		break;
 	case USERS_ADD:
 		//ACAAAA
-		if ((data.id_counter < ID_LEN) && (!data.good_id)) {//Aca entra mientras ic_counter < 7 y no hayas dado al ok
+		if ((data.id_counter < ID_LEN-1) && (!data.good_id)) {//Aca entra mientras ic_counter < 7 y no hayas dado al ok
 			for (i = 0; i < 4; i++) {
 				if (data.id_counter > 3) {
 					if ((i == 3) && (display == true)) {
@@ -208,6 +208,7 @@ void drawFrontEnd(FEData data, state st) {
 			}
 		} else if (data.good_id) {
 			FRDMLedFlash(BLUE);
+
 		} else if ((data.pin_counter < PIN_LEN) && (!data.good_pin)) { // en el caso de que este metiendo el pin
 			for (i = 0; i < 4; i++) {
 				if (data.pin_counter > 3) {

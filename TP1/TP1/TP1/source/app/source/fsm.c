@@ -773,7 +773,7 @@ state claveRoutine(void) {
 	}
 	return updated_state;
 }
-
+/*
 state addRoutine(void) {
 	state updated_state = USERS_ADD;
 	static uint8_t actual_encoder_number = 0;
@@ -865,7 +865,7 @@ state addRoutine(void) {
 
 				break;
 			case BTN_PRESS:
-				if (fe_data.id_counter < ID_LEN ) {
+				if (fe_data.id_counter < ID_LEN-1) {
 					fe_data.id_counter++;
 				}
 				else {
@@ -879,7 +879,7 @@ state addRoutine(void) {
 		}
 	}
 	if ((PVCheckEvent()) && asking_pin) {
-		fe_data.animation_en = false;;
+		fe_data.animation_en = false;
 		timerReset(inactivity_timer_id);
 		event_t ev = PVGetEv();
 		switch (ev) {
@@ -901,7 +901,7 @@ state addRoutine(void) {
 			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
 			break;
 		case BTN_PRESS:
-			if (fe_data.pin_counter < PIN_LEN) {
+			if (fe_data.pin_counter < PIN_LEN-1) {
 				fe_data.pin_counter++;
 			}
 			else {
@@ -928,7 +928,160 @@ state addRoutine(void) {
 
 	return updated_state;
 }
+*/
+state addRoutine(void) {
+	state updated_state = USERS_ADD;
+	static uint8_t actual_encoder_number = 0;
+	static bool using_encoder = false;
+	static bool asking_pin = false;
+	uint8_t* card_event = 0;
+	user_t my_user;
 
+	if (prev_state != USERS_ADD) {
+		FSMPushState();
+
+		fe_data.animation_en = true;
+		fe_data.animation_opt = ADD_SELECTED_ANIMATION;
+		fe_data.id_counter = 0;
+		fe_data.pin_counter = 0;
+		timerReset(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
+		using_encoder = false;
+		asking_pin = false;
+		int i = 0;
+		for(i = 0; i<ID_LEN; i++)
+			encoder_id_digits[i] = 0;
+		for(i = 0; i<PIN_LEN; i++)
+			encoder_pin_digits[i] = 0;
+
+		card_event = NULL;
+
+	}
+
+	if (back_triggered) {
+		back_triggered = false;
+		updated_state = USERS;
+		timerStop(inactivity_timer_id);
+	}
+	if (cancel_triggered) {
+		cancel_triggered = false;
+		updated_state = IDDLE;
+		timerStop(inactivity_timer_id);
+	}
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if (!using_encoder) {
+		card_event = cardGetPAN();
+		if (card_event != NULL) {
+			asking_pin = true;
+			fe_data.good_id = true;
+			fe_data.animation_en = false;
+			fe_data.id_counter = ID_LEN;
+			int i = 0;
+			for( i = 0; i<ID_LEN; i++)
+				encoder_id_digits[i] = card_event[i];
+		}
+	}
+
+	/*if (PVCheckEvent()) {
+		fe_data.animation_en = false;
+		using_encoder = true;
+	}
+	if (using_encoder && (updated_state == USERS_ADD) && !asking_pin) {
+		if (PVCheckEvent()) {
+			event_t ev = PVGetEv();
+			timerReset(inactivity_timer_id);
+			switch (ev) {
+			case ENC_LEFT:
+				if (actual_encoder_number == 0)
+					actual_encoder_number = 9;
+				else
+					actual_encoder_number--;
+
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+				break;
+			case ENC_RIGHT:
+				if (actual_encoder_number == 9)
+					actual_encoder_number = 0;
+
+				else
+					actual_encoder_number++;
+
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+				break;
+			case BTN_PRESS:
+				if (fe_data.id_counter < ID_LEN-1) {
+					fe_data.id_counter++;
+					actual_encoder_number = 0;
+				}
+				else {
+						fe_data.good_id = true;
+						fe_data.animation_en = false;
+						asking_pin = true;
+					}
+				break;
+			default:
+				break;
+			}
+		}
+	}*/
+
+	if (asking_pin && (updated_state == USERS_ADD) && (PVCheckEvent())) {
+		timerReset(inactivity_timer_id);
+		event_t ev = PVGetEv();
+		switch (ev) {
+		case ENC_LEFT:
+			if (actual_encoder_number == 0){
+				actual_encoder_number = 9;
+			}
+			else{
+				actual_encoder_number--;
+			}
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+
+			break;
+		case ENC_RIGHT:
+			if (actual_encoder_number == 9){
+				actual_encoder_number = 0;
+			}
+			else{
+				actual_encoder_number++;
+			}
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+
+			break;
+		case BTN_PRESS:
+			if (fe_data.pin_counter < PIN_LEN-1) {
+				fe_data.pin_counter++;
+				actual_encoder_number = 0;
+			}
+			else {
+				user_t new_user;
+				new_user.admin = false;
+				new_user.available = true;
+				new_user.blocked = false;
+				new_user.id = transformToNum(&encoder_id_digits[0], ID_LEN);
+				new_user.password = transformToNum(&encoder_pin_digits[0], PIN_LEN);
+				new_user.strikes = 0;
+				updated_state = USERS;
+				fe_data.good_pin = true;
+				addUser(new_user);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	if(updated_state != USERS_ADD)
+		FSMPullState();
+
+	return updated_state;
+}
 state delRoutine(void) {
 	int8_t counter = 0;
 	state updated_state = USERS_DEL;
