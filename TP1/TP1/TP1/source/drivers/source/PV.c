@@ -410,7 +410,7 @@ bool PVMarquesina(char *mess) {
 		}
 
 		length = l + 2 * SEV_SEG;
-		countMess = 0;
+		countMess = 4;
 	} else {
 		message[0] = '\0';
 		length = 0;
