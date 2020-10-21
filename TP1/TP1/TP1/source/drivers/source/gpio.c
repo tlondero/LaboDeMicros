@@ -64,8 +64,8 @@ void gpioMode(pin_t pin, uint8_t mode)
 	//PCR CONFIG
 	uint8_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
-	PORT_Type *port_pointer = PORT_SELECTORS[port];
-	GPIO_Type *gpio_pointer = GPIO_SELECTORS[port];
+	PORT_Type *port_pointer = (PORT_Type *) PORT_SELECTORS[port];
+	GPIO_Type *gpio_pointer = (GPIO_Type *) GPIO_SELECTORS[port];
 
 	port_pointer->PCR[number] = 0x00;
 	// Establecemos el pin como GPIO
@@ -105,8 +105,8 @@ void gpioWrite(pin_t pin, bool value)
 {
 	uint8_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
-	PORT_Type *port_pointer = PORT_SELECTORS[port];
-	GPIO_Type *gpio_pointer = GPIO_SELECTORS[port];
+//	PORT_Type *port_pointer = PORT_SELECTORS[port];
+	GPIO_Type *gpio_pointer = (GPIO_Type *)GPIO_SELECTORS[port];
 
 	if (value == HIGH)
 	{
@@ -123,7 +123,7 @@ bool gpioIRQ(pin_t pin, uint8_t irqMode, pinIrqFun_t irqFun)
 
 	uint32_t port = PIN2PORT(pin);	//Tomo el puerto
 	uint32_t number = PIN2NUM(pin); //Tomo el numero
-	PORT_Type *port_pointer = PORT_SELECTORS[port];
+	PORT_Type *port_pointer = (PORT_Type *) PORT_SELECTORS[port];
 	uint32_t IRQn = PORTA_IRQn + port;
 
 	//Identifico a este pin como que tiene la interrupcion configurada
@@ -146,6 +146,7 @@ bool gpioIRQ(pin_t pin, uint8_t irqMode, pinIrqFun_t irqFun)
 	///de cada pin de manera tal que no puede tomar interrupciones?)
 
 	interrupt_init(IRQn);
+	return true;
 }
 
 ///PENSAR: Que hacer con estos? Son los handlers de IRQ por puerto, pero yo tengo un callback por cada pin de cada puerto?
@@ -265,7 +266,7 @@ void gpioToggle(pin_t pin)
 {
 	uint32_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
-	GPIO_Type *gpio_pointer = GPIO_SELECTORS[port];
+	GPIO_Type *gpio_pointer = (GPIO_Type *)GPIO_SELECTORS[port];
 	gpio_pointer->PTOR |= (1 << number);
 }
 
@@ -273,7 +274,7 @@ bool gpioRead(pin_t pin)
 {
 	uint32_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
-	GPIO_Type *gpio_pointer = GPIO_SELECTORS[port];
+	GPIO_Type *gpio_pointer = (GPIO_Type *)GPIO_SELECTORS[port];
 	bool res = gpio_pointer->PDIR & (1 << number);
 	return res;
 }
