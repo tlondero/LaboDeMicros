@@ -229,6 +229,15 @@ state IDDLERoutine(void) {
 		timerResume(inactivity_timer_id);
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
+
+		int i = 0;
+		for(i = 0; i<ID_LEN; i++)
+			encoder_id_digits[i] = 0;
+		for(i = 0; i<PIN_LEN; i++)
+			encoder_pin_digits[i] = 0;
+
+		card_event = NULL;
+
 		//activar las interrupciones de cancel y del
 	}
 
@@ -424,9 +433,10 @@ state accessRoutine(void) {
 	static uint8_t selection=OPEN_SEL;
 
 	if (prev_state != ACCESS) {
-		fe_data.animation_en = false;
+		fe_data.animation_en = true;
 		timerReset(inactivity_timer_id);
 		timerResume(inactivity_timer_id);
+		fe_data.animation_opt = OPEN_SELECTED_ANIMATION;
 		//desactivar las interrupciones de cancel y del
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_DISABLE, backCallback);

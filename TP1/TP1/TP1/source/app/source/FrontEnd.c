@@ -26,12 +26,17 @@ const char CLAVE_MSG[4] = { 'P','A','S','S' };
 const char ADD_MSG[4] = { ' ','A','D','D' };
 const char DEL_MSG[4] = { ' ','D','E','L' };
 
+bool display = true;
+bool init_ok = false;
+
+static tim_id_t selection_timer_id;
+static uint8_t prev_del_id = 255;
+
+
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH FILE SCOPE
  ******************************************************************************/
-bool display = true;
-bool init_ok = false;
-static tim_id_t selection_timer_id;
+
 void displaySelectBlink(void) {
 	display = !display;
 }
@@ -113,15 +118,15 @@ void drawFrontEnd(FEData data, state st) {
 
 		if (data.animation_en) {
 			switch (data.animation_opt) {
-			case OPEN_ANIMATION:
+			case OPEN_SELECTED_ANIMATION:
 				for (i = 0; i < 4; i++)
 					PVDisplaySendChar(OPEN_MSG[i], i);
 				break;
-			case USERS_ANIMATION:
+			case USER_SELECTED_ANIMATION:
 				for (i = 0; i < 4; i++)
 					PVDisplaySendChar(USER_MSG[i], i);
 				break;
-			case BRIGHTNESS_ANIMATION:
+			case BRIGHTNESS_SELECTED_ANIMATION:
 				for (i = 0; i < 4; i++)
 					PVDisplaySendChar(BRIGHTNESS_MSG[i], i);
 				break;
@@ -200,8 +205,11 @@ void drawFrontEnd(FEData data, state st) {
 		}
 		break;
 	case USERS_DEL:
-		if (((user_t *) (data.del_user_ptr)) !=  NULL )
-		PVMarquesina(num2str(((user_t *) (data.del_user_ptr))->id));
+		if ( (((user_t *) (data.del_user_ptr)) !=  NULL)  && (prev_del_id != data.del_i)){
+			char *p = 	num2str(((user_t *) (data.del_user_ptr))->id);
+			PVMarquesina(p);
+			prev_del_id = data.del_i;
+		}
 		if (data.del_user) {
 			FRDMLedFlash(BLUE);
 		}

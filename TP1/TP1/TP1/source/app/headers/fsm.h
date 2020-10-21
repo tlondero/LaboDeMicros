@@ -14,7 +14,7 @@
   /*******************************************************************************
    * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
    ******************************************************************************/
-#define INACTIVITY_TRIGGER_TIME (5000) //ms
+#define INACTIVITY_TRIGGER_TIME (20000) //ms
 #define OPEN_TRIGGER_TIME (5000) //ms
 #define ID_LEN 8
 #define PIN_LEN 5
