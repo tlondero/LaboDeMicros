@@ -120,6 +120,7 @@ void dispShowText(void) {
 void open_animation_Callback(void) {
 	static uint8_t i = 0, j;
 	static char open_animation[4] = { '^', '>', '_', '<' };
+	//static char open_animation[7] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
 	if (i == OPEN_TRIGGER_TIME / 500) {
 		timerStop(timer_open_st);
 	} else {
@@ -224,8 +225,8 @@ bool PVInit(void) {
 	timer_id_mrq = timerGetId();
 	timer_open_st = timerGetId();
 
-	timerStart(timer_open_st, TIMER_MS2TICKS((5)), TIM_MODE_PERIODIC,
-			open_animation_Callback);
+	timerStart(timer_open_st, TIMER_MS2TICKS((5)), TIM_MODE_PERIODIC, open_animation_Callback);
+	//timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC, open_animation_Callback);
 	timerStop(timer_open_st);
 
 	timerStart(timer_id_mrq, TIMER_MS2TICKS(1000), TIM_MODE_PERIODIC,
@@ -419,6 +420,8 @@ bool PVMarquesina(char *mess) {
 
 	timerReset(timer_id_mrq);
 
+	PVDispMessOn();
+
 	return valid;
 }
 
@@ -514,6 +517,8 @@ bool PVAnimation(animation_t animation, bool activate) {
 			valid = false;
 			break;
 		}
+	} else {
+		PVDisplayClear();
 	}
 	return valid;
 }
