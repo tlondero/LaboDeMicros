@@ -112,7 +112,8 @@ void dispShowText(void) {
 		}
 		break;
 	case (PV_NODIR):
-		dir = PV_NODIR;
+		break;
+	default:
 		break;
 	}
 }
@@ -229,7 +230,7 @@ bool PVInit(void) {
 	//timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC, open_animation_Callback);
 	timerStop(timer_open_st);
 
-	timerStart(timer_id_mrq, TIMER_MS2TICKS(1000), TIM_MODE_PERIODIC,
+	timerStart(timer_id_mrq, TIMER_MS2TICKS(750), TIM_MODE_PERIODIC,
 			dispShowText);
 	timerStop(timer_id_mrq);
 	return okLed;
@@ -365,7 +366,6 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 		message[0] = '\0';
 		length = 0;
 		countMess = 0;
-		dir = PV_NODIR;
 	}
 
 	bool valid = false;
@@ -414,7 +414,6 @@ bool PVMarquesina(char *mess) {
 
 		length = l + 2 * SEV_SEG;
 		countMess = 0; //4?
-		dir = PV_LEFT;
 	} else {
 		message[0] = '\0';
 		length = 0;
