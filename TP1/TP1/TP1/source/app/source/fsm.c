@@ -832,6 +832,7 @@ state addRoutine(void) {
 			for( i = 0; i<ID_LEN; i++)
 				encoder_id_digits[i] = card_event[i];
 			fe_data.good_pin = true;
+			fe_data.id_counter= ID_LEN;
 		}
 	}
 
