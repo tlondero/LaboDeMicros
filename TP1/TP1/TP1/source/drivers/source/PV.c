@@ -378,7 +378,7 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 	return valid;
 }
 
-bool PVMarquesina(char *mess, uint8_t time_per_char) {
+bool PVMarquesina(char *mess, uint32_t time_per_char) {
 	bool valid = true;
 	uint8_t l = checkMessageLength(mess);
 	if (l < MAX_MESS_LEN) {
