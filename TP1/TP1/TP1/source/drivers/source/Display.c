@@ -82,7 +82,7 @@ const static character_t characters[] = {
 		{'O', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
 		{'P', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
 		{'Q', {HIGH, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
-		{'R', {LOW, LOW, LOW, LOW, HIGH, LOW, HIGH, LOW} },
+		{'R', {HIGH, LOW, LOW, LOW, HIGH, HIGH, LOW, LOW} },
 		{'S', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
 		{'T', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
 		{'U', {LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
