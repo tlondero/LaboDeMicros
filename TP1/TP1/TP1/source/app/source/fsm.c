@@ -248,6 +248,7 @@ state IDDLERoutine(void) {
 	if (!using_encoder) {
 		card_event = cardGetPAN();
 		if (card_event != NULL) {
+			fe_data.animation_en = false;
 			if (checkExistance(transformToNum(card_event, ID_LEN))) {
 				if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
 					fe_data.blocked_user = true;
@@ -256,7 +257,6 @@ state IDDLERoutine(void) {
 				else {
 					updated_state = ASK_PIN;
 					fe_data.good_id = true;
-					fe_data.animation_en = false;
 					int i = 0;
 					for( i = 0; i<ID_LEN; i++)
 						encoder_id_digits[i] = card_event[i];
