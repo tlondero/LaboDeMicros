@@ -556,10 +556,6 @@ state usersRoutine(void) {
 		updated_state = ACCESS;
 	}
 
-	if (inactivity_triggered) {
-		updated_state = IDDLE;
-		inactivity_triggered = false;
-	}
 
 	if ((updated_state == USERS) && (PVCheckEvent())) {
 		timerReset(inactivity_timer_id);
@@ -697,10 +693,6 @@ state claveRoutine(void) {
 		updated_state = ACCESS;
 	}
 
-	if (inactivity_triggered) {
-		updated_state = IDDLE;
-		inactivity_triggered = false;
-	}
 
 	if ((updated_state == USERS_CLAVE) && (PVCheckEvent())) {
 		timerReset(inactivity_timer_id);
@@ -725,7 +717,7 @@ state claveRoutine(void) {
 			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
 			break;
 		case BTN_PRESS:
-			if (fe_data.pin_counter < PIN_LEN) {
+			if (fe_data.pin_counter < PIN_LEN-1) {
 				fe_data.pin_counter++;
 			}
 			else {
