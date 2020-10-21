@@ -295,7 +295,7 @@ state IDDLERoutine(void) {
 		fe_data.animation_en = false;
 		using_encoder = true;
 	}
-	if (using_encoder && updated_state == IDDLE) {
+	if (using_encoder && (updated_state == IDDLE)) {
 		if (cancel_triggered) {
 			fe_data.animation_en = true;
 			fe_data.id_counter = 0;
@@ -828,6 +828,10 @@ state addRoutine(void) {
 		card_event = cardGetPAN();
 		if (card_event != NULL) {
 			asking_pin = true;
+			int i = 0;
+			for( i = 0; i<ID_LEN; i++)
+				encoder_id_digits[i] = card_event[i];
+			fe_data.good_pin = true;
 		}
 	}
 
@@ -836,7 +840,7 @@ state addRoutine(void) {
 		using_encoder = true;
 	}
 
-	if (using_encoder && updated_state == IDDLE && !asking_pin) {
+	if (using_encoder && (updated_state == USERS_ADD) && !asking_pin) {
 		if (cancel_triggered) {
 			fe_data.animation_en = true;
 			fe_data.id_counter = 0;
