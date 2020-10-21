@@ -289,6 +289,8 @@ state IDDLERoutine(void) {
 		//ahora hay que fijarse si llego un evento de encoder, si es derecha aumento el numero si es izquierda lo achico si es enter avanzo
 		if (PVCheckEvent()) {
 			event_t ev = PVGetEv();
+			timerReset(inactivity_timer_id);
+			timerResume(inactivity_timer_id);//Reinicio timer
 			switch (ev) {
 			case ENC_LEFT:
 				if (actual_encoder_number == 0)
@@ -338,6 +340,11 @@ state IDDLERoutine(void) {
 			}
 		}
 	}
+	if (inactivity_triggered) {
+			updated_state = IDDLE;
+			inactivity_triggered = false;
+			using_encoder = false;
+		}
 	return updated_state;
 }
 state askPinRoutine(void) {
