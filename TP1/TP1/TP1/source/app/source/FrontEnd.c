@@ -18,20 +18,19 @@
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH FILE SCOPE
  ******************************************************************************/
-const char BRIGHTNESS_MSG[4] = { 'B','R','G','H' };
-const char OPEN_MSG[4] = { 'O','P','E','N' };
-const char USER_MSG[4] = { 'U','S','E','R' };
+const char BRIGHTNESS_MSG[4] = { 'B', 'R', 'G', 'H' };
+const char OPEN_MSG[4] = { 'O', 'P', 'E', 'N' };
+const char USER_MSG[4] = { 'U', 'S', 'E', 'R' };
 
-const char CLAVE_MSG[4] = { 'P','A','S','S' };
-const char ADD_MSG[4] = { ' ','A','D','D' };
-const char DEL_MSG[4] = { ' ','D','E','L' };
+const char CLAVE_MSG[4] = { 'P', 'A', 'S', 'S' };
+const char ADD_MSG[4] = { ' ', 'A', 'D', 'D' };
+const char DEL_MSG[4] = { ' ', 'D', 'E', 'L' };
 
 bool display = true;
 bool init_ok = false;
 
 static tim_id_t selection_timer_id;
 static uint8_t prev_del_id = 255;
-
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH FILE SCOPE
@@ -45,8 +44,9 @@ void displaySelectBlink(void) {
  ******************************************************************************/
 
 void drawFrontEnd(FEData data, state st) {
-	selection_timer_id = timerGetId();
+
 	if (init_ok == false) {
+		selection_timer_id = timerGetId();
 		timerStart(selection_timer_id, BLINK_PERIOD, TIM_MODE_PERIODIC,
 				displaySelectBlink);
 		init_ok = true;
@@ -77,8 +77,11 @@ void drawFrontEnd(FEData data, state st) {
 					}
 				}
 			}
-		} else if (data.bad_id) {
+		}
+
+		if (data.bad_id) {
 			FRDMLedFlash(RED); //aca le digo que titile 3 veces rojo
+			//PVMarquesina("BAD ID TRY AGAIN", 400);
 		}
 		break;
 	case ASK_PIN:
@@ -92,7 +95,8 @@ void drawFrontEnd(FEData data, state st) {
 						PVDisplaySendChar('-', i);
 					else
 						PVDisplaySendChar(
-								data.pin_data[data.pin_counter - 3 + i] + '0', i);
+								data.pin_data[data.pin_counter - 3 + i] + '0',
+								i);
 				} else {
 					if (i <= 3 && i == data.pin_counter)
 						PVDisplaySendChar(data.pin_data[i] + '0', i);
@@ -163,34 +167,43 @@ void drawFrontEnd(FEData data, state st) {
 	case BRIGHTNESS:
 		for (i = 0; i < 4; i++)
 			PVDisplaySendChar(BRIGHTNESS_MSG[i], i);
-		if(data.br == true)
+		if (data.br == true)
 			PVDisplaySetBright(data.brightness);
 
 		break;
 	case USERS_CLAVE:
 		for (i = 0; i < 4; i++) {
-						if (data.pin_counter > 3) {
-							if (i < 3)
-								PVDisplaySendChar('-', i);
-							else
-								PVDisplaySendChar(
-										data.pin_data[data.pin_counter - 3 + i] + '0', i);
-						} else {
-							if (i <= 3 && i == data.pin_counter)
-								PVDisplaySendChar(data.pin_data[i] + '0', i);
-							else
-								PVDisplaySendChar('-', i);
-						}
-					}
+			if (data.pin_counter > 3) {
+				if (i < 3)
+					PVDisplaySendChar('-', i);
+				else
+					PVDisplaySendChar(
+							data.pin_data[data.pin_counter - 3 + i] + '0', i);
+			} else {
+				if (i <= 3 && i == data.pin_counter)
+					PVDisplaySendChar(data.pin_data[i] + '0', i);
+				else
+					PVDisplaySendChar('-', i);
+			}
+		}
 		break;
 	case USERS_ADD:
+		//ACAAAA
 		if ((data.id_counter <= ID_LEN) && (!data.good_id)) {//Aca entra mientras ic_counter < 7 y no hayas dado al ok
 			for (i = 0; i < 4; i++) {
 				if (data.id_counter > 3) {
-					PVDisplaySendChar(
-							data.id_data[data.id_counter - 3 + i] + '0', i);
+					if ((i == 3) && (display == true)) {
+						PVDisplaySendChar(' ', i);
+					} else {
+						PVDisplaySendChar(
+								data.id_data[data.id_counter - 3 + i] + '0', i);
+					}
 				} else {
-					PVDisplaySendChar(data.id_data[i] + '0', i);
+					if ((i == (data.id_counter % 4)) && (display == true)) {
+						PVDisplaySendChar(' ', i);
+					} else {
+						PVDisplaySendChar(data.id_data[i] + '0', i);
+					}
 				}
 			}
 		} else if (data.good_id) {
@@ -205,10 +218,10 @@ void drawFrontEnd(FEData data, state st) {
 								data.pin_data[data.pin_counter - 3 + i] + '0',
 								i);
 				} else {
-					if (i < 3)
-						PVDisplaySendChar('-', i);
-					else
+					if (i <= 3 && i == data.pin_counter)
 						PVDisplaySendChar(data.pin_data[i] + '0', i);
+					else
+						PVDisplaySendChar('-', i);
 				}
 			}
 		} else if (data.good_pin) {
@@ -216,8 +229,9 @@ void drawFrontEnd(FEData data, state st) {
 		}
 		break;
 	case USERS_DEL:
-		if ( (((user_t *) (data.del_user_ptr)) !=  NULL)  && (prev_del_id != data.del_i)){
-			char *p = 	num2str(((user_t *) (data.del_user_ptr))->id);
+		if ((((user_t *) (data.del_user_ptr)) != NULL)
+				&& (prev_del_id != data.del_i)) {
+			char *p = num2str(((user_t *) (data.del_user_ptr))->id);
 			PVMarquesina(p, 500);
 			prev_del_id = data.del_i;
 		}

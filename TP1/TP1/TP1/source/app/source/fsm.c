@@ -248,8 +248,8 @@ state IDDLERoutine(void) {
 	if (!using_encoder) {
 		card_event = cardGetPAN();
 		if (card_event != NULL) {
-			fe_data.animation_en = false;
 			if (checkExistance(transformToNum(card_event, ID_LEN))) {
+				fe_data.animation_en = false;
 				if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
 					fe_data.blocked_user = true;
 					updated_state = IDDLE;
