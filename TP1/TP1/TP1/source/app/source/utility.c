@@ -35,7 +35,7 @@ char* num2str(uint32_t num){
 	int8_t i;
 	int8_t j;
 	uint32_t id[DIGIT_MAX_LEN];
-	char chars[DIGIT_MAX_LEN+1];
+	static char chars[DIGIT_MAX_LEN+1];
 
 	for (i = DIGIT_MAX_LEN; i > 0 ; i--) {
 		uint32_t aux = 0;
@@ -53,5 +53,5 @@ char* num2str(uint32_t num){
 
 	chars[8] = '\0';
 
-	return &chars;
+	return chars;
 }
