@@ -130,6 +130,8 @@ void drawFrontEnd(FEData data, state st) {
 				for (i = 0; i < 4; i++)
 					PVDisplaySendChar(BRIGHTNESS_MSG[i], i);
 				break;
+			default:
+				break;
 			}
 		}
 		break;
