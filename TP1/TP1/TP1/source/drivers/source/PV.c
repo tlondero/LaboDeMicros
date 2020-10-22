@@ -389,7 +389,9 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 
 	bool valid = false;
 
-	if (seven_seg_module < SEV_SEG) {
+	if(dispBright == 0){
+		dispClearAll();
+	} else if (seven_seg_module < SEV_SEG) {
 		dispSendChar(ch, seven_seg_module);
 		valid = true;
 	}
