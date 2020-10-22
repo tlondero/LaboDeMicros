@@ -1,7 +1,50 @@
-\input{../Informe/Header.tex}
+\begin{center}
+\textcolor{black}{\huge{\textbf{\underline{OPEN DOOP: Manual de usuario}}}}
+\end{center}
 
-\begin{document}
+\begin{center}
+\textbf{\LARGE{Inicio:}}
+\end{center}
 
-\subsection{Introducción}
+Al encender el dispositivo, se esperará que se ingrese un ID, utilizando el encoder ó la tarjeta. No ocurre nada en caso de que la ID introducida no sea correcta. Una vez ingresada la ID, se encenderá el led \textcolor{blue}{azul} y deberá ingresar el PIN. Con el botón del \textbf{SW2} se puede cancelar la introducción del PIN/ID, mientras que con el \textbf{SW3} se borra el dígito introducido, volviendo al anterior.
 
-\end{document}
+Se cuenta con 3 intentos para ingresar dicho pin. En el caso de que el introducido no sea correcto luego de los intentos, se bloqueará dicho ID, hasta que un \textbf{ADMIN} lo desbloquee.
+
+\begin{center}
+\textbf{\LARGE{Access:}}
+\end{center}
+
+Una vez dentro es posible navegar a través de las distintas opciones mediante el uso del encoder. Las opciones disponibles son ``OPEN'', ``USERS'' y ``BRIGHT''. Open permite abrir la puerta mientras que las otras dos opciones permiten configurar el sistema.
+
+En el caso de inactividad, es decir, que no se efectúe ninguna acción, se volverá al menú principal automáticamente, deslogueando al usuario.
+
+
+\begin{center}
+\textbf{\LARGE{Menúes:}}
+\end{center}
+
+
+
+
+\textbf{\Large{Brightness:}}
+
+
+Permite configurar el nivel de brillo del display, existiendo 3 distintos niveles.
+
+\vspace*{0.5cm}
+
+\textbf{\Large{Users:}}
+
+En este puede configurarse 3 opciones distintas, de las cuales dos son exclusivas para administradores.
+
+\vspace*{0.25cm}
+\textbf{\large{Clave:}}
+En este submenu, disponible para cualquier usuario, permite cambiar el PIN de seguridad del usuario.
+
+\vspace*{0.25cm}
+\textbf{\large{Delete:}}
+\textbf{SOLO PARA ADMINS.} En este submenu permite eliminar usuarios existentes en la base de datos.
+
+\vspace*{0.25cm}
+\textbf{\large{Add:}}
+\textbf{SOLO PARA ADMINS.} En este submenu permite agregar usuarios nuevos a la base de datos.
