@@ -22,16 +22,7 @@
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-typedef struct
-{
-  uint8_t size;
-} Message_t; //uint8 is temporary
 
-typedef enum
-{
-  RIGHT,
-  LEFT
-} direction_t;
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -46,11 +37,6 @@ typedef enum
  */
 void dispInit(void);
 
-/**
- * @brief dispSendMsg: the idea should be to print the msg send by the user, the Message_t struct is under construction
- *
- */
-void dispSendMsg(Message_t msg);
 
 /**
  * @brief dispSendChar: sends to the selected 7 seg the character:

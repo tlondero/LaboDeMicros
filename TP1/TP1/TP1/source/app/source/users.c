@@ -44,7 +44,7 @@ void addUser(user_t new_user) {
         i++;
     }
     if (new_user.id == users[i].id) {
-        users[i] = new_user;   //si lo encontr� le cambio la contrase�a
+        users[i] = new_user;   //si lo encontro le asigna la nueva informacion
     }
     else {
         i = 0;
