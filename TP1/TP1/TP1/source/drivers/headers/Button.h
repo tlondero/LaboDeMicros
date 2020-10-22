@@ -1,4 +1,4 @@
-/***************************************************************************//**
+/***************************************************************************/ /**
   @file     Button.h
   @brief    Simple  driver for buttons
   @author   MAGT
@@ -17,14 +17,11 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-
-
 #define BUTTON_REFRESH_PERIOD 100
 //THIS TRESHOLDS ARE NOT IN MS
 //THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD
 #define HIGH_WHEN_PRESSED 1
 #define LOW_WHEN_PRESSED 0
-
 
 #define LKP_THRESHOLD 50
 
@@ -35,17 +32,17 @@
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 //EVENTS:
-enum{
-	NO_EV,//No event was detected by the button
-	PRESS,//Button was pressed
-	RELEASE,//button was released
-	LKP,// Long Key Press
-	SKP, //Short key press  //Finisher of the ev queue
-	EOQ
+enum
+{
+  NO_EV,   //No event was detected by the button
+  PRESS,   //Button was pressed
+  RELEASE, //button was released
+  LKP,     // Long Key Press
+  SKP,     //Short key press  //Finisher of the ev queue
+  EOQ
 };
 
-typedef uint8_t ButtonEvent ;//instant events such as PRESS and RELEASE
-
+typedef uint8_t ButtonEvent; //instant events such as PRESS and RELEASE
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -65,7 +62,7 @@ typedef uint8_t ButtonEvent ;//instant events such as PRESS and RELEASE
  * @return  the ID for the switch -1 if the you reached the max switches
  */
 
-int8_t ButtonInit(pin_t pin ,uint8_t mode, uint8_t active_low_or_high);
+int8_t ButtonInit(pin_t pin, uint8_t mode, uint8_t active_low_or_high);
 
 /**
  * @brief  ButtonSetIRQ: if you desire to use a dedicated interruption
@@ -85,8 +82,7 @@ int8_t ButtonInit(pin_t pin ,uint8_t mode, uint8_t active_low_or_high);
     fcallback: Function to be called when the button is pressed
  */
 
-void ButtonSetIRQ(int8_t id, uint8_t IRQ_mode,pinIrqFun_t fcallback);
-
+void ButtonSetIRQ(int8_t id, uint8_t IRQ_mode, pinIrqFun_t fcallback);
 
 /**
  * @brief  getter for the button events.
@@ -95,11 +91,10 @@ void ButtonSetIRQ(int8_t id, uint8_t IRQ_mode,pinIrqFun_t fcallback);
  * The EOQ Refers to the tail of the ev queue
  */
 
-const ButtonEvent * ButtonGetEvent(int8_t id);
+const ButtonEvent *ButtonGetEvent(int8_t id);
 bool ButtonCheckEvent(int8_t id);
 
 /*******************************************************************************
  ******************************************************************************/
 
 #endif /* BUTTON_H_ */
-

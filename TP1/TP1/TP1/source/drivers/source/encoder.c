@@ -1,6 +1,7 @@
 #include "../headers/encoder.h"
 #include "../headers/timer.h"
 #include "../headers/board.h"
+#include "../headers/debug.h"
 #include <stdbool.h>
 
 /*******************************************************************************
@@ -8,28 +9,24 @@
  ******************************************************************************/
 #define MAX_ENCODERS 5
 #define NO_MORE_ENCODERS 255
-#define DEVELOPMENT_MODE 1
+
 #define HIGH 1
 #define LOW 0
 
 #define LEN(array) sizeof(array) / sizeof(array[0])
-
-#if DEVELOPMENT_MODE
-#define DEBUG_PIN PIN_B10
-#endif
 
 /*******************************************************************************
  * STRUCTS AND TYPEDEFS
  ******************************************************************************/
 typedef struct
 {
-  pin_t pin_A;
-  pin_t pin_B;
-  bool event_flag;
-  event_t event_queue[20];
-  tim_id_t timer_id;
-  uint8_t in_pointer;
-  uint8_t out_pointer;
+	pin_t pin_A;
+	pin_t pin_B;
+	bool event_flag;
+	event_t event_queue[20];
+	tim_id_t timer_id;
+	uint8_t in_pointer;
+	uint8_t out_pointer;
 
 } encoder_state_t;
 
@@ -39,7 +36,6 @@ typedef struct
 static encoder_state_t encoders[MAX_ENCODERS];
 static uint16_t enconders_cant = 0;
 static tim_id_t encoder_timer_id;
-
 
 /*******************************************************************************
  * FUNCTION DECLARATIONS
@@ -53,7 +49,6 @@ void EncoderUpdate(void);
  * FUNCTION DEFINITIONS
  ******************************************************************************/
 
-
 //Init encoder driver
 void EncoderInit(encoder_id enc_id)
 {
@@ -66,7 +61,7 @@ void EncoderInit(encoder_id enc_id)
 		encoders[enc_id].timer_id = encoder_timer_id;
 		timerStart(encoder_timer_id, (uint32_t)TIMER_MS2TICKS(100), TIM_MODE_SINGLESHOT, NULL); //Previene rebotes
 
-#if DEVELOPMENT_MODE
+#if DEBUGGIN_MODE_ENCODER
 		gpioMode(DEBUG_PIN, OUTPUT);
 		gpioWrite(DEBUG_PIN, LOW);
 #endif
@@ -95,37 +90,34 @@ encoder_id EncoderRegister(pin_t pin_A, pin_t pin_B)
 	return id;
 }
 
-
-
 //Update encoders
 void EncoderUpdate(void)
 {
 	encoder_id id = 0;
 
-#if DEVELOPMENT_MODE
-		gpioWrite(DEBUG_PIN, HIGH);
+#if DEBUGGIN_MODE
+	gpioWrite(DEBUG_PIN, HIGH);
 #endif
-		for (id = 0; id < enconders_cant; id++)
+	for (id = 0; id < enconders_cant; id++)
+	{
+		if (timerExpired(encoders[id].timer_id))
 		{
-			if (timerExpired(encoders[id].timer_id))
+
+			//COMPARE PREV AND CURRENT STATE
+			if (gpioRead(encoders[id].pin_A) == HIGH)
 			{
-
-				//COMPARE PREV AND CURRENT STATE
-				if (gpioRead(encoders[id].pin_A) == HIGH)
-				{
-					EncoderAddNewEvent(id, RIGHT_TURN);
-				}
-				else if(gpioRead(encoders[id].pin_A) == LOW)
-				{
-					EncoderAddNewEvent(id, LEFT_TURN);
-				}
-				timerReset(encoder_timer_id);
+				EncoderAddNewEvent(id, RIGHT_TURN);
 			}
+			else if (gpioRead(encoders[id].pin_A) == LOW)
+			{
+				EncoderAddNewEvent(id, LEFT_TURN);
+			}
+			timerReset(encoder_timer_id);
 		}
+	}
 
-#if DEVELOPMENT_MODE
-		gpioWrite(DEBUG_PIN, LOW);
-		int a = -1;
+#if DEBUGGIN_MODE
+	gpioWrite(DEBUG_PIN, LOW);
 #endif
 }
 //Reports if a new event is available
@@ -137,12 +129,12 @@ bool EncoderEventAVB(encoder_id id)
 //Adds a new a event to the queue
 void EncoderAddNewEvent(encoder_id id, event_t ev)
 {
-	if(encoders[id].in_pointer  != (encoders[id].out_pointer + LEN(encoders[id].event_queue))){
-		encoders[id].event_queue[encoders[id].in_pointer] =  ev;
+	if (encoders[id].in_pointer != (encoders[id].out_pointer + LEN(encoders[id].event_queue)))
+	{
+		encoders[id].event_queue[encoders[id].in_pointer] = ev;
 		encoders[id].in_pointer = (++encoders[id].in_pointer) % (LEN(encoders[id].event_queue));
 		encoders[id].event_flag = EVENT_AVB;
 	}
-
 }
 //Pops the last event in the queue
 event_t EncoderPopEvent(encoder_id id)
@@ -153,10 +145,12 @@ event_t EncoderPopEvent(encoder_id id)
 		event_t ev;
 		ev = encoders[id].event_queue[encoders[id].out_pointer];
 		encoders[id].out_pointer = (++encoders[id].out_pointer) % (LEN(encoders[id].event_queue));
-		if(encoders[id].out_pointer == encoders[id].in_pointer){
+		if (encoders[id].out_pointer == encoders[id].in_pointer)
+		{
 			encoders[id].event_flag = EVENT_NOT_AVB;
 		}
 		return ev;
 	}
-	else return 0;//
+	else
+		return 0; //
 }

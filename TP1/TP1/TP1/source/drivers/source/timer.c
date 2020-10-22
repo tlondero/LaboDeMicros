@@ -10,6 +10,12 @@
 
 #include "../headers/timer.h"
 #include "../headers/SysTick.h"
+#include "../headers/debug.h"
+
+#if DEBUGGIN_MODE && DEBUGGIN_MODE_TIMER
+#include "../headers/gpio.h"
+#endif
+
 #include <stdbool.h>
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -88,6 +94,10 @@ static tim_id_t timers_cant = TIMER_ID_DELAY + 1; //1
 
 void timerInit(void)
 {
+#if DEBUGGIN_MODE && DEBUGGIN_MODE_TIMER
+	gpioMode(DEBUG_PIN, OUTPUT);
+	gpioWrite(DEBUG_PIN, LOW);
+#endif
     static bool yaInit = false;
     if (yaInit)
         return;
@@ -203,7 +213,6 @@ uint8_t isTimerPaused(tim_id_t id)
             return true;
         }
     }
-
 }
 
 /*******************************************************************************
@@ -213,6 +222,9 @@ uint8_t isTimerPaused(tim_id_t id)
  ******************************************************************************/
 static void timer_isr(void)
 {
+#if DEBUGGIN_MODE && DEBUGGIN_MODE_TIMER
+    gpioWrite(DEBUG_PIN, HIGH);
+#endif
     for (index = TIMER_ID_DELAY; index < timers_cant; index++)
     {
         if ((timers[index].running == TIMER_RUNNING) && (timers[index].expired == TIMER_NOT_EXPIRED) && (timers[index].cnt > 0))
@@ -239,6 +251,9 @@ static void timer_isr(void)
             timers[index].expired = TIMER_NOT_EXPIRED;
         }
     }
+#if DEBUGGIN_MODE && DEBUGGIN_MODE_TIMER
+    gpioWrite(DEBUG_PIN, LOW);
+#endif
 }
 
 /******************************************************************************/

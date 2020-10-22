@@ -1,4 +1,4 @@
-/***************************************************************************//**
+/***************************************************************************/ /**
   @file     Display.h
   @brief
   @author   MAGT
@@ -17,15 +17,21 @@
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
- ******/
+ ***************************************/
+
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
-typedef struct{
-	uint8_t size;
+typedef struct
+{
+  uint8_t size;
 } Message_t; //uint8 is temporary
 
-typedef enum{RIGHT,LEFT} direction_t;
+typedef enum
+{
+  RIGHT,
+  LEFT
+} direction_t;
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -34,14 +40,11 @@ typedef enum{RIGHT,LEFT} direction_t;
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
-
 /**
  * @brief dispInit: Initializes the display
  *
  */
 void dispInit(void);
-
-
 
 /**
  * @brief dispSendMsg: the idea should be to print the msg send by the user, the Message_t struct is under construction

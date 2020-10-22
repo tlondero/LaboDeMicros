@@ -1,4 +1,4 @@
-/***************************************************************************//**
+/***************************************************************************/ /**
  @file     PV.c
  @brief    
  @author   MAGT
@@ -19,20 +19,20 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define	PV_BUTTON		PORTNUM2PIN(PB,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PV_BUTTON PORTNUM2PIN(PB, 2) //VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PIN_C2_EN PORTNUM2PIN(PC, 2) //VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define PIN_C7_EN PORTNUM2PIN(PC, 7) //VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-#define LED_LINE_A		PORTNUM2PIN(PC,11)			//MARRON (ESTA EN FRENTE)
-#define LED_LINE_B 		PORTNUM2PIN(PC,10)           //ROJO
+#define LED_LINE_A PORTNUM2PIN(PC, 11) //MARRON (ESTA EN FRENTE)
+#define LED_LINE_B PORTNUM2PIN(PC, 10) //ROJO
 
-#define LED_IN_PV		3
-#define DEC_IN_PV		2
-#define EXTERN_LEDS		3
+#define LED_IN_PV 3
+#define DEC_IN_PV 2
+#define EXTERN_LEDS 3
 
-#define SEV_SEG			4
+#define SEV_SEG 4
 
-const uint8_t ST_PIN[DEC_IN_PV] = { LED_LINE_A, LED_LINE_B };
+const uint8_t ST_PIN[DEC_IN_PV] = {LED_LINE_A, LED_LINE_B};
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -53,10 +53,10 @@ static bool button_is_pressed = false;
 
 static bool isEvent = false;
 static PVEv_t event = NO_PV_EV;
-static uint8_t listEv[NO_PV_EV] = { 0 };
+static uint8_t listEv[NO_PV_EV] = {0};
 
 //Extern leds
-static int8_t idLed[EXTERN_LEDS] = { 0 };
+static int8_t idLed[EXTERN_LEDS] = {0};
 
 //Display
 static int8_t dispBright;
@@ -93,23 +93,32 @@ void multiplexLedCallback(void);
  *******************************************************************************
  ******************************************************************************/
 
-void dispShowText(void) {
+void dispShowText(void)
+{
+#if DEBUGGIN_MODE_PV
+	gpioWrite(DEBUG_PIN, HIGH);
+#endif
+
 	uint8_t i = 0;
 
-	for (i = 0; i < SEV_SEG; i++) {
+	for (i = 0; i < SEV_SEG; i++)
+	{
 		dispSendChar(message[(i + countMess) % length], i);
 	}
 
-	switch (dir) {
+	switch (dir)
+	{
 	case (PV_LEFT):
 		countMess++;
-		if ((countMess + SEV_SEG) > length) {
+		if ((countMess + SEV_SEG) > length)
+		{
 			countMess = 0;
 		}
 		break;
 	case (PV_RIGHT):
 		countMess--;
-		if ((countMess - SEV_SEG) < 0) {
+		if ((countMess - SEV_SEG) < 0)
+		{
 			countMess = length - SEV_SEG;
 		}
 		break;
@@ -118,34 +127,48 @@ void dispShowText(void) {
 	default:
 		break;
 	}
+
+#if DEBUGGIN_MODE_PV
+	gpioWrite(DEBUG_PIN, LOW);
+#endif
 }
 
-void open_animation_Callback(void) {
+void open_animation_Callback(void)
+{
 	static uint8_t i = 0, j;
-	static char open_animation[4] = { '^', '>', '_', '<' };
+	static char open_animation[4] = {'^', '>', '_', '<'};
 	//static char open_animation[7] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
-	if (i == OPEN_TRIGGER_TIME / 500) {
+	if (i == OPEN_TRIGGER_TIME / 500)
+	{
 		timerStop(timer_open_st);
-	} else {
+	}
+	else
+	{
 		for (j = 0; j < 4; j++)
 			dispSendChar(open_animation[i % 4], j);
 	}
 	i++;
 }
 
-uint8_t checkMessageLength(char *mes) {
+uint8_t checkMessageLength(char *mes)
+{
 	uint8_t i = 0;
-	while (mes[i] != '\0') {
+	while (mes[i] != '\0')
+	{
 		i++;
 	}
 	return i + 1;
 }
 
-void PVButtonPressedCallback(void) {
-	if (timerExpired(timer_id_button)) {
+void PVButtonPressedCallback(void)
+{
+	if (timerExpired(timer_id_button))
+	{
 		button_is_pressed = true;
 		timerReset(timer_id_button);
-	} else {
+	}
+	else
+	{
 		button_is_pressed = false;
 	}
 }
@@ -156,8 +179,12 @@ void PVButtonPressedCallback(void) {
  *******************************************************************************
  ******************************************************************************/
 
-bool PVInit(void) {
-
+bool PVInit(void)
+{
+#if DEBUGGIN_MODE_PV == 1
+	gpioMode(DEBUG_PIN, OUTPUT);
+	gpioWrite(DEBUG_PIN, LOW);
+#endif
 	//Button init
 	timer_id_button = timerGetId();
 	timerStart(timer_id_button, TIMER_MS2TICKS(200), TIM_MODE_SINGLESHOT, NULL);
@@ -181,7 +208,8 @@ bool PVInit(void) {
 	//LED STATUS INIT
 	bool okLed = true;
 
-	for (uint8_t i = 0; i < DEC_IN_PV; i++) {
+	for (uint8_t i = 0; i < DEC_IN_PV; i++)
+	{
 		gpioMode(ST_PIN[i], OUTPUT);
 		gpioWrite(ST_PIN[i], LOW);
 	}
@@ -197,21 +225,25 @@ bool PVInit(void) {
 	 idLed[1] = led_init_led(PE, 26, TURNS_ON_WITH_0);
 	 */
 
-	if ((idLed[0] == -1) || (idLed[1] == -1) || (idLed[2] == -1)) {
+	if ((idLed[0] == -1) || (idLed[1] == -1) || (idLed[2] == -1))
+	{
 		okLed = false;
-	} else {
+	}
+	else
+	{
 
 		//Led default config
 		uint8_t bright = 10;
-		uint32_t fade = 100;			//ms
-		uint32_t dt = 50;				//%
+		uint32_t fade = 100; //ms
+		uint32_t dt = 50;	 //%
 		uint8_t flashes = 0;
-		uint32_t period = 1000;		//ms
+		uint32_t period = 1000; //ms
 		uint32_t time = 0;		//ms
 
 		uint8_t i;
 
-		for (i = 0; i < EXTERN_LEDS; i++) {
+		for (i = 0; i < EXTERN_LEDS; i++)
+		{
 			led_configure_brightness(idLed[i], bright);
 			led_configure_time(idLed[i], time);
 			led_configure_fade(idLed[i], fade);
@@ -229,23 +261,24 @@ bool PVInit(void) {
 	timer_open_st = timerGetId();
 
 	timerStart(timer_open_st, TIMER_MS2TICKS(5), TIM_MODE_PERIODIC,
-			open_animation_Callback);
+			   open_animation_Callback);
 	//timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC, open_animation_Callback);
 	timerStop(timer_open_st);
 
 	timerStart(timer_id_mrq, TIMER_MS2TICKS(1000), TIM_MODE_PERIODIC,
-			dispShowText);
+			   dispShowText);
 	timerStop(timer_id_mrq);
 	return okLed;
 }
 
-void PVSuscribeEvent(PVEv_t ev, bool state) {
+void PVSuscribeEvent(PVEv_t ev, bool state)
+{
 	listEv[ev] = state;
 }
 
-bool PVCheckEvent(void) {
-	if ((button_is_pressed == true)
-			|| (EncoderEventAVB(idEncoder) == EVENT_AVB))
+bool PVCheckEvent(void)
+{
+	if ((button_is_pressed == true) || (EncoderEventAVB(idEncoder) == EVENT_AVB))
 		isEvent = true;
 	else
 		isEvent = false;
@@ -253,33 +286,47 @@ bool PVCheckEvent(void) {
 	return isEvent;
 }
 
-PVEv_t PVGetEv(void) {
-	if (isEvent == true) {
+PVEv_t PVGetEv(void)
+{
+	if (isEvent == true)
+	{
 
-		if (EncoderEventAVB(idEncoder)) {
+		if (EncoderEventAVB(idEncoder))
+		{
 			event_t ev = EncoderPopEvent(idEncoder);
-			if ((ev == RIGHT_TURN) && (listEv[ENC_RIGHT])) {
+			if ((ev == RIGHT_TURN) && (listEv[ENC_RIGHT]))
+			{
 				event = ENC_RIGHT;
-			} else if ((ev == LEFT_TURN) && (listEv[ENC_LEFT])) {
+			}
+			else if ((ev == LEFT_TURN) && (listEv[ENC_LEFT]))
+			{
 				event = ENC_LEFT;
-			} else {
+			}
+			else
+			{
 				event = NO_PV_EV;
 			}
-		} else if (button_is_pressed == true) {
+		}
+		else if (button_is_pressed == true)
+		{
 			event = BTN_PRESS;
 			button_is_pressed = false;
 		}
-	} else {
+	}
+	else
+	{
 		event = NO_PV_EV;
 	}
 
 	return event;
 }
 
-bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
+bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback)
+{
 	uint8_t IRQ = PV_CANT_MODES;
 	bool correct_mode = true;
-	switch (IRQ_mode) {
+	switch (IRQ_mode)
+	{
 	case (PV_DISABLE):
 		IRQ = GPIO_IRQ_MODE_DISABLE;
 		break;
@@ -303,17 +350,22 @@ bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 		break;
 	}
 
-	if (correct_mode) {
+	if (correct_mode)
+	{
 		ButtonSetIRQ(button, IRQ, fcallback);
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 }
 
-void PVDisplayClear(void) {
+void PVDisplayClear(void)
+{
 	uint8_t i;
-	for (i = 0; i < MAX_MESS_LEN; i++) {
+	for (i = 0; i < MAX_MESS_LEN; i++)
+	{
 		message[i] = '\0';
 	}
 	length = 0;
@@ -325,21 +377,27 @@ void PVDisplayClear(void) {
 	dispClearAll();
 }
 
-bool PVDisplaySetBright(uint8_t br) {
+bool PVDisplaySetBright(uint8_t br)
+{
 	bool valid = true;
-	if ((br >= 0) && (br <= 100)) {
+	if ((br >= 0) && (br <= 100))
+	{
 		dispBright = br;
 		dispBrightness(dispBright);
-	} else {
+	}
+	else
+	{
 		valid = false;
 	}
 	return valid;
 }
 
-bool PVIncreaseBrightness(void) {
+bool PVIncreaseBrightness(void)
+{
 	bool topValue = false;
 	dispBright += deltaBright;
-	if (dispBright >= 100) {
+	if (dispBright >= 100)
+	{
 		dispBright = 100;
 		topValue = true;
 	}
@@ -347,39 +405,49 @@ bool PVIncreaseBrightness(void) {
 	return topValue;
 }
 
-bool PVDecreaseBrightness(void) {
+bool PVDecreaseBrightness(void)
+{
 	bool bottomValue = false;
 	dispBright -= deltaBright;
-	if (dispBright <= 0) {
+	if (dispBright <= 0)
+	{
 		dispBright = 0;
 		bottomValue = true;
 		dispClearAll();
-	} else {
+	}
+	else
+	{
 		dispBrightness(dispBright);
 	}
 	return bottomValue;
 }
 
-int8_t PVGetBrightness(void) {
+int8_t PVGetBrightness(void)
+{
 	return dispBright;
 }
 
-int8_t PVGetDeltaBright(void) {
+int8_t PVGetDeltaBright(void)
+{
 	return deltaBright;
 }
 
-bool PVSetDeltaBright(uint8_t br) {
+bool PVSetDeltaBright(uint8_t br)
+{
 	bool valid = false;
-	if ((br >= 0) && (br <= 100)) {
+	if ((br >= 0) && (br <= 100))
+	{
 		deltaBright = br;
 		valid = true;
 	}
 	return valid;
 }
 
-bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
+bool PVDisplaySendChar(char ch, uint8_t seven_seg_module)
+{
 
-	if (message[0] != '\0') {
+	if (message[0] != '\0')
+	{
 		timerReset(timer_id_mrq);
 		timerStop(timer_id_mrq);
 		message[0] = '\0';
@@ -389,7 +457,8 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 
 	bool valid = false;
 
-	if (seven_seg_module < SEV_SEG) {
+	if (seven_seg_module < SEV_SEG)
+	{
 		dispSendChar(ch, seven_seg_module);
 		valid = true;
 	}
@@ -397,10 +466,12 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 	return valid;
 }
 
-bool PVMarquesina(char *mess, uint32_t time_per_char) {
+bool PVMarquesina(char *mess, uint32_t time_per_char)
+{
 	bool valid = true;
 	uint8_t l = checkMessageLength(mess);
-	if (l < MAX_MESS_LEN) {
+	if (l < MAX_MESS_LEN)
+	{
 
 		PVDisplaySetTime(time_per_char);
 		//Pongo todo en mayusculas
@@ -408,33 +479,44 @@ bool PVMarquesina(char *mess, uint32_t time_per_char) {
 		char tempString1[l];
 		char tempString2[l + 2 * SEV_SEG];
 
-		for (i = 0; i < l; i++) {
+		for (i = 0; i < l; i++)
+		{
 			char aux = mess[i];
-			if ((aux >= 97) && (aux <= 122)) {
+			if ((aux >= 97) && (aux <= 122))
+			{
 				aux -= 32;
 			}
 			tempString1[i] = aux;
 		}
 
 		//Agrego 4 ' ' al principio y 4 al final
-		for (i = 0; i < l + 7; i++) {
-			if (i < SEV_SEG) {
+		for (i = 0; i < l + 7; i++)
+		{
+			if (i < SEV_SEG)
+			{
 				tempString2[i] = 32;
-			} else if (i < 3 + l) {
+			}
+			else if (i < 3 + l)
+			{
 				tempString2[i] = tempString1[i - SEV_SEG];
-			} else {
+			}
+			else
+			{
 				tempString2[i] = 32;
 			}
 		}
 		tempString2[l + 7] = '\0';
 
-		for (i = 0; i < l + 2 * SEV_SEG; i++) {
+		for (i = 0; i < l + 2 * SEV_SEG; i++)
+		{
 			message[i] = tempString2[i];
 		}
 
 		length = l + 2 * SEV_SEG;
 		countMess = 0; //4?
-	} else {
+	}
+	else
+	{
 		message[0] = '\0';
 		length = 0;
 		countMess = 0;
@@ -448,12 +530,15 @@ bool PVMarquesina(char *mess, uint32_t time_per_char) {
 	return valid;
 }
 
-bool PVDispManualShift(PVDirection_t direction, uint8_t cant) {
+bool PVDispManualShift(PVDirection_t direction, uint8_t cant)
+{
 
 	bool valid = true;
 
-	if ((countMess + cant < length) && (countMess - cant > 0)) {
-		switch (direction) {
+	if ((countMess + cant < length) && (countMess - cant > 0))
+	{
+		switch (direction)
+		{
 		case (PV_LEFT):
 			countMess += cant;
 			break;
@@ -464,15 +549,19 @@ bool PVDispManualShift(PVDirection_t direction, uint8_t cant) {
 			valid = false;
 			break;
 		}
-	} else {
+	}
+	else
+	{
 		valid = false;
 	}
 	return valid;
 }
 
-bool PVDispMessOn(void) {
+bool PVDispMessOn(void)
+{
 	bool valid = false;
-	if (message[0] != '\0') {
+	if (message[0] != '\0')
+	{
 		timerResume(timer_id_mrq);
 		valid = true;
 	}
@@ -480,11 +569,13 @@ bool PVDispMessOn(void) {
 	return valid;
 }
 
-bool PVDisplaySetShift(PVDirection_t direction) {
+bool PVDisplaySetShift(PVDirection_t direction)
+{
 
 	bool valid = true;
 
-	switch (direction) {
+	switch (direction)
+	{
 	case (PV_RIGHT):
 		dir = PV_RIGHT;
 		break;
@@ -502,24 +593,29 @@ bool PVDisplaySetShift(PVDirection_t direction) {
 	return valid;
 }
 
-bool PVDisplaySetTime(uint32_t time) {
+bool PVDisplaySetTime(uint32_t time)
+{
 
 	bool valid = false;
 
-	if (time != 0) {
+	if (time != 0)
+	{
 		mrqtime = time;
 		timerStart(timer_id_mrq, TIMER_MS2TICKS(time), TIM_MODE_PERIODIC,
-				dispShowText);
+				   dispShowText);
 		valid = true;
 	}
 
 	return valid;
 }
 
-bool PVAnimation(animation_t animation, bool activate) {
+bool PVAnimation(animation_t animation, bool activate)
+{
 	bool valid = true;
-	if (activate) {
-		switch (animation) {
+	if (activate)
+	{
+		switch (animation)
+		{
 		case IDDLE_ANIMATION:
 			break;
 		case ASK_PIN_ANIMATION:
@@ -540,18 +636,23 @@ bool PVAnimation(animation_t animation, bool activate) {
 			valid = false;
 			break;
 		}
-	} else {
+	}
+	else
+	{
 		PVDisplayClear();
 	}
 	return valid;
 }
 
-bool PVLedSetBright(PVLed_t led, uint8_t value) {
+bool PVLedSetBright(PVLed_t led, uint8_t value)
+{
 	bool valid = false;
-	if ((value >= 0) && (value <= 100)) {
+	if ((value >= 0) && (value <= 100))
+	{
 		double newVal = value;
 		valid = true;
-		switch (led) {
+		switch (led)
+		{
 		case (PV_LED_1):
 			led_configure_brightness(idLed[0], newVal);
 			break;
@@ -562,7 +663,8 @@ bool PVLedSetBright(PVLed_t led, uint8_t value) {
 			led_configure_brightness(idLed[2], newVal);
 			break;
 		case (PV_LED_ALL):
-			for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+			for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+			{
 				led_configure_brightness(idLed[i], newVal);
 			}
 			break;
@@ -573,11 +675,14 @@ bool PVLedSetBright(PVLed_t led, uint8_t value) {
 	return valid;
 }
 
-bool PVLedSetFade(PVLed_t led, uint8_t value) {
+bool PVLedSetFade(PVLed_t led, uint8_t value)
+{
 	bool valid = false;
-	if ((value >= 0) && (value <= 100)) {
+	if ((value >= 0) && (value <= 100))
+	{
 		valid = true;
-		switch (led) {
+		switch (led)
+		{
 		case (PV_LED_1):
 			led_configure_fade(idLed[0], value);
 			break;
@@ -588,7 +693,8 @@ bool PVLedSetFade(PVLed_t led, uint8_t value) {
 			led_configure_fade(idLed[2], value);
 			break;
 		case (PV_LED_ALL):
-			for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+			for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+			{
 				led_configure_fade(idLed[i], value);
 			}
 			break;
@@ -599,12 +705,15 @@ bool PVLedSetFade(PVLed_t led, uint8_t value) {
 	return valid;
 }
 
-bool PVLedSetDt(PVLed_t led, uint8_t value) {
+bool PVLedSetDt(PVLed_t led, uint8_t value)
+{
 	bool valid = false;
-	if ((value >= 0) && (value <= 100)) {
+	if ((value >= 0) && (value <= 100))
+	{
 		uint8_t realdt = 100 - value;
 		valid = true;
-		switch (led) {
+		switch (led)
+		{
 		case (PV_LED_1):
 			led_configure_dt(idLed[0], realdt);
 			break;
@@ -615,7 +724,8 @@ bool PVLedSetDt(PVLed_t led, uint8_t value) {
 			led_configure_dt(idLed[2], realdt);
 			break;
 		case (PV_LED_ALL):
-			for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+			for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+			{
 				led_configure_fade(idLed[i], value);
 			}
 			break;
@@ -626,11 +736,14 @@ bool PVLedSetDt(PVLed_t led, uint8_t value) {
 	return valid;
 }
 
-bool PVLedSetFlash(PVLed_t led, uint8_t value) {
+bool PVLedSetFlash(PVLed_t led, uint8_t value)
+{
 	bool valid = false;
-	if ((value >= 0) && (value <= 100)) {
+	if ((value >= 0) && (value <= 100))
+	{
 		valid = true;
-		switch (led) {
+		switch (led)
+		{
 		case (PV_LED_1):
 			led_configure_flashes(idLed[0], value);
 			break;
@@ -641,7 +754,8 @@ bool PVLedSetFlash(PVLed_t led, uint8_t value) {
 			led_configure_flashes(idLed[2], value);
 			break;
 		case (PV_LED_ALL):
-			for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+			for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+			{
 				led_configure_fade(idLed[i], value);
 			}
 			break;
@@ -652,11 +766,14 @@ bool PVLedSetFlash(PVLed_t led, uint8_t value) {
 	return valid;
 }
 
-bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
+bool PVLedSetPeriod(PVLed_t led, uint8_t value)
+{
 	bool valid = false;
-	if ((value >= 0) && (value <= 100)) {
+	if ((value >= 0) && (value <= 100))
+	{
 		valid = true;
-		switch (led) {
+		switch (led)
+		{
 		case (PV_LED_1):
 			led_configure_period(idLed[0], value);
 			break;
@@ -667,7 +784,8 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 			led_configure_period(idLed[2], value);
 			break;
 		case (PV_LED_ALL):
-			for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+			for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+			{
 				led_configure_fade(idLed[i], value);
 			}
 			break;
@@ -678,9 +796,11 @@ bool PVLedSetPeriod(PVLed_t led, uint8_t value) {
 	return valid;
 }
 
-bool PVLedSetTime(PVLed_t led, uint8_t value) {
+bool PVLedSetTime(PVLed_t led, uint8_t value)
+{
 	bool valid = true;
-	switch (led) {
+	switch (led)
+	{
 	case (PV_LED_1):
 		led_configure_time(idLed[0], value);
 		break;
@@ -691,7 +811,8 @@ bool PVLedSetTime(PVLed_t led, uint8_t value) {
 		led_configure_time(idLed[2], value);
 		break;
 	case (PV_LED_ALL):
-		for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+		for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+		{
 			led_configure_fade(idLed[i], value);
 		}
 		break;
@@ -701,11 +822,13 @@ bool PVLedSetTime(PVLed_t led, uint8_t value) {
 	return valid;
 }
 
-bool PVLedFlash(PVLed_t led, uint8_t color) {
+bool PVLedFlash(PVLed_t led, uint8_t color)
+{
 
 	bool valid = false;
 	valid = true;
-	switch (led) {
+	switch (led)
+	{
 	case (PV_LED_1):
 		led_flash(idLed[0]);
 		break;
@@ -716,7 +839,8 @@ bool PVLedFlash(PVLed_t led, uint8_t color) {
 		led_flash(idLed[2]);
 		break;
 	case (PV_LED_ALL):
-		for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+		for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+		{
 			led_flash(idLed[i]);
 		}
 		break;
@@ -727,10 +851,12 @@ bool PVLedFlash(PVLed_t led, uint8_t color) {
 	return valid;
 }
 
-bool PVLedOn(PVLed_t led) {
+bool PVLedOn(PVLed_t led)
+{
 
 	bool valid = false;
-	switch (led) {
+	switch (led)
+	{
 	case (PV_LED_1):
 		led_set_state(idLed[0], HIGH);
 		break;
@@ -741,7 +867,8 @@ bool PVLedOn(PVLed_t led) {
 		led_set_state(idLed[2], HIGH);
 		break;
 	case (PV_LED_ALL):
-		for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+		for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+		{
 			led_set_state(idLed[i], HIGH);
 		}
 		break;
@@ -752,8 +879,10 @@ bool PVLedOn(PVLed_t led) {
 	return valid;
 }
 
-void PVLedOff(PVLed_t led) {
-	switch (led) {
+void PVLedOff(PVLed_t led)
+{
+	switch (led)
+	{
 	case (PV_LED_1):
 		led_set_state(idLed[0], LOW);
 		break;
@@ -764,7 +893,8 @@ void PVLedOff(PVLed_t led) {
 		led_set_state(idLed[2], LOW);
 		break;
 	case (PV_LED_ALL):
-		for (uint8_t i = 0; i < EXTERN_LEDS; i++) {
+		for (uint8_t i = 0; i < EXTERN_LEDS; i++)
+		{
 			led_set_state(idLed[i], LOW);
 		}
 		break;
@@ -773,13 +903,17 @@ void PVLedOff(PVLed_t led) {
 	}
 }
 
-void PVLedPoll(void) {
+void PVLedPoll(void)
+{
 	led_poll();
 }
 
-void PVStatusLedSelect(PVStatus_t led, bool state) {
-	if (state) {
-		switch (led) {
+void PVStatusLedSelect(PVStatus_t led, bool state)
+{
+	if (state)
+	{
+		switch (led)
+		{
 		case (ON_ST_1):
 			gpioWrite(LED_LINE_A, !HIGH);
 			gpioWrite(LED_LINE_B, !LOW);
@@ -801,7 +935,9 @@ void PVStatusLedSelect(PVStatus_t led, bool state) {
 			gpioWrite(LED_LINE_B, LOW);
 			break;
 		}
-	} else {
+	}
+	else
+	{
 		gpioWrite(LED_LINE_A, LOW);
 		gpioWrite(LED_LINE_B, LOW);
 	}
