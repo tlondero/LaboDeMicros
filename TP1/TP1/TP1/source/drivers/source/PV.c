@@ -95,12 +95,9 @@ void multiplexLedCallback(void);
 
 void dispShowText(void) {
 	uint8_t i = 0;
-	if (dispBright == 0) {
-		dispClearAll();
-	} else {
-		for (i = 0; i < SEV_SEG; i++) {
-			dispSendChar(message[(i + countMess) % length], i);
-		}
+
+	for (i = 0; i < SEV_SEG; i++) {
+		dispSendChar(message[(i + countMess) % length], i);
 	}
 
 	switch (dir) {
@@ -395,9 +392,7 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 
 	bool valid = false;
 
-	if (dispBright == 0) {
-		dispClearAll();
-	} else if (seven_seg_module < SEV_SEG) {
+	if (seven_seg_module < SEV_SEG) {
 		dispSendChar(ch, seven_seg_module);
 		valid = true;
 	}
