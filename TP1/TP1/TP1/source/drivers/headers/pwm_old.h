@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "timer.h"
-#include "header/gpio.h"
+#include "../headers/gpio.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
