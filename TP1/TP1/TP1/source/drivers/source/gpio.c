@@ -10,7 +10,12 @@
 #include "MK64F12.h"
 #include "hardware.h"
 
+/*******************************************************************************
+ * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
+ ******************************************************************************/
 #define PORT_mGPIO 1
+#define DEBUGGIN_MODE_GPIO 1
+
 //Clock gating masks
 const static uint32_t SIM_SCGC5_PORT_MASKS[] = {SIM_SCGC5_PORTA_MASK, SIM_SCGC5_PORTB_MASK, SIM_SCGC5_PORTC_MASK, SIM_SCGC5_PORTD_MASK, SIM_SCGC5_PORTE_MASK};
 
@@ -64,8 +69,8 @@ void gpioMode(pin_t pin, uint8_t mode)
 	//PCR CONFIG
 	uint8_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
-	PORT_Type *port_pointer = (PORT_Type *) PORT_SELECTORS[port];
-	GPIO_Type *gpio_pointer = (GPIO_Type *) GPIO_SELECTORS[port];
+	PORT_Type *port_pointer = (PORT_Type *)PORT_SELECTORS[port];
+	GPIO_Type *gpio_pointer = (GPIO_Type *)GPIO_SELECTORS[port];
 
 	port_pointer->PCR[number] = 0x00;
 	// Establecemos el pin como GPIO
@@ -84,11 +89,11 @@ void gpioMode(pin_t pin, uint8_t mode)
 		{
 		case INPUT_PULLDOWN:
 			port_pointer->PCR[number] |= PORT_PCR_PE(1); // PULL ENABLE
-			port_pointer->PCR[number] |= PORT_PCR_PS(0);	  //SET PULL DOWN
+			port_pointer->PCR[number] |= PORT_PCR_PS(0); //SET PULL DOWN
 			break;
 		case INPUT_PULLUP:
 			port_pointer->PCR[number] |= PORT_PCR_PE(1); // PULL ENABLE
-			port_pointer->PCR[number] |= PORT_PCR_PS(1);	  //SET PULL DOWN
+			port_pointer->PCR[number] |= PORT_PCR_PS(1); //SET PULL DOWN
 			break;
 		default:
 			break;
@@ -105,7 +110,7 @@ void gpioWrite(pin_t pin, bool value)
 {
 	uint8_t port = PIN2PORT(pin);
 	uint32_t number = PIN2NUM(pin);
-//	PORT_Type *port_pointer = PORT_SELECTORS[port];
+	//	PORT_Type *port_pointer = PORT_SELECTORS[port];
 	GPIO_Type *gpio_pointer = (GPIO_Type *)GPIO_SELECTORS[port];
 
 	if (value == HIGH)
@@ -123,7 +128,7 @@ bool gpioIRQ(pin_t pin, uint8_t irqMode, pinIrqFun_t irqFun)
 
 	uint32_t port = PIN2PORT(pin);	//Tomo el puerto
 	uint32_t number = PIN2NUM(pin); //Tomo el numero
-	PORT_Type *port_pointer = (PORT_Type *) PORT_SELECTORS[port];
+	PORT_Type *port_pointer = (PORT_Type *)PORT_SELECTORS[port];
 	uint32_t IRQn = PORTA_IRQn + port;
 
 	//Identifico a este pin como que tiene la interrupcion configurada

@@ -8,6 +8,8 @@
  ******************************************************************************/
 #include "../headers/Card.h"
 #include "../headers/gpio.h"
+#include "../headers/board.h"
+#include "../headers/debug.h"
 #include "MK64F12.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -19,9 +21,10 @@
 #define SS 0b01011
 #define ES 0b11111
 #define LOW_NYBBLE_MASK (0b00001111)
-#define CARD_EN_PIN PORTNUM2PIN(PC, 17) //Amarillo
+#define CARD_EN_PIN PORTNUM2PIN(PC, 17)	  //Amarillo
 #define CARD_DATA_PIN PORTNUM2PIN(PB, 11) //Azul
-#define CARD_CLK_PIN PORTNUM2PIN(PB, 3) //Verde
+#define CARD_CLK_PIN PORTNUM2PIN(PB, 3)	  //Verde
+
 #define DEVELOPMENT_MODE 1
 
 #define LEN(array) sizeof(array) / sizeof(array[0])
@@ -33,10 +36,10 @@ static uint8_t data[DATA_LENGHT]; //
 static bool enable;
 static bool error;
 
-static bool go = false;		//Beging reading incoming binits
-static bool es_rx = false;	//Flag que se enciende cuando se detecta ES
-static bool lrc_rx = false; //Flag que se enciende cuando se detecta LRC
-static bool ss_rx = false;		//Flag que se enciende cuando se dectecta SS
+static bool go = false;		  //Beging reading incoming binits
+static bool es_rx = false;	  //Flag que se enciende cuando se detecta ES
+static bool lrc_rx = false;	  //Flag que se enciende cuando se detecta LRC
+static bool ss_rx = false;	  //Flag que se enciende cuando se dectecta SS
 static bool card_avb = false; //Flag que se enciende cuando tenemos una tarjeta lista para procesar
 
 //COUNTERS
@@ -59,6 +62,11 @@ void flushData(void);
 
 void cardInitDriver(void (*fun_callback)(void))
 {
+#if DEBUGGIN_MODE_CARD && DEBUGGIN_MODE
+	gpioMode(DEBUG_PIN, OUTPUT);
+	gpioWrite(DEBUG_PIN, LOW);
+#endif
+
 	gpioMode(CARD_EN_PIN, INPUT_PULLUP);
 	gpioMode(CARD_DATA_PIN, INPUT_PULLUP);
 	gpioMode(CARD_CLK_PIN, INPUT_PULLUP);
@@ -68,28 +76,27 @@ void cardInitDriver(void (*fun_callback)(void))
 	////////////////////////////////////////////////////////////////////////////////////
 	NVIC_EnableIRQ(PORTC_IRQn);
 	NVIC_EnableIRQ(PORTB_IRQn);
-
 }
-void flushData(void){
+void flushData(void)
+{
 	int i = 0;
 	for (i = 0; i < LEN(data); i++)
 		data[i] = 0;
 }
-
 
 uint8_t *cardGetPAN(void)
 {
 
 	uint8_t i = 0;
 
-	if ((card_avb==true) && (checkParity() == true)) //Si tenemos una tarjeta disponible y pasa
+	if ((card_avb == true) && (checkParity() == true)) //Si tenemos una tarjeta disponible y pasa
 	{
 		while ((data[i + 1] != FS) && (i < PAN_LENGHT))
 		{
 			pan[i] = data[i + 1] & LOW_NYBBLE_MASK;
 			i++;
 		}
-		card_avb=false;
+		card_avb = false;
 		flushData();
 		return &pan[0];
 	}
@@ -97,23 +104,28 @@ uint8_t *cardGetPAN(void)
 	{
 		return 0;
 	}
-
 }
 static int ya_entre = 0;
 void enableCallback(void)
 {
+
 	enable = !gpioRead(CARD_EN_PIN);
 
 	if (ya_entre == 0)
 	{
+#if DEBUGGIN_MODE_CARD && DEBUGGIN_MODE
+	gpioWrite(DEBUG_PIN, HIGH);
+#endif
 		flushData();
 	}
 	ya_entre++;
 	if (ya_entre == 2)
 	{
+#if DEBUGGIN_MODE_CARD
+	gpioWrite(DEBUG_PIN, LOW);
+#endif
 		ya_entre = 0;
 	}
-
 
 	bit_counter = 0;
 	character = 0;
@@ -123,14 +135,13 @@ void enableCallback(void)
 	lrc_rx = false;
 	ss_rx = false;
 	error = false;
+
 }
-
-
-
 
 void clockCallback(void)
 {
-	bool my_data = !gpioRead(CARD_DATA_PIN); // Read incoming bit_counter
+
+		bool my_data = !gpioRead(CARD_DATA_PIN); // Read incoming bit_counter
 
 	//Begin reading data stream.
 	if (my_data)
@@ -159,7 +170,8 @@ void clockCallback(void)
 			lrc_rx = true;
 			card_avb = true;
 		}
-		else{
+		else
+		{
 			card_avb = false;
 		}
 		data[char_counter++] = character; //stores the characters in the data buffer
@@ -171,6 +183,7 @@ void clockCallback(void)
 	{
 		bit_counter++;
 	}
+
 }
 
 bool checkParity(void)
