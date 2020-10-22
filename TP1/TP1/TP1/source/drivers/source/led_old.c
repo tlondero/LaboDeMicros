@@ -6,9 +6,9 @@
  */
 
 
-#include "header/led.h"
-#include "header/pwm.h"
-#include "header/gpio.h"
+#include "../headers/led_old.h"
+#include "../headers/pwm_old.h"
+#include "../headers/gpio.h"
 /*******************************************************************************
  * GLOBAL VARIABLES WITH LOCAL SCOPE
  ******************************************************************************/
