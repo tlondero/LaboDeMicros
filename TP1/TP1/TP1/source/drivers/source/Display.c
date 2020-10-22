@@ -178,8 +178,8 @@ void dispInit(void)
 	timerInit();
 	timer_id = timerGetId();
 	timerStart(timer_id, TIMER_MS2TICKS(REFRESH_RATE), TIM_MODE_PERIODIC,
-			   multiplexDiplayCallback);
-	//Cada 15 ms se multiplexea el display ~ cada uno aprox 50fps
+			   multiplexDiplayCallback);//activa el timer del multiplex
+
 }
 
 bool dispSelect(int8_t disp)

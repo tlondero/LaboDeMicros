@@ -80,7 +80,23 @@ bool getBlockedStatus(uint32_t userID);
 * @brief checkExistance: returns true if the user ID specified exist.
 */
 bool checkExistance(uint32_t user_ID);
+/**
+* @brief getUsersList: returns a pointer to the users database.
+*/
 user_t * getUsersList(void);
+/**
+* @brief checkPassword: verify password
+* @param user_ID the ID number in the database
+* @param user_pin the user pin.
+* @returns true if the password and id are equal to the ones in the database
+*/
+
 bool checkPassword(uint32_t user_ID, uint32_t user_pin);
+
+/**
+* @brief setPassword: sets password
+* @param user_ID the ID number in the database
+* @param user_pin the new user pin.
+*/
 void setPassword(uint32_t user_ID, uint32_t new_pin);
 #endif
