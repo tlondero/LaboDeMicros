@@ -22,7 +22,7 @@
 #define MAX_PWMS 16
 #define UNAVAILABLE_SPACE -1
 #define DEVELOPMENT_MODE 1
-#define PWM_TIMEBASE 1 //ms
+#define PWM_TIMEBASE 0.1 //ms
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/

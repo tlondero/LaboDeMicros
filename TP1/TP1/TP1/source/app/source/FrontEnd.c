@@ -26,6 +26,11 @@ const char CLAVE_MSG[4] = { 'P', 'A', 'S', 'S' };
 const char ADD_MSG[4] = { ' ', 'A', 'D', 'D' };
 const char DEL_MSG[4] = { ' ', 'D', 'E', 'L' };
 
+//BRIGHTNESS
+const char LOW_MSG[4] = {'B','r','=','1'};
+const char MED_MSG[4] = {'B','r','=','2'};
+const char HIGH_MSG[4] = {'B','r','=','3'};
+
 bool display = true;
 bool init_ok = false;
 
@@ -47,7 +52,7 @@ void drawFrontEnd(FEData data, state st) {
 
 	if (init_ok == false) {
 		selection_timer_id = timerGetId();
-		timerStart(selection_timer_id, BLINK_PERIOD, TIM_MODE_PERIODIC,
+		timerStart(selection_timer_id, TIMER_MS2TICKS(BLINK_PERIOD), TIM_MODE_PERIODIC,
 				displaySelectBlink);
 		init_ok = true;
 	}
@@ -141,7 +146,6 @@ void drawFrontEnd(FEData data, state st) {
 		break;
 	case OPEN:
 		if (data.open) {
-
 			PVMarquesina("OPEN DOOR", 300);
 		}
 
@@ -167,10 +171,26 @@ void drawFrontEnd(FEData data, state st) {
 	case BRIGHTNESS:
 		{
 			char *bri = num2str(data.brightness);
-			PVDisplaySendChar(' ', 0);
+			/*PVDisplaySendChar(' ', 0);
 			PVDisplaySendChar(bri[7], 3);
 			PVDisplaySendChar(bri[6], 2);
-			PVDisplaySendChar(bri[5], 1);
+			PVDisplaySendChar(bri[5], 1);*/
+			switch (bri[7]) {
+				case '0':
+					for (i = 0; i < 4; i++)
+						PVDisplaySendChar(LOW_MSG[i], i);
+					break;
+				case '1':
+					for (i = 0; i < 4; i++)
+						PVDisplaySendChar(MED_MSG[i], i);
+					break;
+				case '2':
+					for (i = 0; i < 4; i++)
+						PVDisplaySendChar(HIGH_MSG[i], i);
+					break;
+				default:
+					break;
+			}
 	//		for (i = 0; i < 4; i++)
 	//			PVDisplaySendChar(BRIGHTNESS_MSG[i], i);
 			if (data.br == true)

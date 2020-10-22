@@ -169,7 +169,7 @@ state FSMInitState(void) {
 	//Front-end related stuff
 	fe_data.animation_en = true;
 	fe_data.animation_opt = IDDLE_ANIMATION;
-	fe_data.brightness = 100;
+	fe_data.brightness = 2;
 	fe_data.id_data = &encoder_id_digits[0];
 	fe_data.pin_data = &encoder_pin_digits[0];
 	//me suscribo a los eventos de encoder
@@ -200,13 +200,13 @@ state FSMRun(state actual_state) {
 		updated_state = askPinRoutine();//DONE
 		break;
 	case ACCESS:
-		updated_state = accessRoutine();//TODO
+		updated_state = accessRoutine();//DONE
 		break;
 	case OPEN:
 		updated_state = openRoutine();//DONE
 		break;
 	case USERS:
-		updated_state = usersRoutine();//TODO
+		updated_state = usersRoutine();//DONE
 		break;
 	case BRIGHTNESS:
 		updated_state = brightnessRoutine();//DONE
@@ -275,6 +275,8 @@ state IDDLERoutine(void) {
 				fe_data.animation_en = false;
 				if (getBlockedStatus(transformToNum(card_event, ID_LEN))) {
 					fe_data.blocked_user = true;
+					fe_data.bad_id = true;
+					fe_data.animation_en = true;
 					updated_state = IDDLE;
 				}
 				else {
@@ -343,6 +345,7 @@ state IDDLERoutine(void) {
 							fe_data.animation_en = true;
 							fe_data.animation_opt = IDDLE_ANIMATION;
 							fe_data.id_counter = 0;
+							fe_data.bad_id = true;
 							updated_state = IDDLE;
 						}
 						else {
@@ -677,11 +680,11 @@ state brightnessRoutine(void) {
 		timerReset(inactivity_timer_id);
 		event_t ev = PVGetEv();
 		if ((ev == ENC_LEFT) && (fe_data.brightness > 0)) {
-			fe_data.brightness--;
+			fe_data.brightness-=1;
 			fe_data.br = true;
 		}
-		else if ((ev == ENC_RIGHT) && (fe_data.brightness < 100)) {
-			fe_data.brightness++;
+		else if ((ev == ENC_RIGHT) && (fe_data.brightness < 3)) {
+			fe_data.brightness+=1;
 			fe_data.br = true;
 		}
 		else if (ev == BTN_PRESS) {

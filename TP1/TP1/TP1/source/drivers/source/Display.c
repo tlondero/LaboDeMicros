@@ -10,6 +10,8 @@
 #include "../headers/Display.h"
 #include "../headers/gpio.h"
 #include "../headers/board.h"
+
+#include "../headers/pwm_old.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******/
@@ -43,7 +45,8 @@
 
 #define SEVEN_SEGMENTS_PINS 8
 
-#define REFRESH_RATE 1//ms
+#define REFRESH_RATE 3//ms
+
 const uint8_t PINES[SEVEN_SEGMENTS_PINS] = { PIN_A, PIN_B, PIN_C, PIN_D, PIN_E,
 PIN_F, PIN_G, PIN_DOT };
 
@@ -83,6 +86,7 @@ const static character_t characters[] = {
 		{'P', {HIGH, HIGH, LOW, LOW, HIGH, HIGH, HIGH, LOW} },
 		{'Q', {HIGH, HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW} },
 		{'R', {HIGH, LOW, LOW, LOW, HIGH, HIGH, LOW, LOW} },
+		{'r', {LOW, LOW, LOW, LOW, HIGH, LOW, HIGH, LOW} },
 		{'S', {HIGH, LOW, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
 		{'T', {HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, LOW} },
 		{'U', {LOW, HIGH, HIGH, HIGH, HIGH, HIGH, LOW, LOW} },
@@ -92,6 +96,7 @@ const static character_t characters[] = {
 		{'Y', {LOW, HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW} },
 		{'Z', {HIGH, HIGH, LOW, HIGH, LOW, LOW, HIGH, LOW} },
 
+
 		{'-', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} },
 		{' ', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW} },
 		{'^', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} },
@@ -99,15 +104,18 @@ const static character_t characters[] = {
 		{'_', {LOW, LOW, LOW, HIGH, LOW, LOW, LOW, LOW} },
 		{'<', {LOW, LOW, LOW, LOW, HIGH, LOW, LOW, LOW} },
 		{'.', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, HIGH} },
+		{'=', {LOW, LOW, LOW, HIGH, LOW, LOW, HIGH, LOW} },
 
-		//Prueba tomi (EL SUICIDIOS)
+
+		//Segmentos
 		{'a', {HIGH, LOW, LOW, LOW, LOW, LOW, LOW, LOW} },
 		{'b', {LOW, HIGH, LOW, LOW, LOW, LOW, LOW, LOW} },
 		{'c', {LOW, LOW, HIGH, LOW, LOW, LOW, LOW, LOW} },
 		{'d', {LOW, LOW, LOW, HIGH, LOW, LOW, LOW, LOW} },
 		{'e', {LOW, LOW, LOW, LOW, HIGH, LOW, LOW, LOW} },
 		{'f', {LOW, LOW, LOW, LOW, LOW, HIGH, LOW, LOW} },
-		{'g', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} }
+		{'g', {LOW, LOW, LOW, LOW, LOW, LOW, HIGH, LOW} },
+
 };
 
 typedef struct {
@@ -242,6 +250,7 @@ void multiplexDiplayCallback(void) {
 	}
 	i++;
 }
+
 //brightness: 0 a 100
 void dispBrightness(uint8_t brightness) {
 	uint8_t i;

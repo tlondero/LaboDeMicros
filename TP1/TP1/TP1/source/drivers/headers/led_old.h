@@ -34,7 +34,7 @@
 #define TURNS_ON_WITH_1 0
 #define TURNS_ON_WITH_0	1
 
-#define LED_TIMEBASE 100
+#define LED_TIMEBASE 1000
 #define PWM_FREQ 60 * 2
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
