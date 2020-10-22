@@ -56,7 +56,7 @@
 
 
 
-static tim_id_t idButton1
+static tim_id_t idButton1;
 static int8_t idLed1;
 static uint8_t br=100;
 void App_Init (void)
