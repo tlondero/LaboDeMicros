@@ -19,9 +19,9 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define	PV_BUTTON		PORTNUM2PIN(PB,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C2_EN		PORTNUM2PIN(PC,2)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#define PIN_C7_EN		PORTNUM2PIN(PC,7)			//VER PIN PORQUE NO TENGO NI PUTA IDEA!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#define	PV_BUTTON		PORTNUM2PIN(PB,2)
+#define PIN_C2_EN		PORTNUM2PIN(PC,2)
+#define PIN_C7_EN		PORTNUM2PIN(PC,7)
 
 #define LED_LINE_A		PORTNUM2PIN(PC,11)			//MARRON (ESTA EN FRENTE)
 #define LED_LINE_B 		PORTNUM2PIN(PC,10)           //ROJO
@@ -191,11 +191,6 @@ bool PVInit(void) {
 	idLed[2] = led_init_led(PORTNUM2PIN(PB, 21), TURNS_ON_WITH_0);
 	idLed[1] = led_init_led(PORTNUM2PIN(PE, 26), TURNS_ON_WITH_0);
 
-	/*
-	 idLed[0] = led_init_led(PB, 22, TURNS_ON_WITH_0);
-	 idLed[2] = led_init_led(PB, 21, TURNS_ON_WITH_0);
-	 idLed[1] = led_init_led(PE, 26, TURNS_ON_WITH_0);
-	 */
 
 	if ((idLed[0] == -1) || (idLed[1] == -1) || (idLed[2] == -1)) {
 		okLed = false;
@@ -206,8 +201,8 @@ bool PVInit(void) {
 		uint32_t fade = 100;			//ms
 		uint32_t dt = 50;				//%
 		uint8_t flashes = 0;
-		uint32_t period = 1000;		//ms
-		uint32_t time = 0;		//ms
+		uint32_t period = 1000;			//ms
+		uint32_t time = 0;				//ms
 
 		uint8_t i;
 
@@ -403,12 +398,12 @@ bool PVMarquesina(char *mess, uint32_t time_per_char) {
 	if (l < MAX_MESS_LEN) {
 
 		PVDisplaySetTime(time_per_char);
-		//Pongo todo en mayusculas
+		
 		uint8_t i;
 		char tempString1[l];
 		char tempString2[l + 2 * SEV_SEG];
 
-		for (i = 0; i < l; i++) {
+		for (i = 0; i < l; i++) {					//Pongo todo en mayusculas
 			char aux = mess[i];
 			if ((aux >= 97) && (aux <= 122)) {
 				aux -= 32;
@@ -416,8 +411,7 @@ bool PVMarquesina(char *mess, uint32_t time_per_char) {
 			tempString1[i] = aux;
 		}
 
-		//Agrego 4 ' ' al principio y 4 al final
-		for (i = 0; i < l + 7; i++) {
+		for (i = 0; i < l + 7; i++) {				//Agrego 4 ' ' al principio y 4 al final
 			if (i < SEV_SEG) {
 				tempString2[i] = 32;
 			} else if (i < 3 + l) {
