@@ -21,12 +21,9 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define TIMER_DEVELOPMENT_MODE 1
-
+#define TIMER_DEVELOPMENT_MODE 0
 #define TIMER_ID_DELAY 0 //ID del timer bloqueante reservado dentro del driver
-
 #define TIMER_TICK_MS 1
-
 #if TIMER_TICK_MS != 10000U / (SYSTICK_ISR_FREQUENCY_HZ)
 #error Las frecuencias no coinciden!!
 #endif // TIMER_TICK_MS != (10000U/SYSTICK_ISR_FREQUENCY_HZ)
@@ -58,15 +55,6 @@ typedef struct
 } timer_t;
 
 /*******************************************************************************
- * VARIABLES WITH GLOBAL SCOPE
- ******************************************************************************/
-
-/*******************************************************************************
- * VARIABLES WITH LOCAL SCOPE
- ******************************************************************************/
-static uint8_t index;
-
-/*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
 
@@ -76,13 +64,9 @@ static uint8_t index;
 static void timer_isr(void);
 
 /*******************************************************************************
- * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
- ******************************************************************************/
-
-/*******************************************************************************
  * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
  ******************************************************************************/
-
+static uint8_t index;
 static timer_t timers[TIMERS_MAX_CANT];
 static tim_id_t timers_cant = TIMER_ID_DELAY + 1; //1
 
@@ -95,14 +79,14 @@ static tim_id_t timers_cant = TIMER_ID_DELAY + 1; //1
 void timerInit(void)
 {
 #if DEBUGGIN_MODE && DEBUGGIN_MODE_TIMER
-	gpioMode(DEBUG_PIN, OUTPUT);
-	gpioWrite(DEBUG_PIN, LOW);
+    gpioMode(DEBUG_PIN, OUTPUT);
+    gpioWrite(DEBUG_PIN, LOW);
 #endif
     static bool yaInit = false;
     if (yaInit)
         return;
 
-    SysTick_Init(timer_isr); // init peripheral
+    SysTick_Init(timer_isr);
 
     yaInit = true;
 }
@@ -127,7 +111,8 @@ void timerStart(tim_id_t id, ttick_t ticks, uint8_t mode, tim_callback_t callbac
     if ((id < timers_cant) && (mode < CANT_TIM_MODES) && (id >= 0))
 #endif // TIMER_DEVELOPMENT_MODE
     {
-        timers[id].period = ticks; //
+        //Timer init default config
+        timers[id].period = ticks;
         timers[id].cnt = timers[id].period;
         timers[id].mode = mode;
         timers[id].callback = callback;
@@ -138,7 +123,6 @@ void timerStart(tim_id_t id, ttick_t ticks, uint8_t mode, tim_callback_t callbac
 
 void timerStop(tim_id_t id)
 {
-// ****** COMPLETAR ******
 #if TIMER_DEVELOPMENT_MODE
     if ((id < timers_cant) && (id > 0))
 #endif
@@ -184,8 +168,6 @@ bool timerExpired(tim_id_t id)
             return false;
         }
     }
-    // Verifico si expiró el timer
-    // y bajo el flag
 }
 
 //Blocking delay
@@ -229,9 +211,9 @@ static void timer_isr(void)
     {
         if ((timers[index].running == TIMER_RUNNING) && (timers[index].expired == TIMER_NOT_EXPIRED) && (timers[index].cnt > 0))
         {
-            timers[index].cnt -= 1;
+            timers[index].cnt -= 1; //Reduce 1 from the remaning timer counts
             if (timers[index].cnt == END_OF_TIMER)
-            { //end of timer --> perform callback
+            { //if the timer has finished --> perform callback
                 if (timers[index].callback != NULL)
                 {
                     timers[index].callback();

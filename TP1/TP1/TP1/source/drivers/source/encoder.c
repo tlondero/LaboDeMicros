@@ -38,18 +38,24 @@ static uint16_t enconders_cant = 0;
 static tim_id_t encoder_timer_id;
 
 /*******************************************************************************
- * FUNCTION DECLARATIONS
+ * FUNCTION DECLARATIONS WITH LOCAL SCOPE
  ******************************************************************************/
-//Adds a new a event to the queue
+
+/**
+ * @brief Adds a new a event to the queue
+ * @param encoder_id unique encoder identifier
+ * @param event_t RIGHT_TURN LEFT_TURN
+ */
 void EncoderAddNewEvent(encoder_id id, event_t ev);
-//Update encoders
+/**
+ * @brief Updates the event queue if a new event has been detected
+ */
 void EncoderUpdate(void);
 
 /*******************************************************************************
  * FUNCTION DEFINITIONS
  ******************************************************************************/
 
-//Init encoder driver
 void EncoderInit(encoder_id enc_id)
 {
 	static bool warm_up_rdy = false;
@@ -152,5 +158,5 @@ event_t EncoderPopEvent(encoder_id id)
 		return ev;
 	}
 	else
-		return 0; //
+		return EVENT_NOT_AVB;
 }
