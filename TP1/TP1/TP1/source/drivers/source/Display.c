@@ -43,7 +43,7 @@
 
 #define SEVEN_SEGMENTS_PINS 8
 
-#define REFRESH_RATE 3//ms
+#define REFRESH_RATE 1//ms
 const uint8_t PINES[SEVEN_SEGMENTS_PINS] = { PIN_A, PIN_B, PIN_C, PIN_D, PIN_E,
 PIN_F, PIN_G, PIN_DOT };
 
@@ -100,7 +100,7 @@ const static character_t characters[] = {
 		{'<', {LOW, LOW, LOW, LOW, HIGH, LOW, LOW, LOW} },
 		{'.', {LOW, LOW, LOW, LOW, LOW, LOW, LOW, HIGH} },
 
-		//Prueba tomi
+		//Prueba tomi (EL SUICIDIOS)
 		{'a', {HIGH, LOW, LOW, LOW, LOW, LOW, LOW, LOW} },
 		{'b', {LOW, HIGH, LOW, LOW, LOW, LOW, LOW, LOW} },
 		{'c', {LOW, LOW, HIGH, LOW, LOW, LOW, LOW, LOW} },

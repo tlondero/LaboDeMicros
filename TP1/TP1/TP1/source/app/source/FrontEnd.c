@@ -165,11 +165,17 @@ void drawFrontEnd(FEData data, state st) {
 		}
 		break;
 	case BRIGHTNESS:
-		for (i = 0; i < 4; i++)
-			PVDisplaySendChar(BRIGHTNESS_MSG[i], i);
-		if (data.br == true)
-			PVDisplaySetBright(data.brightness);
-
+		{
+			char *bri = num2str(data.brightness);
+			PVDisplaySendChar(' ', 0);
+			PVDisplaySendChar(bri[7], 3);
+			PVDisplaySendChar(bri[6], 2);
+			PVDisplaySendChar(bri[5], 1);
+	//		for (i = 0; i < 4; i++)
+	//			PVDisplaySendChar(BRIGHTNESS_MSG[i], i);
+			if (data.br == true)
+				PVDisplaySetBright(data.brightness);
+		}
 		break;
 	case USERS_CLAVE:
 		for (i = 0; i < 4; i++) {
@@ -189,7 +195,7 @@ void drawFrontEnd(FEData data, state st) {
 		break;
 	case USERS_ADD:
 		//ACAAAA
-		if ((data.id_counter < ID_LEN-1) && (!data.good_id)) {//Aca entra mientras ic_counter < 7 y no hayas dado al ok
+		if ((data.id_counter < ID_LEN) && (!data.good_id)) {//Aca entra mientras ic_counter < 7 y no hayas dado al ok
 			for (i = 0; i < 4; i++) {
 				if (data.id_counter > 3) {
 					if ((i == 3) && (display == true)) {
