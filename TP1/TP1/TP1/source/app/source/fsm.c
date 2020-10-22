@@ -980,14 +980,14 @@ state addRoutine(void) {
 			asking_pin = true;
 			fe_data.good_id = true;
 			fe_data.animation_en = false;
-			fe_data.id_counter = ID_LEN;
+			fe_data.id_counter = ID_LEN+1;
 			int i = 0;
 			for( i = 0; i<ID_LEN; i++)
 				encoder_id_digits[i] = card_event[i];
 		}
 	}
-
-	/*if (PVCheckEvent()) {
+///WARNING
+	if (PVCheckEvent()) {
 		fe_data.animation_en = false;
 		using_encoder = true;
 	}
@@ -1014,22 +1014,25 @@ state addRoutine(void) {
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
 				break;
 			case BTN_PRESS:
-				if (fe_data.id_counter < ID_LEN-1) {
+				if (fe_data.id_counter < ID_LEN) {
 					fe_data.id_counter++;
 					actual_encoder_number = 0;
-				}
-				else {
+					if (fe_data.id_counter == ID_LEN){
 						fe_data.good_id = true;
 						fe_data.animation_en = false;
 						asking_pin = true;
 					}
+				}
+
 				break;
 			default:
 				break;
 			}
 		}
-	}*/
+	}
+	///WARNING
 
+	//Manejo de input del PIN
 	if (asking_pin && (updated_state == USERS_ADD) && (PVCheckEvent())) {
 		timerReset(inactivity_timer_id);
 		event_t ev = PVGetEv();
