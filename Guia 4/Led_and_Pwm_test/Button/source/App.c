@@ -65,7 +65,7 @@ void App_Init (void)
 	//Interrupciones de pines
 	led_init_driver();
 	idButton1= initButton(PIN_SW2, INPUT_PULLUP);
-	idLed1 = led_init_led(PIN_LED_RED, TURNS_ON_WITH_0);
+	idLed1 = led_init_led(PORTNUM2PIN(2, 3), TURNS_ON_WITH_1);
 	led_configure_brightness(idLed1, br);
 	led_set_state(idLed1, HIGH);
 }

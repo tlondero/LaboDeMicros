@@ -130,16 +130,26 @@ void led_configure_brightness(int8_t led_id, uint8_t brightness){
 	if(led_id >= 0 && led_id < MAX_LEDS){
 		if(INITIALIZED_LEDS[led_id]){
 			if(brightness >= 0 && brightness <= 100){
-				if(LEDS[led_id].led_activation_mode == TURNS_ON_WITH_0)
+				if(LEDS[led_id].led_activation_mode == TURNS_ON_WITH_0){
 					LEDS[led_id].brightness = brightness;
-				else
-					LEDS[led_id].brightness = 100 - brightness;
-				if(LEDS[led_id].state){
-					if(LEDS[led_id].brightness){
-						pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
+					if(LEDS[led_id].state){
+						if(LEDS[led_id].brightness){
+							pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
+						}
+						else{
+							pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
+						}
 					}
-					else{
-						pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
+				}
+				else{
+					LEDS[led_id].brightness = 100 - brightness;
+					if(LEDS[led_id].state){
+						if(LEDS[led_id].brightness == 100){
+							pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
+						}
+						else{
+							pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
+						}
 					}
 				}
 			}
