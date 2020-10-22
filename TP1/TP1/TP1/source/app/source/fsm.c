@@ -773,13 +773,169 @@ state claveRoutine(void) {
 	}
 	return updated_state;
 }
+/*
+state addRoutine(void) {
+	state updated_state = USERS_ADD;
+	static uint8_t actual_encoder_number = 0;
+	static bool using_encoder = false;
+	uint8_t* card_event = 0;
+	static bool asking_pin = false;
+	user_t my_user;
 
+	if (prev_state != USERS_ADD) {
+		FSMPushState();
+		fe_data.animation_opt = ADD_SELECTED_ANIMATION;
+		fe_data.animation_en = true;
+		using_encoder = false;
+		timerReset(inactivity_timer_id);
+		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
+		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
+		fe_data.id_counter = 0;
+		fe_data.pin_counter = 0;
+		//activar las interrupciones de cancel y del
+	}
+
+	if (back_triggered) {
+		back_triggered = false;
+		updated_state = USERS;
+		timerStop(inactivity_timer_id);
+	}
+	if (cancel_triggered) {
+		cancel_triggered = false;
+		updated_state = IDDLE;
+		timerStop(inactivity_timer_id);
+	}
+	if (inactivity_triggered) {
+		updated_state = IDDLE;
+		inactivity_triggered = false;
+	}
+
+	if (!using_encoder && !asking_pin) {
+		card_event = cardGetPAN();
+		if (card_event != NULL) {
+			asking_pin = true;
+			int i = 0;
+			for( i = 0; i<ID_LEN; i++)
+				encoder_id_digits[i] = card_event[i];
+			fe_data.good_pin = true;
+			fe_data.id_counter= ID_LEN;
+			fe_data.animation_en = false;
+		}
+	}
+
+	if (PVCheckEvent()) {
+		fe_data.animation_en = false;
+		using_encoder = true;
+	}
+
+	if (using_encoder && (updated_state == USERS_ADD) && !asking_pin) {
+		if (cancel_triggered) {
+			fe_data.animation_en = true;
+			fe_data.id_counter = 0;
+			using_encoder = false;
+			fe_data.animation_en = true;
+			cancel_triggered = false;
+		}
+		else if (back_triggered) {
+			if (fe_data.id_counter > 0) {
+				fe_data.id_counter--;
+			}
+			back_triggered = false;
+		}
+		//ahora hay que fijarse si llego un evento de encoder, si es derecha aumento el numero si es izquierda lo achico si es enter avanzo
+		if (PVCheckEvent()) {
+			fe_data.animation_en = false;
+			event_t ev = PVGetEv();
+			timerReset(inactivity_timer_id);
+			switch (ev) {
+			case ENC_LEFT:
+				if (actual_encoder_number == 0)
+					actual_encoder_number = 9;
+				else
+					actual_encoder_number--;
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+
+				break;
+			case ENC_RIGHT:
+				if (actual_encoder_number == 9)
+					actual_encoder_number = 0;
+				else
+					actual_encoder_number++;
+				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
+
+				break;
+			case BTN_PRESS:
+				if (fe_data.id_counter < ID_LEN-1) {
+					fe_data.id_counter++;
+				}
+				else {
+					asking_pin = true;
+					fe_data.good_id = true;
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	if ((PVCheckEvent()) && asking_pin) {
+		fe_data.animation_en = false;
+		timerReset(inactivity_timer_id);
+		event_t ev = PVGetEv();
+		switch (ev) {
+		case ENC_LEFT:
+			if (actual_encoder_number == 0)
+				actual_encoder_number = 9;
+			else
+				actual_encoder_number--;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case ENC_RIGHT:
+			if (actual_encoder_number == 9)
+				actual_encoder_number = 0;
+
+			else
+				actual_encoder_number++;
+
+			encoder_pin_digits[fe_data.pin_counter] = actual_encoder_number;
+			break;
+		case BTN_PRESS:
+			if (fe_data.pin_counter < PIN_LEN-1) {
+				fe_data.pin_counter++;
+			}
+			else {
+
+				my_user.id=transformToNum(&encoder_id_digits[0], ID_LEN);
+				my_user.password= transformToNum(&encoder_pin_digits[0], PIN_LEN);
+				my_user.admin = false;
+				my_user.available= true;
+				my_user.blocked= false;
+				my_user.strikes = 0;
+//				addUser({ transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN), false, true,false, 0 });
+				addUser(my_user);
+				fe_data.good_pin = true;
+				updated_state = USERS;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	if(updated_state != USERS_ADD)
+		FSMPullState();
+
+	return updated_state;
+}
+*/
 state addRoutine(void) {
 	state updated_state = USERS_ADD;
 	static uint8_t actual_encoder_number = 0;
 	static bool using_encoder = false;
 	static bool asking_pin = false;
 	uint8_t* card_event = 0;
+	user_t my_user;
 
 	if (prev_state != USERS_ADD) {
 		FSMPushState();
@@ -817,22 +973,21 @@ state addRoutine(void) {
 		updated_state = IDDLE;
 		inactivity_triggered = false;
 	}
-	//CARGA DEL ID MEDIANTE LECTOR DE TARJETAS
+
 	if (!using_encoder) {
 		card_event = cardGetPAN();
 		if (card_event != NULL) {
 			asking_pin = true;
 			fe_data.good_id = true;
 			fe_data.animation_en = false;
-			fe_data.id_counter = ID_LEN+1;
+			fe_data.id_counter = ID_LEN;
 			int i = 0;
 			for( i = 0; i<ID_LEN; i++)
 				encoder_id_digits[i] = card_event[i];
 		}
 	}
 
-	//CARGA DEL ID CON EL ENCODER
-	if (PVCheckEvent()) {
+	/*if (PVCheckEvent()) {
 		fe_data.animation_en = false;
 		using_encoder = true;
 	}
@@ -859,24 +1014,22 @@ state addRoutine(void) {
 				encoder_id_digits[fe_data.id_counter] = actual_encoder_number;
 				break;
 			case BTN_PRESS:
-				if (fe_data.id_counter < ID_LEN) {
+				if (fe_data.id_counter < ID_LEN-1) {
 					fe_data.id_counter++;
 					actual_encoder_number = 0;
-					if (fe_data.id_counter == ID_LEN){
+				}
+				else {
 						fe_data.good_id = true;
 						fe_data.animation_en = false;
 						asking_pin = true;
 					}
-				}
-
 				break;
 			default:
 				break;
 			}
 		}
-	}
+	}*/
 
-	//CARGA DEL PIN (SOLO MEDIANTE ENCODER ROTATORIO)
 	if (asking_pin && (updated_state == USERS_ADD) && (PVCheckEvent())) {
 		timerReset(inactivity_timer_id);
 		event_t ev = PVGetEv();
@@ -1039,6 +1192,7 @@ void inactivityCallback(void) {
 void openCallback(void) {
 	open_triggered = true;
 }
+
 
 void cancelCallback(void) {
 	cancel_triggered = true;

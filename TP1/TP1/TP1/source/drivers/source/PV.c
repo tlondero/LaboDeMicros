@@ -49,7 +49,7 @@ const uint8_t ST_PIN[DEC_IN_PV] = { LED_LINE_A, LED_LINE_B };
 //Button
 static PVButton_t button;
 static PVEncoder_t idEncoder;
-static bool button_is_pressed = false;
+static bool button_is_pressed  = false;
 
 static bool isEvent = false;
 static PVEv_t event = NO_PV_EV;
@@ -95,12 +95,8 @@ void multiplexLedCallback(void);
 
 void dispShowText(void) {
 	uint8_t i = 0;
-	if (dispBright == 0) {
-		dispClearAll();
-	} else {
-		for (i = 0; i < SEV_SEG; i++) {
-			dispSendChar(message[(i + countMess) % length], i);
-		}
+	for (i = 0; i < SEV_SEG; i++) {
+		dispSendChar(message[(i + countMess) % length], i);
 	}
 
 	switch (dir) {
@@ -144,11 +140,12 @@ uint8_t checkMessageLength(char *mes) {
 	return i + 1;
 }
 
-void PVButtonPressedCallback(void) {
-	if (timerExpired(timer_id_button)) {
+void PVButtonPressedCallback(void){
+	if(timerExpired(timer_id_button))
+	{
 		button_is_pressed = true;
 		timerReset(timer_id_button);
-	} else {
+	}else{
 		button_is_pressed = false;
 	}
 }
@@ -231,8 +228,7 @@ bool PVInit(void) {
 	timer_id_mrq = timerGetId();
 	timer_open_st = timerGetId();
 
-	timerStart(timer_open_st, TIMER_MS2TICKS((5)), TIM_MODE_PERIODIC,
-			open_animation_Callback);
+	timerStart(timer_open_st, TIMER_MS2TICKS((5)), TIM_MODE_PERIODIC, open_animation_Callback);
 	//timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC, open_animation_Callback);
 	timerStop(timer_open_st);
 
@@ -247,8 +243,7 @@ void PVSuscribeEvent(PVEv_t ev, bool state) {
 }
 
 bool PVCheckEvent(void) {
-	if ((button_is_pressed == true)
-			|| (EncoderEventAVB(idEncoder) == EVENT_AVB))
+	if ((button_is_pressed == true) || (EncoderEventAVB(idEncoder) == EVENT_AVB))
 		isEvent = true;
 	else
 		isEvent = false;
@@ -316,7 +311,7 @@ bool PVButtonIRQ(PVIRQMode_t IRQ_mode, pinIrqFun_t fcallback) {
 
 void PVDisplayClear(void) {
 	uint8_t i;
-	for (i = 0; i < MAX_MESS_LEN; i++) {
+	for(i=0; i < MAX_MESS_LEN; i++){
 		message[i] = '\0';
 	}
 	length = 0;
@@ -335,7 +330,6 @@ bool PVDisplaySetBright(uint8_t br) {
 		dispBrightness(dispBright);
 	} else if (br == 0) {
 		dispClearAll();
-		dispBright = br;
 	} else {
 		valid = false;
 	}
@@ -395,9 +389,7 @@ bool PVDisplaySendChar(char ch, uint8_t seven_seg_module) {
 
 	bool valid = false;
 
-	if (dispBright == 0) {
-		dispClearAll();
-	} else if (seven_seg_module < SEV_SEG) {
+	if (seven_seg_module < SEV_SEG) {
 		dispSendChar(ch, seven_seg_module);
 		valid = true;
 	}

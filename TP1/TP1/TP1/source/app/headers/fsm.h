@@ -14,13 +14,7 @@
   /*******************************************************************************
    * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
    ******************************************************************************/
-#define DEVELOPMENT_MODE_FSM 1
-#if DEVELOPMENT_MODE_FSM == 1
-	#define INACTIVITY_TRIGGER_TIME (500000) //ms
-#else
-	#define INACTIVITY_TRIGGER_TIME (30000) //ms
-#endif
-
+#define INACTIVITY_TRIGGER_TIME (30000) //ms
 #define OPEN_TRIGGER_TIME (5000) //ms
 #define ID_LEN 8
 #define PIN_LEN 5
