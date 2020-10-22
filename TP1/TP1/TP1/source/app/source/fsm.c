@@ -817,7 +817,7 @@ state addRoutine(void) {
 		updated_state = IDDLE;
 		inactivity_triggered = false;
 	}
-
+	//CARGA DEL ID MEDIANTE LECTOR DE TARJETAS
 	if (!using_encoder) {
 		card_event = cardGetPAN();
 		if (card_event != NULL) {
@@ -830,7 +830,8 @@ state addRoutine(void) {
 				encoder_id_digits[i] = card_event[i];
 		}
 	}
-///WARNING
+
+	//CARGA DEL ID CON EL ENCODER
 	if (PVCheckEvent()) {
 		fe_data.animation_en = false;
 		using_encoder = true;
@@ -874,9 +875,8 @@ state addRoutine(void) {
 			}
 		}
 	}
-	///WARNING
 
-	//Manejo de input del PIN
+	//CARGA DEL PIN (SOLO MEDIANTE ENCODER ROTATORIO)
 	if (asking_pin && (updated_state == USERS_ADD) && (PVCheckEvent())) {
 		timerReset(inactivity_timer_id);
 		event_t ev = PVGetEv();
