@@ -19,8 +19,8 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define TIMER_TICK_MS       1
-#define TIMER_MS2TICKS(ms)  ((ms)/TIMER_TICK_MS)
+#define TIMER_TICK_MS       10
+#define TIMER_MS2TICKS(ms)  ((ms)*TIMER_TICK_MS)
 #define TIMER_INVALID_ID 255
 #define TIMER_ID_INTERNAL   0
 /*******************************************************************************

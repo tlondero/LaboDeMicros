@@ -18,7 +18,7 @@
 
 #define MAX_BUTTONS 10
 #define BUFF_LEN 50
-#define POLLING_MODE 1
+#define POLLING_MODE 0
 /*******************************************************************************/
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE

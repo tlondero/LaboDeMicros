@@ -36,6 +36,7 @@
 		<item value="false" key="WizardProjectsImportPage.STORE_COPY_PROJECT_ID"/>
 		<item value="false" key="WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
+			<item value="C:\Users\Msrt\Documents\GitHub\LaboDeMicros\Guia 4\Led_and_Pwm_test\Button"/>
 			<item value="C:\Users\Acer\Desktop\GitHub\LaboDeMicros\Guia 4\Led_and_Pwm_test\Button"/>
 			<item value="C:\Users\Guido\Documents\GitHub\LaboDeMicros\Guia 4\Led_and_Pwm_test\Button"/>
 		</list>

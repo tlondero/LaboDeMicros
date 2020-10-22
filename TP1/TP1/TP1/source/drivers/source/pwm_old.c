@@ -99,7 +99,7 @@ void pwm_query(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state)
 #if (DEVELOPMENT_MODE == 1)
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS)
 	{
-		if (freq > 0 && freq < (uint32_t)(1000.0 / 2.0 * (float)PWM_TIMEBASE))
+		if (freq > 0 && freq < (uint32_t)(1000.0 / (2.0 * (float)PWM_TIMEBASE)) )
 		{ //no anda si la base de tiempo no es al menos dos veces mas chica que el periodo
 			if (dt >= 0 && dt <= 100)
 			{
@@ -151,7 +151,7 @@ void pwm_poll(void)
 			{ //si la pwm del pin esta activada
 				if (gpioRead(PWMS[i].pin))
 				{ //si estaba prendido
-					if (((float)timer) - (float)PWMS[i].last_updated > (((float)(((1.0 / ((float)PWMS[i].freq))) * 1000.0 * (((float)(100 - PWMS[i].dt)) / 100.0))) / ((float)PWM_TIMEBASE)))
+					if (((float)timer) - (float)PWMS[i].last_updated > (((float)(((1.0 / ((float)PWMS[i].freq))) * (1000.0/PWM_TIMEBASE)* (((float)(100 - PWMS[i].dt)) / 100.0))) / ((float)PWM_TIMEBASE)))
 					{
 						gpioToggle(PWMS[i].pin);	  //si ya paso periodo*(100-duty cycle) apago el pin
 						PWMS[i].last_updated = timer; //reseteo el contador
@@ -159,7 +159,7 @@ void pwm_poll(void)
 				}
 				else
 				{ //si estaba apagado
-					if (((float)timer) - (float)PWMS[i].last_updated > (((float)(((1.0 / ((float)PWMS[i].freq))) * 1000.0 * (((float)(PWMS[i].dt)) / 100.0))) / ((float)PWM_TIMEBASE)))
+					if (((float)timer) - (float)PWMS[i].last_updated > (((float)(((1.0 / ((float)PWMS[i].freq))) * (1000.0/PWM_TIMEBASE) * (((float)(PWMS[i].dt)) / 100.0))) / ((float)PWM_TIMEBASE)))
 					{
 						gpioToggle(PWMS[i].pin);	  //si ya paso periodo*(duty cycle) prendo el pin
 						PWMS[i].last_updated = timer; //reseteo el contador

@@ -160,7 +160,7 @@ bool PVInit(void) {
 
 	//Button init
 	timer_id_button = timerGetId();
-	timerStart(timer_id_button, 200, TIM_MODE_SINGLESHOT, NULL);
+	timerStart(timer_id_button, TIMER_MS2TICKS(200), TIM_MODE_SINGLESHOT, NULL);
 
 	button = ButtonInit(PV_BUTTON, INPUT_PULLUP, LOW_WHEN_PRESSED);
 	ButtonSetIRQ(button, GPIO_IRQ_MODE_FALLING_EDGE, PVButtonPressedCallback);
@@ -228,7 +228,7 @@ bool PVInit(void) {
 	timer_id_mrq = timerGetId();
 	timer_open_st = timerGetId();
 
-	timerStart(timer_open_st, TIMER_MS2TICKS((5)), TIM_MODE_PERIODIC,
+	timerStart(timer_open_st, TIMER_MS2TICKS(5), TIM_MODE_PERIODIC,
 			open_animation_Callback);
 	//timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC, open_animation_Callback);
 	timerStop(timer_open_st);
@@ -327,12 +327,9 @@ void PVDisplayClear(void) {
 
 bool PVDisplaySetBright(uint8_t br) {
 	bool valid = true;
-	if ((br >= 1) && (br <= 100)) {
+	if ((br >= 0) && (br <= 100)) {
 		dispBright = br;
 		dispBrightness(dispBright);
-	} else if (br == 0) {
-		dispClearAll();
-		dispBright = br;
 	} else {
 		valid = false;
 	}

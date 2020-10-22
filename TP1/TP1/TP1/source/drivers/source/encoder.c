@@ -64,7 +64,7 @@ void EncoderInit(encoder_id enc_id)
 		timerInit();
 		encoder_timer_id = timerGetId();
 		encoders[enc_id].timer_id = encoder_timer_id;
-		timerStart(encoder_timer_id, 100, TIM_MODE_SINGLESHOT, NULL); //Previene rebotes
+		timerStart(encoder_timer_id, (uint32_t)TIMER_MS2TICKS(100), TIM_MODE_SINGLESHOT, NULL); //Previene rebotes
 
 #if DEVELOPMENT_MODE
 		gpioMode(DEBUG_PIN, OUTPUT);

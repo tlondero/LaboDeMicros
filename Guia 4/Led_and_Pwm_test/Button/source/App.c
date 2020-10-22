@@ -59,13 +59,24 @@
 static tim_id_t idButton1;
 static int8_t idLed1;
 static uint8_t br=100;
+static tim_id_t timer_trucho;
+static bool bool_trucho;
+
+void callback(void){
+	bool_trucho = !bool_trucho;
+	if(bool_trucho == false)
+		led_configure_brightness(idLed1, 0);
+	else
+		led_configure_brightness(idLed1, br);
+}
 void App_Init (void)
 {
-
+	timer_trucho = timerGetId();
+	timerStart(timer_trucho, 8, TIM_MODE_PERIODIC, callback);
 	//Interrupciones de pines
 	led_init_driver();
 	idButton1= initButton(PIN_SW2, INPUT_PULLUP);
-	idLed1 = led_init_led(PORTNUM2PIN(2, 3), TURNS_ON_WITH_1);
+	idLed1 = led_init_led(PORTNUM2PIN(PC,1), TURNS_ON_WITH_1); //PORTNUM2PIN(2, 3)
 	led_configure_brightness(idLed1, br);
 	led_set_state(idLed1, HIGH);
 }
@@ -80,8 +91,8 @@ void App_Run (void)
 
 	Button_Event evsw1 = getButtonEvent(idButton1);
 	if(evsw1 == PRESS){
-		br--;
-		led_configure_brightness(idLed1, br);
+		br = br - 20;
+		led_configure_brightness(idLed1, 1);
 	}
 	led_poll();
 }
