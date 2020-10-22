@@ -6,9 +6,9 @@
  */
 
 
-#include "../headers/led_old.h"
-#include "../headers/pwm_old.h"
-#include "../headers/gpio.h"
+#include "header/led.h"
+#include "header/pwm.h"
+#include "header/gpio.h"
 /*******************************************************************************
  * GLOBAL VARIABLES WITH LOCAL SCOPE
  ******************************************************************************/
@@ -130,10 +130,17 @@ void led_configure_brightness(int8_t led_id, uint8_t brightness){
 	if(led_id >= 0 && led_id < MAX_LEDS){
 		if(INITIALIZED_LEDS[led_id]){
 			if(brightness >= 0 && brightness <= 100){
-				LEDS[led_id].brightness = brightness;
+				if(LEDS[led_id].led_activation_mode == TURNS_ON_WITH_0)
+					LEDS[led_id].brightness = brightness;
+				else
+					LEDS[led_id].brightness = 100 - brightness;
 				if(LEDS[led_id].state){
-					pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
-
+					if(LEDS[led_id].brightness){
+						pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
+					}
+					else{
+						pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
+					}
 				}
 			}
 		}

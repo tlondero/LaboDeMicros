@@ -5,7 +5,7 @@
  *      Author: MAGT
  */
 
-#include "../headers/pwm_old.h"
+#include "header/pwm.h"
 
 /*******************************************************************************
  * GLOBAL VARIABLES WITH LOCAL SCOPE
@@ -15,8 +15,6 @@ static uint32_t timer;
 static uint8_t INITIALIZED_PWMS[MAX_PWMS];
 static pwm_t PWMS[MAX_PWMS];
 static uint8_t init;
-
-
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE

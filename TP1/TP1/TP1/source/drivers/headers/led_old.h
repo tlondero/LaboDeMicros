@@ -4,9 +4,8 @@
   @author   MAGT
  ******************************************************************************/
 
-#ifndef DRIVERS_HEADERS_LED_OLD_H_
-#define DRIVERS_HEADERS_LED_OLD_H_
-
+#ifndef _LED_H_
+#define _LED_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
@@ -35,8 +34,8 @@
 #define TURNS_ON_WITH_1 0
 #define TURNS_ON_WITH_0	1
 
-#define LED_TIMEBASE 50
-#define PWM_FREQ 60
+#define LED_TIMEBASE 100
+#define PWM_FREQ 70
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
@@ -109,4 +108,4 @@ void led_poll(void);
 /*******************************************************************************
  ******************************************************************************/
 
-#endif /* DRIVERS_HEADERS_LED_OLD_H_ */
+#endif // _LED_H_
