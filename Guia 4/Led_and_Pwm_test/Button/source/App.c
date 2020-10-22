@@ -56,67 +56,18 @@
 
 
 
-static tim_id_t idButton1, idLed1, idLed2, idLed3, idTimer1, idDebug;
-static uint32_t timer=3;
-static uint32_t rainbow_start;
-static uint8_t rainbow;
-void callbacktimer(void);
-void debug_callbackb2(void);
+static tim_id_t idButton1
+static int8_t idLed1;
+static uint8_t br=100;
 void App_Init (void)
 {
 
 	//Interrupciones de pines
-	timerInit();
 	led_init_driver();
-	gpioMode(PIN_B2, OUTPUT);
-	gpioWrite(PIN_B2, LOW);
-	idDebug = timerGetId();
-	timerStart(idDebug, 127, TIM_MODE_PERIODIC, debug_callbackb2);
-	gpioMode(PIN_LED_BLUE, OUTPUT);
-	gpioWrite(PIN_LED_BLUE,HIGH);
-	gpioMode(PIN_LED_RED, OUTPUT);
-	gpioWrite(PIN_LED_RED,HIGH);
-	gpioMode(PIN_LED_GREEN, OUTPUT);
-	gpioWrite(PIN_LED_GREEN,HIGH);
 	idButton1= initButton(PIN_SW2, INPUT_PULLUP);
 	idLed1 = led_init_led(PIN_LED_RED, TURNS_ON_WITH_0);
-	idLed2 = led_init_led(PIN_LED_GREEN, TURNS_ON_WITH_0);
-	idLed3 = led_init_led(PIN_LED_BLUE, TURNS_ON_WITH_0);
-	led_configure_period(idLed1, 1000);
-	led_configure_flashes(idLed1, 10);
-	led_configure_dt(idLed1, 50);
-	led_configure_brightness(idLed1, 2);
-	led_configure_period(idLed2, 1000);
-	led_configure_flashes(idLed2, 10);
-	led_configure_dt(idLed2, 50);
-	led_configure_brightness(idLed2, 2);
-	led_configure_period(idLed3, 1000);
-	led_configure_flashes(idLed3, 10);
-	led_configure_dt(idLed3, 50);
-	led_configure_brightness(idLed3, 2);
-	idTimer1 = timerGetId();
-	timerStart(idTimer1, 250, TIM_MODE_PERIODIC, callbacktimer);
-}
-
-void debug_callbackb2(void){
-	gpioToggle(PIN_B2);
-}
-void callbacktimer(void){
-	timer++;
-	if(rainbow == 1){
-		if(timer == rainbow_start+1){
-			led_flash(idLed1);
-		}
-		else if(timer == rainbow_start+4){
-			led_flash(idLed2);
-		}
-		else if(timer == rainbow_start+7){
-			led_flash(idLed3);
-		}
-		else if(timer == rainbow_start+8){
-			rainbow = 0;
-		}
-	}
+	led_configure_brightness(idLed1, br);
+	led_set_state(idLed1, HIGH);
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
@@ -129,9 +80,8 @@ void App_Run (void)
 
 	Button_Event evsw1 = getButtonEvent(idButton1);
 	if(evsw1 == PRESS){
-		rainbow = 1;
-		rainbow_start = timer;
+		br--;
+		led_configure_brightness(idLed1, br);
 	}
 	led_poll();
-	pwm_poll();
 }
