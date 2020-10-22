@@ -3,9 +3,9 @@
   @brief    PWM services
   @author   MAGT
  ******************************************************************************/
-#ifndef DRIVERS_HEADERS_PWM_OLD_H_
-#define DRIVERS_HEADERS_PWM_OLD_H_
 
+#ifndef _PWM_H_
+#define _PWM_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "timer.h"
-#include "gpio.h"
+#include "header/gpio.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -73,13 +73,7 @@ void pwm_unquery(int8_t id, uint8_t final_state);
  * the queried pwms.
  */
 void pwm_poll(void);
-
-/**
- * @brief
- *
- */
-void pwm_destroy(uint8_t pwm_id);
 /*******************************************************************************
  ******************************************************************************/
 
-#endif /* DRIVERS_HEADERS_PWM_OLD_H_ */
+#endif // _LED_H_
