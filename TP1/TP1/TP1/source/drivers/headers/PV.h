@@ -165,10 +165,7 @@ bool PVDispMessOn(void);
  */
 bool PVDispManualShift(PVDirection_t direction, uint8_t cant);
 
-/**
- * @brief
- */
-bool PVAnimation(animation_t animation, bool activate);
+
 
 /**
  * @brief LED Set brightnes

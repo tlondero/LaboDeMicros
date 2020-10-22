@@ -16,10 +16,11 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
+#define POLLING_MODE 0
 
 #define BUTTON_REFRESH_PERIOD 100
 //THIS TRESHOLDS ARE NOT IN MS
-//THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD
+//THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD or use the macro TIMER_MS2TICKS
 #define HIGH_WHEN_PRESSED 1
 #define LOW_WHEN_PRESSED 0
 
@@ -38,8 +39,8 @@ enum
   PRESS,   //Button was pressed
   RELEASE, //button was released
   LKP,     // Long Key Press
-  SKP,     //Short key press  //Finisher of the ev queue
-  EOQ
+  SKP,     //Short key press
+  EOQ		//Finisher of the ev queue
 };
 
 typedef uint8_t ButtonEvent; //instant events such as PRESS and RELEASE
@@ -92,7 +93,7 @@ void ButtonSetIRQ(int8_t id, uint8_t IRQ_mode, pinIrqFun_t fcallback);
  */
 
 const ButtonEvent *ButtonGetEvent(int8_t id);
-bool ButtonCheckEvent(int8_t id);
+
 
 /*******************************************************************************
  ******************************************************************************/

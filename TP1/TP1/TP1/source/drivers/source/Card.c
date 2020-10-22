@@ -17,9 +17,9 @@
 
 #define DATA_LENGHT (40)
 #define CHAR_LENGHT (5)
-#define FS 0b01101 //FS 0b10110 //
-#define SS 0b01011
-#define ES 0b11111
+#define FS 0b01101
+#define SS 0b01011 //Start Sentinel
+#define ES 0b11111 //End Sentinel
 #define LOW_NYBBLE_MASK (0b00001111)
 #define CARD_EN_PIN PORTNUM2PIN(PC, 17)	  //Amarillo
 #define CARD_DATA_PIN PORTNUM2PIN(PB, 11) //Azul
@@ -32,7 +32,7 @@
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 static uint8_t pan[PAN_LENGHT];
-static uint8_t data[DATA_LENGHT]; //
+static uint8_t data[DATA_LENGHT];
 static bool enable;
 static bool error;
 
@@ -114,7 +114,7 @@ void enableCallback(void)
 	if (ya_entre == 0)
 	{
 #if DEBUGGIN_MODE_CARD && DEBUGGIN_MODE
-	gpioWrite(DEBUG_PIN, HIGH);
+		gpioWrite(DEBUG_PIN, HIGH);
 #endif
 		flushData();
 	}
@@ -122,7 +122,7 @@ void enableCallback(void)
 	if (ya_entre == 2)
 	{
 #if DEBUGGIN_MODE_CARD
-	gpioWrite(DEBUG_PIN, LOW);
+		gpioWrite(DEBUG_PIN, LOW);
 #endif
 		ya_entre = 0;
 	}
@@ -135,13 +135,12 @@ void enableCallback(void)
 	lrc_rx = false;
 	ss_rx = false;
 	error = false;
-
 }
 
 void clockCallback(void)
 {
 
-		bool my_data = !gpioRead(CARD_DATA_PIN); // Read incoming bit_counter
+	bool my_data = !gpioRead(CARD_DATA_PIN); // Read incoming bit_counter
 
 	//Begin reading data stream.
 	if (my_data)
@@ -183,7 +182,6 @@ void clockCallback(void)
 	{
 		bit_counter++;
 	}
-
 }
 
 bool checkParity(void)

@@ -10,6 +10,28 @@
 #include "../headers/gpio.h"
 #include "../headers/debug.h"
 #include "../headers/board.h"
+
+/*******************************************************************************
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+ ******************************************************************************/
+typedef struct {
+	uint32_t time_start;
+	uint32_t time;		//time the LED will stay on the new state in ms. 0 means forever.
+	uint32_t period;	//period for flashing LEDs in ms.
+	uint32_t flashes;	//times the LED will flash in flashing mode. 0 means forever.
+	uint32_t fade;		//time the LED will take to fully change states on a fade in ms. 0 means no fade.
+	int8_t led_id; 	//ID of the initialized LED
+	int8_t pwm_id;
+	uint8_t led_pin;	//pin of the LED
+	uint8_t led_activation_mode;//pin mode of the LED
+	uint8_t brightness;	//brightness, values from 0 to 100 and has a 1:1 ratio with duty cycle
+	uint8_t flashing;
+	uint8_t dt;
+	uint32_t curr_dt;
+	uint8_t state;
+	uint8_t curr_flashes;
+}led_t;
+
 /*******************************************************************************
  * GLOBAL VARIABLES WITH LOCAL SCOPE
  ******************************************************************************/
@@ -21,21 +43,27 @@ static uint32_t led_timer;
 static uint8_t init;
 
 /*******************************************************************************
- * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
- ******************************************************************************/
-
-/*******************************************************************************
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE
  ******************************************************************************/
 /**
  * @brief Get normalized state of a LED, where the normalized state 1 indicates the LED in ON
  *                and the normalized state 0 indicates the LED is OFF.
  * @param state the electrical state of the pin
- * @param activation_mode whether the led is turned on with 1 or 0
+ * @param activation_mode whether the led is turned on with 1 or 0. Use the provided defines.
  */
 bool get_normalized_state(bool state, uint8_t activation_mode);
+
+/**
+ * @brief Get the unnormalized state of a LED, where the normalized state 1 indicates the LED in ON
+ *                and the normalized state 0 indicates the LED is OFF. This is taking into consideration
+ *                that the LED can be turned on with either a 1 or 0.
+ * @param state the electrical state of the pin
+ * @param activation_mode whether the led is turned on with 1 or 0. Use the provided defines.
+ */
 bool unnormalize_state(bool norm_state, uint8_t activation_mode);
+
 static void timer_callback(void);
+
 /*******************************************************************************
  * FUNCTION DEFINITIONS WITH LOCAL SCOPE
  ******************************************************************************/
@@ -93,18 +121,18 @@ void led_init_driver(void)
 int8_t led_init_led(pin_t pin, uint8_t activation_mode)
 {
 
-	int8_t id = led_get_id();
+	int8_t id = led_get_id();									//Pido un ID
 	gpioMode(pin, OUTPUT);
-	gpioWrite(pin, unnormalize_state(LOW, activation_mode));
+	gpioWrite(pin, unnormalize_state(LOW, activation_mode));	//configuro el pin
 	int8_t pwm_id;
 	if (id != UNAVAILABLE_SPACE)
-	{ //valores iniciales importantes
+	{ 															//configuro valores iniciales importantes != 0.
 		LEDS[id].brightness = 100;
 		LEDS[id].dt = 50;
 		LEDS[id].led_id = id;
 		LEDS[id].led_pin = pin;
 		LEDS[id].led_activation_mode = activation_mode;
-		pwm_id = pwm_init_signal(pin); //genero una pwm para el led
+		pwm_id = pwm_init_signal(pin); 							//genero una pwm para el led
 		if (pwm_id != UNAVAILABLE_SPACE)
 		{
 			LEDS[id].pwm_id = pwm_id;
@@ -123,16 +151,11 @@ int8_t led_init_led(pin_t pin, uint8_t activation_mode)
 
 void led_destroy_led(int8_t led_id)
 {
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id < MAX_LEDS)
 	{
 		INITIALIZED_LEDS[led_id] = 0;	  //libero espacio
 		pwm_destroy(LEDS[led_id].pwm_id); //destruyo dependencias
 	}
-#else
-	INITIALIZED_LEDS[led_id] = 0;
-	pwm_destroy(LEDS[led_id].pwm_id);
-#endif
 }
 
 int8_t led_get_id(void)
@@ -141,7 +164,7 @@ int8_t led_get_id(void)
 	uint8_t found_space = 0;
 	int8_t id = -1;
 	for (i = 0; i < MAX_LEDS; i++)
-	{ //me fijo si hay espacio
+	{ 										//me fijo si hay espacio
 		if (!(INITIALIZED_LEDS[i]))
 		{
 			INITIALIZED_LEDS[i] = 1;
@@ -162,35 +185,33 @@ int8_t led_get_id(void)
 
 void led_configure_brightness(int8_t led_id, uint8_t brightness)
 {
-
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id >= 0 && led_id < MAX_LEDS)
 	{
 		if (INITIALIZED_LEDS[led_id])
 		{
 			if (brightness >= 0 && brightness <= 100)
 			{
-				if (LEDS[led_id].led_activation_mode == TURNS_ON_WITH_0)
+				if (LEDS[led_id].led_activation_mode == TURNS_ON_WITH_0)		//Si el led se prende con 0
 				{
 					LEDS[led_id].brightness = brightness;
-					if (LEDS[led_id].state)
+					if (LEDS[led_id].state)										//Si estaba prendido, reinicio la pwm para ver los efectos
 					{
 						if (LEDS[led_id].brightness)
 						{
 							pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
 						}
-						else
+						else		//Si el brightness vale cero, apago el led
 						{
 							pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
 						}
 					}
 				}
-				else
+				else								//Si el led se prende con 1
 				{
-					LEDS[led_id].brightness = 100 - brightness;
+					LEDS[led_id].brightness = 100 - brightness;		//Por como se hacen las cuentas en poll, invierto el brightness
 					if (LEDS[led_id].state)
 					{
-						if (LEDS[led_id].brightness == 100)
+						if (LEDS[led_id].brightness == 100)//Si el brightness vale cien, apago el led
 						{
 							pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
 						}
@@ -203,14 +224,10 @@ void led_configure_brightness(int8_t led_id, uint8_t brightness)
 			}
 		}
 	}
-#else
-	LEDS[led_id].brightness = brightness;
-#endif
 }
 
 void led_configure_time(int8_t led_id, uint32_t time)
 {
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id >= 0 && led_id < MAX_LEDS)
 	{
 		if (INITIALIZED_LEDS[led_id])
@@ -218,14 +235,10 @@ void led_configure_time(int8_t led_id, uint32_t time)
 			LEDS[led_id].time = time;
 		}
 	}
-#else
-	LEDS[led_id].time = time;
-#endif
 }
 
 void led_configure_period(int8_t led_id, uint32_t period)
 {
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id >= 0 && led_id < MAX_LEDS)
 	{
 		if (INITIALIZED_LEDS[led_id])
@@ -233,14 +246,10 @@ void led_configure_period(int8_t led_id, uint32_t period)
 			LEDS[led_id].period = period;
 		}
 	}
-#else
-	LEDS[led_id].period = period;
-#endif
 }
 
 void led_configure_flashes(int8_t led_id, uint32_t flashes)
 {
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id >= 0 && led_id < MAX_LEDS)
 	{
 		if (INITIALIZED_LEDS[led_id])
@@ -248,14 +257,10 @@ void led_configure_flashes(int8_t led_id, uint32_t flashes)
 			LEDS[led_id].flashes = flashes;
 		}
 	}
-#else
-	LEDS[led_id].flashes = flashes;
-#endif
 }
 
 void led_configure_fade(int8_t led_id, uint32_t fade)
 {
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id >= 0 && led_id < MAX_LEDS)
 	{
 		if (INITIALIZED_LEDS[led_id])
@@ -263,14 +268,10 @@ void led_configure_fade(int8_t led_id, uint32_t fade)
 			LEDS[led_id].fade = fade;
 		}
 	}
-#else
-	LEDS[led_id].fade = fade;
-#endif
 }
 
 void led_configure_dt(int8_t led_id, uint8_t dt)
 {
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id >= 0 && led_id < MAX_LEDS)
 	{
 		if (INITIALIZED_LEDS[led_id])
@@ -278,19 +279,16 @@ void led_configure_dt(int8_t led_id, uint8_t dt)
 			LEDS[led_id].dt = dt;
 		}
 	}
-#else
-	LEDS[led_id].dt = dt;
-#endif
 }
 
 void led_set_state(int8_t led_id, uint8_t norm_state)
 {
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id >= 0 && led_id < MAX_LEDS)
 	{
 		if (INITIALIZED_LEDS[led_id])
-		{ //si esta inicializado el led
-			LEDS[led_id].flashing = 0;
+		{									 //si esta inicializado el led
+			LEDS[led_id].flashing = 0;		//digo que no esta flasheando mas
+			//Si me pidieron prenderlo lo prendo, sino lo apago
 			if (norm_state)
 			{
 				pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH); //si me piden prender el led, activo la pwm
@@ -299,7 +297,7 @@ void led_set_state(int8_t led_id, uint8_t norm_state)
 			{
 				pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode)); //si me piden apagar, desactivo la pwm
 			}
-			LEDS[led_id].state = norm_state; //guardo el estao
+			LEDS[led_id].state = norm_state; //guardo el estado
 			if (LEDS[led_id].time)
 			{
 				LEDS[led_id].time_start = led_timer; //si time != 0 entonces guardo cuando empieza a contar
@@ -307,28 +305,11 @@ void led_set_state(int8_t led_id, uint8_t norm_state)
 			}
 		}
 	}
-#else
-	if (norm_state)
-	{
-		pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
-	}
-	else
-	{
-		pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
-	}
-	LEDS[led_id].state = norm_state;
-	if (LEDS[led_id].time)
-	{
-		LEDS[led_id].time_start = led_timer; //si time != 0 entonces guardo cuando empieza a contar
-		LED_TIMERS[led_id] = 1;
-	}
-#endif
 }
 
 void led_flash(int8_t led_id)
 {
 	uint8_t cur_norm_state;
-#if (DEVELOPMENT_MODEE == 1)
 	if (led_id >= 0 && led_id < MAX_LEDS)
 	{
 		if (INITIALIZED_LEDS[led_id])
@@ -343,25 +324,6 @@ void led_flash(int8_t led_id)
 				LEDS[led_id].curr_flashes += 1; //y ya registro el primer flash
 		}
 	}
-
-#else
-	LEDS[led_id].curr_flashes = 0;
-	LEDS[led_id].flashing = 1;
-	LEDS[led_id].time_start = led_timer;
-	LED_TIMERS[led_id] = 1;
-	cur_norm_state = get_normalized_state(gpioRead(LEDS[led_id].led_pin), LEDS[led_id].led_activation_mode);
-	if (!cur_norm_state)
-	{
-		pwm_query(LEDS[led_id].pwm_id, PWM_FREQ, LEDS[led_id].brightness, HIGH);
-	}
-	else
-	{
-		pwm_unquery(LEDS[led_id].pwm_id, unnormalize_state(LOW, LEDS[led_id].led_activation_mode));
-	}
-	LEDS[led_id].state = !cur_norm_state;
-	if (LEDS[led_id].flashes != 0)
-		LEDS[led_id].curr_flashes += 1;
-#endif
 }
 
 void led_poll(void)

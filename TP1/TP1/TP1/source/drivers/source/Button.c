@@ -18,7 +18,7 @@
 
 #define MAX_BUTTONS 10
 #define BUFF_LEN 50
-#define POLLING_MODE 0
+
 
 /*******************************************************************************/
 /*******************************************************************************
@@ -59,7 +59,7 @@ int8_t ButtonInit(pin_t pin, uint8_t mode, uint8_t active_low_or_high)
 		{ //if is the first time intis the timer and the periodic interruption for polling
 			timerInit();
 			tim_id_t Bt_timmer = timerGetId();
-
+//if the user doesnt want to use the polling mode can disable it
 #if POLLING_MODE
 			timerStart(Bt_timmer, TIMER_MS2TICKS(BUTTON_REFRESH_PERIOD),
 					   TIM_MODE_PERIODIC, ButtonsCheck);
@@ -172,7 +172,4 @@ void ButtonsCheck(void)
 	}
 }
 
-bool ButtonCheckEvent(int8_t id)
-{
-	return active_buttons[id].new_info;
-}
+

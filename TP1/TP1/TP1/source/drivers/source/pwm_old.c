@@ -8,6 +8,17 @@
 #include "../headers/pwm_old.h"
 #include "../headers/debug.h"
 
+/*******************************************************************************
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+ ******************************************************************************/
+typedef struct {
+	uint32_t freq;
+	uint8_t pwm_id;
+	uint32_t dt;
+	uint8_t pin;
+	uint8_t queried;
+	uint32_t last_updated;
+}pwm_t;
 
 /*******************************************************************************
  * GLOBAL VARIABLES WITH LOCAL SCOPE
@@ -102,20 +113,14 @@ int8_t pwm_init_signal(pin_t pin)
 
 void pwm_destroy(uint8_t pwm_id)
 {
-#if (DEVELOPMENT_MODE == 1)
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS)
 	{
 		INITIALIZED_PWMS[pwm_id] = 0; //libero espacio
 	}
-#else
-	INITIALIZED_PWMS[pwm_id] = 0;
-#endif
 }
 
 void pwm_query(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state)
 {
-	uint32_t f;
-#if (DEVELOPMENT_MODE == 1)
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS)
 	{
 		if (freq > 0 && freq < (uint32_t)(1000.0 / (2.0 * (float)PWM_TIMEBASE)))
@@ -133,18 +138,10 @@ void pwm_query(int8_t pwm_id, uint32_t freq, uint32_t dt, uint8_t initial_state)
 			}
 		}
 	}
-#else
-	PWMS[pwm_id].freq = freq;
-	PWMS[pwm_id].dt = dt;
-	PWMS[pwm_id].queried = 1;
-	PWMS[pwm_id].last_updated = timer;
-	gpioWrite(PWMS[pwm_id].pin, initial_state);
-#endif
 }
 
 void pwm_unquery(int8_t pwm_id, uint8_t final_state)
 {
-#if (DEVELOPMENT_MODE == 1)
 	if (pwm_id >= 0 && pwm_id < MAX_PWMS)
 	{
 		if (INITIALIZED_PWMS[pwm_id] == 1)
@@ -153,10 +150,6 @@ void pwm_unquery(int8_t pwm_id, uint8_t final_state)
 			gpioWrite(PWMS[pwm_id].pin, final_state); //dejo el pin en su estado final
 		}
 	}
-#else
-	PWMS[pwm_id].queried = 0;				  //registro que la pwm esta desactivada
-	gpioWrite(PWMS[pwm_id].pin, final_state); //dejo el pin en su estado final
-#endif
 }
 
 void pwm_poll(void)

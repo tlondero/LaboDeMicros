@@ -60,9 +60,8 @@ void drawFrontEnd(FEData data, state st) {
 	switch (st) {
 	case IDDLE:
 		if (data.animation_en) {
-//			PVAnimation(IDDLE_ANIMATION, true);
 			for (i = 0; i < 4; i++) {
-				PVDisplaySendChar('-', i); //Por ahora guiones
+				PVDisplaySendChar('-', i);
 			}
 
 		} else if ((!data.good_id) && (!data.bad_id)) {
@@ -86,7 +85,7 @@ void drawFrontEnd(FEData data, state st) {
 
 		if (data.bad_id) {
 			FRDMLedFlash(RED); //aca le digo que titile 3 veces rojo
-			//PVMarquesina("BAD ID TRY AGAIN", 400);
+
 		}
 		break;
 	case ASK_PIN:
@@ -114,10 +113,7 @@ void drawFrontEnd(FEData data, state st) {
 		}
 		for (i = 0; i < getStrikes(transformToNum(data.pin_data, PIN_LEN));
 				i++) {
-			//Turn on led de rojo la placa verde
-			////////////////////////////
-			//////////MIRAAAAR////////////TODO
-			////////////////////////////
+			//Turn on led  rojo la placa verde
 		}
 		break;
 	case ACCESS:
@@ -171,10 +167,7 @@ void drawFrontEnd(FEData data, state st) {
 	case BRIGHTNESS:
 		{
 			char *bri = num2str(data.brightness);
-			/*PVDisplaySendChar(' ', 0);
-			PVDisplaySendChar(bri[7], 3);
-			PVDisplaySendChar(bri[6], 2);
-			PVDisplaySendChar(bri[5], 1);*/
+
 			switch (bri[7]) {
 				case '0':
 					for (i = 0; i < 4; i++)
@@ -191,8 +184,7 @@ void drawFrontEnd(FEData data, state st) {
 				default:
 					break;
 			}
-	//		for (i = 0; i < 4; i++)
-	//			PVDisplaySendChar(BRIGHTNESS_MSG[i], i);
+
 			if (data.br == true)
 				PVDisplaySetBright(data.brightness);
 		}
@@ -214,7 +206,7 @@ void drawFrontEnd(FEData data, state st) {
 		}
 		break;
 	case USERS_ADD:
-		//ACAAAA
+
 		if ((data.id_counter < ID_LEN) && (!data.good_id)) {//Aca entra mientras ic_counter < 7 y no hayas dado al ok
 			for (i = 0; i < 4; i++) {
 				if (data.id_counter > 3) {

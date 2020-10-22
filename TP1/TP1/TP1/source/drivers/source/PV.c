@@ -69,7 +69,6 @@ static int8_t countMess;
 static uint32_t mrqtime = 1000;
 
 //Timers
-static tim_id_t timer_open_st;
 static tim_id_t timer_id_mrq;
 static tim_id_t timer_id_button; //Para evitar rebotes
 /*******************************************************************************
@@ -77,7 +76,7 @@ static tim_id_t timer_id_button; //Para evitar rebotes
  ******************************************************************************/
 
 bool PVLedSelect(PVLed_t led);
-void open_animation_Callback(void);
+
 void multiplexLedCallback(void);
 /*******************************************************************************
  * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
@@ -133,22 +132,7 @@ void dispShowText(void)
 #endif
 }
 
-void open_animation_Callback(void)
-{
-	static uint8_t i = 0, j;
-	static char open_animation[4] = {'^', '>', '_', '<'};
-	//static char open_animation[7] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
-	if (i == OPEN_TRIGGER_TIME / 500)
-	{
-		timerStop(timer_open_st);
-	}
-	else
-	{
-		for (j = 0; j < 4; j++)
-			dispSendChar(open_animation[i % 4], j);
-	}
-	i++;
-}
+
 
 uint8_t checkMessageLength(char *mes)
 {
@@ -253,12 +237,9 @@ bool PVInit(void)
 	//timer init
 	timerInit();
 	timer_id_mrq = timerGetId();
-	timer_open_st = timerGetId();
 
-	timerStart(timer_open_st, TIMER_MS2TICKS(5), TIM_MODE_PERIODIC,
-			   open_animation_Callback);
-	//timerStart(timer_open_st, TIMER_MS2TICKS((500)), TIM_MODE_PERIODIC, open_animation_Callback);
-	timerStop(timer_open_st);
+
+
 
 	timerStart(timer_id_mrq, TIMER_MS2TICKS(1000), TIM_MODE_PERIODIC,
 			   dispShowText);
@@ -606,40 +587,6 @@ bool PVDisplaySetTime(uint32_t time)
 	return valid;
 }
 
-bool PVAnimation(animation_t animation, bool activate)
-{
-	bool valid = true;
-	if (activate)
-	{
-		switch (animation)
-		{
-		case IDDLE_ANIMATION:
-			break;
-		case ASK_PIN_ANIMATION:
-			break;
-		case ACCESS_ANIMATION:
-			break;
-		case OPEN_ANIMATION:
-			timerReset(timer_open_st);
-			timerResume(timer_open_st);
-			break;
-		case USERS_ANIMATION:
-			break;
-		case BRIGHTNESS_ANIMATION:
-			break;
-		case INVALID_ID_ANIMATION:
-			break;
-		default:
-			valid = false;
-			break;
-		}
-	}
-	else
-	{
-		PVDisplayClear();
-	}
-	return valid;
-}
 
 bool PVLedSetBright(PVLed_t led, uint8_t value)
 {
