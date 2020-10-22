@@ -1,30 +1,26 @@
 \begin{center}
-\textcolor{black}{\huge{\textbf{\underline{OPEN DOOP: Manual de usuario}}}}
+\textcolor{black}{\huge{\textbf{\underline{Manual de usuario}}}}
 \end{center}
 
 \begin{center}
 \textbf{\LARGE{Inicio:}}
 \end{center}
 
-Al encender el dispositivo, se esperará que se ingrese un ID, utilizando el encoder ó la tarjeta. No ocurre nada en caso de que la ID introducida no sea correcta. Una vez ingresada la ID, se encenderá el led \textcolor{blue}{azul} y deberá ingresar el PIN. Con el botón del \textbf{SW2} se puede cancelar la introducción del PIN/ID, mientras que con el \textbf{SW3} se borra el dígito introducido, volviendo al anterior.
+Al encender el dispositivo, se esperará que se ingrese un ID (8 dígitos), utilizando el encoder (rotandolo para seleccionar los números y con el botón del mismo validando el caracter) ó la tarjeta. En caso de que la ID introducida no sea correcta titilará el led \textcolor{red}{rojo} de la FRDM. Una vez ingresada la ID, titilará el led \textcolor{blue}{azul} y deberá ingresar el PIN (5 dígitos). Con el botón del \textbf{CANCEL} (SW2) se puede cancelar la introducción del PIN/ID, mientras que con el \textbf{BACK} (SW3) se vuelve al anterior.
 
-Se cuenta con 3 intentos para ingresar dicho pin. En el caso de que el introducido no sea correcto luego de los intentos, se bloqueará dicho ID, hasta que un \textbf{ADMIN} lo desbloquee.
+Se cuenta con 3 intentos para ingresar dicho pin. En el caso de que el introducido no sea correcto titilará el led \textcolor{red}{rojo}. Luego de los 3 intentos fallidos, se bloqueará dicho ID, hasta que un \textbf{ADMIN} lo añada de vuelta.
+
+En el caso de inactividad, es decir, que no se efectúe ninguna acción, se volverá al menú de inicio automáticamente, deslogueando al usuario, sin importar en que submenú se encuentre el usuario.
 
 \begin{center}
 \textbf{\LARGE{Access:}}
 \end{center}
 
-Una vez dentro es posible navegar a través de las distintas opciones mediante el uso del encoder. Las opciones disponibles son ``OPEN'', ``USERS'' y ``BRIGHT''. Open permite abrir la puerta mientras que las otras dos opciones permiten configurar el sistema.
-
-En el caso de inactividad, es decir, que no se efectúe ninguna acción, se volverá al menú principal automáticamente, deslogueando al usuario.
-
+Una vez dentro es posible navegar a través de las distintas opciones mediante el uso del encoder. Las opciones disponibles son ``OPEN'', ``USERS'' y ``BRIGHT''. Open permite abrir la puerta durante 5 segundos. En este intervalo titilará el led \textcolor{green}{verde} y aparecerá un mensaje de ``OPEN DOOR'' en el display. Por otro lado, las otras dos opciones permiten configurar el sistema.
 
 \begin{center}
 \textbf{\LARGE{Menúes:}}
 \end{center}
-
-
-
 
 \textbf{\Large{Brightness:}}
 
@@ -39,12 +35,18 @@ En este puede configurarse 3 opciones distintas, de las cuales dos son exclusiva
 
 \vspace*{0.25cm}
 \textbf{\large{Clave:}}
-En este submenu, disponible para cualquier usuario, permite cambiar el PIN de seguridad del usuario.
+En este submenu, disponible para cualquier usuario, permite cambiar el PIN de seguridad del usuario. Este debe introducirse mediante el uso del encoder.
 
 \vspace*{0.25cm}
 \textbf{\large{Delete:}}
-\textbf{SOLO PARA ADMINS.} En este submenu permite eliminar usuarios existentes en la base de datos.
+\textbf{SOLO PARA ADMINS.} Se muestran en pantalla los distintos ID's disponibles en la base de datos. Gire para cambiar de ID y presione para eliminar.
 
 \vspace*{0.25cm}
 \textbf{\large{Add:}}
-\textbf{SOLO PARA ADMINS.} En este submenu permite agregar usuarios nuevos a la base de datos.
+\textbf{SOLO PARA ADMINS.} En este submenu permite agregar usuarios nuevos a la base de datos, usando tanto el encoder como la tarjeta para agregar el ID pero solo el primero para agregar el PIN.
+
+\begin{center}
+\textbf{\LARGE{Consideraciones:}}
+\end{center}
+
+El sistema se alimenta con $3.3 \ V$.
