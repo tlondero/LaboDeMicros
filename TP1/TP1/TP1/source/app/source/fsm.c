@@ -62,7 +62,7 @@ static state prev_state = IDDLE;
  * FUNCTION PROTOTYPES WITH FILE SCOPE
  ******************************************************************************/
  /**
-  * @brief IDDLERoutine RELLENAR.
+  * @brief Initial state of the app.
   *
   * @return state variable with the updated state
   */

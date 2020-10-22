@@ -21,19 +21,8 @@
  ******************************************************************************/
 #define MAX_PWMS 16
 #define UNAVAILABLE_SPACE -1
-#define DEVELOPMENT_MODE 1
 #define PWM_TIMEBASE 0.1 //ms
-/*******************************************************************************
- * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
- ******************************************************************************/
-typedef struct {
-	uint32_t freq;
-	uint8_t pwm_id;
-	uint32_t dt;
-	uint8_t pin;
-	uint8_t queried;
-	uint32_t last_updated;
-}pwm_t;
+
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
