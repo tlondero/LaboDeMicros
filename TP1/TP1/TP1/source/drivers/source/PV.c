@@ -330,6 +330,7 @@ bool PVDisplaySetBright(uint8_t br) {
 		dispBrightness(dispBright);
 	} else if (br == 0) {
 		dispClearAll();
+		dispBright = br;
 	} else {
 		valid = false;
 	}
