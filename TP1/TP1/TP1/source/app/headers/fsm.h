@@ -16,7 +16,7 @@
    ******************************************************************************/
 #define DEVELOPMENT_MODE_FSM 1
 #if DEVELOPMENT_MODE_FSM == 1
-	#define INACTIVITY_TRIGGER_TIME (500000) //ms
+	#define INACTIVITY_TRIGGER_TIME (10000) //ms
 #else
 	#define INACTIVITY_TRIGGER_TIME (30000) //ms
 #endif

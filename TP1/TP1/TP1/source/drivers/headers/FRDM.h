@@ -61,52 +61,61 @@ bool FRDMInit(void);
 
 /**
  * @brief Returns the event of the button
+ * @param button: button selected
  */
 FRDMEv_t FRDMButtonGetEv(uint8_t button);
 
 /**
  * @brief Set fade time
+ * @param value: amount of fade time
  */
 bool FRDMLedSetFade(uint8_t value);
 
 /**
  * @brief Set DT %
+ * @param value: amount of dt
  */
 bool FRDMLedSetDt(uint8_t value);
 
 /**
  * @brief Set amounts of flashes (0 = forever)
+ * @param value: flash times
  */
 bool FRDMLedSetFlash(uint8_t value);
 
 /**
  * @brief Set flash period
+ * @param value: period time
  */
 bool FRDMLedSetPeriod(uint8_t value);
 
 /**
  * @brief Set flash ON
+ * @param led: seledted led
  */
 bool FRDMLedFlash(uint8_t led);
 
 /**
  * @brief Set button IQR
+ * @param button: selected button
+ *		  IRQ_mode: action mode
+ *        fcallback: callback
  */
 bool FRDMButtonIRQ(uint8_t button, uint8_t IRQ_mode, pinIrqFun_t fcallback);
 
 /**
- * @brief Turn off ALL leds (R G B)
+ * @brief Turn off all leds (R G B)
  */
 void FRDMLedOff(void);
 
 /**
- * @brief Poll led and pwm
+ * @brief Poll led
  */
 void FRDMLedPoll(void);
 
-
 /**
  * @brief Led on time
+ * @param value: led time
  */
 bool FRDMLedSetTime(uint8_t value);
 
@@ -117,14 +126,23 @@ void FRDMToggleOnOff(void);
 
 /**
  * @brief Turns on a color
+ * @param color: color desired
  */
 void FRDMLedColor(uint8_t color);
 
-
+/**
+ * @brief Check if there is an event
+ */
 bool FRDMCheckEvent(void);
 
+/**
+ * @brief Get button event
+ */
 FRDMEv_t FRDMGetEv(void);
 
+/**
+ * @brief Suscribe to an ivent
+ */
 void FRDMSuscribeEvent(FRDMEv_t ev, bool state);
 
 
