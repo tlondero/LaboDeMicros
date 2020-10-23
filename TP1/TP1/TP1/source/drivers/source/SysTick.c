@@ -58,11 +58,11 @@ bool SysTick_Init(systick_callback_t callback)
 __ISR__ SysTick_Handler(void)
 {
 #if DEBUGGIN_MODE_SYSTICK
-	gpioWrite(DEBUG_PIN, HIGH)
+	gpioWrite(DEBUG_PIN, HIGH);
 #endif
 		st_callback();
 
 #if DEBUGGIN_MODE_SYSTICK
-	gpioWrite(DEBUG_PIN, LOW)
+	gpioWrite(DEBUG_PIN, LOW);
 #endif
 }

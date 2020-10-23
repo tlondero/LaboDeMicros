@@ -101,7 +101,7 @@ void EncoderUpdate(void)
 {
 	encoder_id id = 0;
 
-#if DEBUGGIN_MODE
+#if DEBUGGIN_MODE_ENCODER && DEBUGGIN_MODE
 	gpioWrite(DEBUG_PIN, HIGH);
 #endif
 	for (id = 0; id < enconders_cant; id++)
@@ -122,7 +122,7 @@ void EncoderUpdate(void)
 		}
 	}
 
-#if DEBUGGIN_MODE
+#if DEBUGGIN_MODE_ENCODER && DEBUGGIN_MODE
 	gpioWrite(DEBUG_PIN, LOW);
 #endif
 }

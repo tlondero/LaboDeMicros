@@ -43,14 +43,14 @@ static void timer_callback(void);
  ******************************************************************************/
 void timer_callback(void)
 {
-#if DEBUGGIN_MODE_PWM
+#if DEBUGGIN_MODE_PWM && DEBUGGIN_MODE
 	gpioWrite(DEBUG_PIN, HIGH);
 #endif
 
 	timer++;
 
-#if DEBUGGIN_MODE_PWM
-	gpioWrite(DEBUG_PIN, HIGH);
+#if DEBUGGIN_MODE_PWM && DEBUGGIN_MODE
+	gpioWrite(DEBUG_PIN, LOW);
 #endif
 }
 
@@ -59,7 +59,7 @@ void timer_callback(void)
  ******************************************************************************/
 void pwm_init_driver(void)
 {
-#if DEBUGGIN_MODE_PWM
+#if DEBUGGIN_MODE_PWM && DEBUGGIN_MODE
 	gpioMode(DEBUG_PIN, OUTPUT);
 	gpioWrite(DEBUG_PIN, LOW);
 #endif

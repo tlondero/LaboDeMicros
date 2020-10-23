@@ -14,6 +14,8 @@
 #include "../headers/timer.h"
 #include "../../app/headers/fsm.h"
 #include <stdbool.h>
+#include "../headers/debug.h"
+
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -94,7 +96,7 @@ void multiplexLedCallback(void);
 
 void dispShowText(void)
 {
-#if DEBUGGIN_MODE_PV
+#if DEBUGGIN_MODE_PV && DEBUGGIN_MODE
 	gpioWrite(DEBUG_PIN, HIGH);
 #endif
 
@@ -127,7 +129,7 @@ void dispShowText(void)
 		break;
 	}
 
-#if DEBUGGIN_MODE_PV
+#if DEBUGGIN_MODE_PV && DEBUGGIN_MODE
 	gpioWrite(DEBUG_PIN, LOW);
 #endif
 }
