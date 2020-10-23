@@ -17,7 +17,7 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 #define POLLING_MODE 0
-
+// using this in 0 may cause a few warnings of unused variables.
 #define BUTTON_REFRESH_PERIOD 100
 //THIS TRESHOLDS ARE NOT IN MS
 //THE VALUE IN MS IS:  THRESHOLD_XXX * BUTTON REFRESH PERIOD or use the macro TIMER_MS2TICKS
