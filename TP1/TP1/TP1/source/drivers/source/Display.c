@@ -46,7 +46,7 @@
 
 #define SEVEN_SEGMENTS_PINS 8
 
-#define REFRESH_RATE 3 //ms
+#define REFRESH_RATE 5 //ms
 
 const uint8_t PINES[SEVEN_SEGMENTS_PINS] = {PIN_A, PIN_B, PIN_C, PIN_D, PIN_E,
 											PIN_F, PIN_G, PIN_DOT};

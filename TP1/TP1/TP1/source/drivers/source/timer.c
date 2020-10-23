@@ -24,7 +24,7 @@
 #define TIMER_DEVELOPMENT_MODE 0
 #define TIMER_ID_DELAY 0 //ID del timer bloqueante reservado dentro del driver
 
-#if TIMER_TICK_MS != 10000U / (SYSTICK_ISR_FREQUENCY_HZ)
+#if TIMER_TICK_MS != 100000U / (SYSTICK_ISR_FREQUENCY_HZ)
 #error Las frecuencias no coinciden!!
 #endif // TIMER_TICK_MS != (10000U/SYSTICK_ISR_FREQUENCY_HZ)
 
