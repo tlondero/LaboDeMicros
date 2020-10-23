@@ -143,6 +143,7 @@ void drawFrontEnd(FEData data, state st) {
 	case OPEN:
 		if (data.open) {
 			PVMarquesina("OPEN DOOR", 300);
+			FRDMLedFlash(GREEN);
 		}
 
 		break;
