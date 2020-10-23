@@ -1,6 +1,6 @@
 #include "../headers/board.h"
 
-#define DEBUGGIN_MODE 1
+#define DEBUGGIN_MODE 0
 
 #define DEBUGGIN_MODE_CARD 0 //DONE
 #define DEBUGGIN_MODE_DISPLAY 0 //DONE
@@ -9,4 +9,4 @@
 #define DEBUGGIN_MODE_PV 0 // DONE
 #define DEBUGGIN_MODE_PWM 0 //DONE
 #define DEBUGGIN_MODE_SYSTICK 0 //DONE
-#define DEBUGGIN_MODE_TIMER 1
+#define DEBUGGIN_MODE_TIMER 0 //DONE
