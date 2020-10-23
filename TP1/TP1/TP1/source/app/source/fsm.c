@@ -462,6 +462,7 @@ state askPinRoutine(void) {
 			else {
 				//Me fijo que la password coincida con el ID
 				if (checkPassword(transformToNum(&encoder_id_digits[0], ID_LEN), transformToNum(&encoder_pin_digits[0], PIN_LEN))) {
+					clearStrikes();
 					updated_state = ACCESS;
 					fe_data.good_pin = true;
 				}
