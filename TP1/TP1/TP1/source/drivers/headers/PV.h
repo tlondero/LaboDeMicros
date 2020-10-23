@@ -70,8 +70,14 @@ typedef encoder_id PVEncoder_t;
  */
 bool PVInit(void);
 
+/**
+ * @brief Suscribe to an ivent
+ */
 void PVSuscribeEvent(PVEv_t ev, bool state);
 
+/**
+ * @brief Check if there is an event
+ */
 bool PVCheckEvent(void);
 
 /**
@@ -89,8 +95,18 @@ void PVLedPoll(void);
  */
 void PVDisplayClear(void);
 
+/**
+ * @brief Roll message on disp
+ * @param *mess: message
+ *        time_per_char: time to shift 1 digit
+ */
 bool PVMarquesina(char *mess, uint32_t time_per_char);
 
+/**
+ * @brief Send char to display
+ * @param ch: char
+ *        seven_seg_module: 0-3 display selected
+ */
 bool PVDisplaySendChar(char ch, uint8_t seven_seg_module);
 
 /**
@@ -104,19 +120,28 @@ PVEv_t PVGetEv(void);
 bool PVDisplaySetBright(uint8_t brightness);
 
 /**
- * @brief Increase brightness
+ * @brief Increase brightness in delta 
  */
 bool PVIncreaseBrightness(void);
 
 /**
- * @brief Decrease brightness
+ * @brief Decrease brightness in delta 
  */
 bool PVDecreaseBrightness(void);
 
+/**
+ * @brief Returns brightness value
+ */
 int8_t PVGetBrightness(void);
 
+/**
+ * @brief Set brightness value
+ */
 bool PVSetDeltaBright(uint8_t br);
 
+/**
+ * @brief Set brightness delta value
+ */
 int8_t PVGetDeltaBright(void);
 
 /**
@@ -125,51 +150,75 @@ int8_t PVGetDeltaBright(void);
  */
 bool PVDisplaySetShift(PVDirection_t direction);
 
+
 bool PVDisplaySetTime(uint32_t time);
 
+/**
+ * @brief Start rolling message
+ */
 bool PVDispMessOn(void);
 
+/**
+ * @brief Shift cracters in display
+ * @param direction: right/left
+ * 		  cant: number of shifts
+ */
 bool PVDispManualShift(PVDirection_t direction, uint8_t cant);
 
 
 
 /**
  * @brief LED Set brightnes
+ * @param led: the led selected
+ * 		  value: bright value
  */
 bool PVLedSetBright(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED Set fade time
+ * @param led: the led selected
+ * 		  value: fade time
  */
 bool PVLedSetFade(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED Set DT %
+ * @param led: the led selected
+ * 		  value: dt
  */
 bool PVLedSetDt(PVLed_t led, uint8_t value);
 
 /**
- * @brief LED  Set amounts of flashes (0 = forever)
+ * @brief LED  Set amounts of flashes 
+ * @param led: the led selected
+ * 		  value: flash times (0 = forever)
  */
 bool PVLedSetFlash(PVLed_t led, uint8_t value);
 
 /**
- * @brief LED Set time on
+ * @brief LED Set period time
+ * @param led: the led selected
+ * 		  value: period
  */
 bool PVLedSetPeriod(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED  Set flash period
+ * @param led: the led selected
+ * 		  value: time
  */
 bool PVLedSetTime(PVLed_t led, uint8_t value);
 
 /**
  * @brief LED  Set flash ON
+ * @param led: the led selected
+ * 		  value: flash times
  */
 bool PVLedFlash(PVLed_t led, uint8_t value);
 
 /**
- * @brief LED COLOR SET
+ * @brief Turns on led
+ * @param led: the led selected
  */
 bool PVLedOn(PVLed_t led);
 
@@ -178,6 +227,11 @@ bool PVLedOn(PVLed_t led);
  */
 void PVLedOff(PVLed_t led);
 
+/**
+ * @brief Select pv red led status
+ * @param led: the led selected
+ * 		  state: on=true - off=false
+ */
 void PVStatusLedSelect(PVStatus_t led, bool state);
 
 /*******************************************************************************

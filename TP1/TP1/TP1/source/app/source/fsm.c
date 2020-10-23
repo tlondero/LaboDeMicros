@@ -29,7 +29,7 @@ static uint8_t encoder_pin_digits_mirror[PIN_LEN];
 
 //Id Buffer
 static uint8_t encoder_id_digits[ID_LEN];
-static uint8_t encoder_id_digits_mirror[ID_LEN];
+static uint8_t encoder_id_digits_mirror[ID_LEN];//Used to push the encoder_id_digits
 
 //Frond-end data
 static FEData fe_data;

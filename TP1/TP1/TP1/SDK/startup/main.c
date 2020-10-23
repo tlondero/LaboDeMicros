@@ -26,15 +26,9 @@ int main (void)
     hw_Init();
     hw_DisableInterrupts();
     App_Init(); /* Program-specific setup */
-    //FRDM_tb_Init();
-   // PV_tb_Init();
-    //LED_TB_APP_INIT();
     hw_EnableInterrupts();
 
     while(1){
         App_Run(); /* Program-specific loop  */
-		//FRDM_tb_Run();
-		//PV_tb_Run();
-		//LED_TB_APP_RUN();
     }
 }

@@ -6,9 +6,9 @@
 \textbf{\LARGE{Inicio:}}
 \end{center}
 
-Al encender el dispositivo, se esperará que se ingrese un ID (8 dígitos), utilizando el encoder (rotandolo para seleccionar los números y con el botón del mismo validando el caracter) ó la tarjeta. En caso de que la ID introducida no sea correcta titilará el led \textcolor{red}{rojo} de la FRDM. Una vez ingresada la ID, titilará el led \textcolor{blue}{azul} y deberá ingresar el PIN (5 dígitos). Con el botón del \textbf{CANCEL} (SW2) se puede cancelar la introducción del PIN/ID, mientras que con el \textbf{BACK} (SW3) se vuelve al anterior.
+Al encender el dispositivo, se esperará que se ingrese un ID (de 8 dígitos), utilizando el encoder (rotandolo para seleccionar los números y con el botón del mismo validando el caracter) o pasando la tarjeta por el lector. En caso de que el ID introducido no sea correcto, titilará el led \textcolor{red}{rojo} de la placa FRDM. Caso contrario, titilará el led \textcolor{blue}{azul} y se deberá ingresar el PIN (de 5 dígitos) correspondiente. Con el botón del \textbf{CANCEL} (SW2) se puede cancelar la introducción del PIN/ID, mientras que con el \textbf{BACK} (SW3) se vuelve al dígito anterior para modificarlo.
 
-Se cuenta con 3 intentos para ingresar dicho pin. En el caso de que el introducido no sea correcto titilará el led \textcolor{red}{rojo}. Luego de los 3 intentos fallidos, se bloqueará dicho ID, hasta que un \textbf{ADMIN} lo añada de vuelta.
+El usuario cuenta con 3 intentos disponibles para ingresar dicho PIN. En caso de que el introducido no sea correcto, titilará el led \textcolor{red}{rojo}. Luego de los 3 intentos fallidos, se bloqueará dicho ID, hasta que un \textbf{ADMIN} lo añada de vuelta.
 
 En el caso de inactividad, es decir, que no se efectúe ninguna acción, se volverá al menú de inicio automáticamente, deslogueando al usuario, sin importar en que submenú se encuentre el usuario.
 
@@ -16,19 +16,23 @@ En el caso de inactividad, es decir, que no se efectúe ninguna acción, se volv
 \textbf{\LARGE{Access:}}
 \end{center}
 
-Una vez dentro es posible navegar a través de las distintas opciones mediante el uso del encoder. Las opciones disponibles son ``OPEN'', ``USERS'' y ``BRIGHT''. Open permite abrir la puerta durante 5 segundos. En este intervalo titilará el led \textcolor{green}{verde} y aparecerá un mensaje de ``OPEN DOOR'' en el display. Por otro lado, las otras dos opciones permiten configurar el sistema.
+Una vez dentro es posible navegar a través de las distintas opciones mediante el uso del encoder. Las opciones disponibles son ``OPEN'', ``USERS'' y ``BRIGHT''. 
 
 \begin{center}
 \textbf{\LARGE{Menúes:}}
 \end{center}
 
-\textbf{\Large{Brightness:}}
 
+\textbf{\Large{Open:}} 
+
+Este menú permite abrir la puerta durante 5 segundos. En este intervalo titilará el led \textcolor{green}{verde} y aparecerá un mensaje de ``OPEN DOOR'' en el display. Luego se volverá al inicio.
+
+\vspace*{0.5cm}
+\textbf{\Large{Brightness:}}
 
 Permite configurar el nivel de brillo del display, existiendo 3 distintos niveles.
 
-\vspace*{0.5cm}
-
+\vspace*{0.25cm}
 \textbf{\Large{Users:}}
 
 En este puede configurarse 3 opciones distintas, de las cuales dos son exclusivas para administradores.
@@ -39,12 +43,13 @@ En este submenu, disponible para cualquier usuario, permite cambiar el PIN de se
 
 \vspace*{0.25cm}
 \textbf{\large{Delete:}}
-\textbf{SOLO PARA ADMINS.} Se muestran en pantalla los distintos ID's disponibles en la base de datos. Gire para cambiar de ID y presione para eliminar.
+\textbf{SOLO PARA ADMINS.} Se muestran en pantalla los distintos ID's disponibles en la base de datos. Girando el encoder se cambia de ID y presionandolo se elimina el seleccionado.
 
 \vspace*{0.25cm}
 \textbf{\large{Add:}}
-\textbf{SOLO PARA ADMINS.} En este submenu permite agregar usuarios nuevos a la base de datos, usando tanto el encoder como la tarjeta para agregar el ID pero solo el primero para agregar el PIN.
+\textbf{SOLO PARA ADMINS.} En este submenú permite agregar usuarios nuevos a la base de datos, usando tanto el encoder como la tarjeta para agregar el ID pero solo el primero para agregar el PIN.
 
+\vspace*{0.5cm}
 \begin{center}
 \textbf{\LARGE{Consideraciones:}}
 \end{center}
