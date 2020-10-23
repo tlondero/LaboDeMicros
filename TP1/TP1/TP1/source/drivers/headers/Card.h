@@ -1,6 +1,6 @@
-/***************************************************************************//**
+/***************************************************************************/ /**
   @file     Card.h
-  @brief    magnetic card xd
+  @brief    Driver de lector de tarjeta magnetica
   @author   MAGT
  ******************************************************************************/
 
@@ -24,18 +24,14 @@
  * @brief  cardGetPAN: returns a pointer to the data, its null if it doesnt have a message, or the message had an error.
  * @returns pointer to the data.
  */
-uint8_t * cardGetPAN(void);
+uint8_t *cardGetPAN(void);
 
 /**
  * @brief  cardInitDriver: Initializes all the drivers that the card driver uses.
  */
 void cardInitDriver(void (*fun_callback)(void));
 
-
-
 /*******************************************************************************
  ******************************************************************************/
-
-
 
 #endif /* CARD_H_ */

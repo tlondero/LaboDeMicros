@@ -14,6 +14,7 @@
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  *****************************************************BRIGHTNESS_MSG***************************/
+#define DEVELOPMENT_MODE 1
 
 #define DATA_LENGHT (40)
 #define CHAR_LENGHT (5)
@@ -24,9 +25,6 @@
 #define CARD_EN_PIN PORTNUM2PIN(PC, 17)	  //Amarillo
 #define CARD_DATA_PIN PORTNUM2PIN(PB, 11) //Azul
 #define CARD_CLK_PIN PORTNUM2PIN(PB, 3)	  //Verde
-
-#define DEVELOPMENT_MODE 1
-
 #define LEN(array) sizeof(array) / sizeof(array[0])
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -50,11 +48,25 @@ static uint8_t char_counter = 0;
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH FILE SCOPE DECLARATION
  ******************************************************************************/
-//Callbacks
-void cardCallback(void);
+
+/**
+ * @brief  Initializes the first stage of data reception 
+ */
 void enableCallback(void);
+
+/**
+ * @brief  Reads a new incoming binit if transmission is running
+ */
 void clockCallback(void);
+
+/**
+ * @brief Runs a parity check through all the received data. Parity should be ODD
+ */
 bool checkParity(void);
+
+/**
+ * @brief  Cleans data buffer
+ */
 void flushData(void);
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE DEFINITION
@@ -70,13 +82,11 @@ void cardInitDriver(void (*fun_callback)(void))
 	gpioMode(CARD_EN_PIN, INPUT_PULLUP);
 	gpioMode(CARD_DATA_PIN, INPUT_PULLUP);
 	gpioMode(CARD_CLK_PIN, INPUT_PULLUP);
-	////////////////////////////////////////////////////////////////////////////////////
+
 	gpioIRQ(CARD_EN_PIN, GPIO_IRQ_MODE_BOTH_EDGES, enableCallback);
 	gpioIRQ(CARD_CLK_PIN, GPIO_IRQ_MODE_FALLING_EDGE, clockCallback);
-	////////////////////////////////////////////////////////////////////////////////////
-	NVIC_EnableIRQ(PORTC_IRQn);
-	NVIC_EnableIRQ(PORTB_IRQn);
 }
+
 void flushData(void)
 {
 	int i = 0;
@@ -86,29 +96,28 @@ void flushData(void)
 
 uint8_t *cardGetPAN(void)
 {
-
 	uint8_t i = 0;
 
-	if ((card_avb == true) && (checkParity() == true)) //Si tenemos una tarjeta disponible y pasa
+	if ((card_avb == true) && (checkParity() == true))
 	{
 		while ((data[i + 1] != FS) && (i < PAN_LENGHT))
 		{
-			pan[i] = data[i + 1] & LOW_NYBBLE_MASK;
+			pan[i] = data[i + 1] & LOW_NYBBLE_MASK; //Remove parity bit
 			i++;
 		}
 		card_avb = false;
-		flushData();
+		flushData(); //flush data
 		return &pan[0];
 	}
 	else
 	{
-		return 0;
+		return 0; //if no cards is available or the parity check did not pass return null
 	}
 }
+
 static int ya_entre = 0;
 void enableCallback(void)
 {
-
 	enable = !gpioRead(CARD_EN_PIN);
 
 	if (ya_entre == 0)
@@ -127,6 +136,7 @@ void enableCallback(void)
 		ya_entre = 0;
 	}
 
+	//Init reception settings
 	bit_counter = 0;
 	character = 0;
 	char_counter = 0;
@@ -139,7 +149,6 @@ void enableCallback(void)
 
 void clockCallback(void)
 {
-
 	bool my_data = !gpioRead(CARD_DATA_PIN); // Read incoming bit_counter
 
 	//Begin reading data stream.
@@ -177,7 +186,7 @@ void clockCallback(void)
 		character = 0;
 		bit_counter = 0;
 	}
-	//Sino terminamos de contar
+	//If data keeps on comming
 	else if (go == true && lrc_rx == false)
 	{
 		bit_counter++;
@@ -198,7 +207,7 @@ bool checkParity(void)
 			lrc_parity[j] ^= ((data[i] & (1 << j)) >> j);
 		}
 		if (char_parity == 0)
-		{ //if it wasnt ODD parity.
+		{ //if parity is even then a mistake has been detected
 			error = true;
 			is_ok = false;
 		}
