@@ -271,7 +271,7 @@ state IDDLERoutine(void) {
 
 		FRDMButtonIRQ(cancel_switch, BT_FEDGE, cancelCallback);
 		FRDMButtonIRQ(back_switch, BT_FEDGE, backCallback);
-
+		using_encoder = false;
 		int i = 0;
 		for(i = 0; i<ID_LEN; i++)
 			encoder_id_digits[i] = 0;
@@ -319,18 +319,18 @@ state IDDLERoutine(void) {
 		fe_data.animation_en = false;
 		using_encoder = true;
 	}
-
+	//Boton de cancel
+	if (cancel_triggered) {
+	            fe_data.animation_en = true;
+	            fe_data.id_counter = 0;
+	            using_encoder = false;
+	            cancel_triggered = false;
+	       }
 	//Si estaba usando el encoder y aun no me tengo que ir del estado
 	if (using_encoder && (updated_state == IDDLE)) {
-		//Boton de cancel
-		if (cancel_triggered) {
-			fe_data.animation_en = true;
-			fe_data.id_counter = 0;
-			using_encoder = false;
-			cancel_triggered = false;
-		}
+
 		//Boton de back
-		else if (back_triggered) {
+		 if (back_triggered) {
 			if (fe_data.id_counter > 0) {
 				fe_data.id_counter--;
 			}
