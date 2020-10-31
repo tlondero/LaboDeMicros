@@ -47,11 +47,13 @@ void timer_callback(void)
 	gpioWrite(DEBUG_PIN, HIGH);
 #endif
 
+
 	timer++;
 
 #if DEBUGGIN_MODE_PWM && DEBUGGIN_MODE
 	gpioWrite(DEBUG_PIN, LOW);
 #endif
+
 }
 
 /*******************************************************************************
