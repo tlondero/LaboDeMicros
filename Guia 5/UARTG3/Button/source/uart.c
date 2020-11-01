@@ -1,84 +1,91 @@
-/*
- * uart.c
- *
- *  Created on: Oct 30, 2020
- *      Author: Guido
- */
-
+/***************************************************************************//**
+ @file     uart.c
+ @brief    Uart driver for MK64
+ @author   MAGT
+ ******************************************************************************/
+/*******************************************************************************
+ * INCLUDE HEADER FILES
+ ******************************************************************************/
 #include "header/uart.h"
 #include "header/gpio.h"
 #include <stdbool.h>
 #include "hardware.h"
-
+/*******************************************************************************
+ * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
+ ******************************************************************************/
+// baud rate related defines
 #define MAX_BAUD_RATE ((uint32_t)0xFFFF)
 #define MIN_BAUD_RATE 0x0000
 #define BAUD_RATE_DEFAULT 9600
-
-#define MAX_WATER_MARK 128
-#define TX_WATER_MARK_DEFAULT 2
-#define RX_WATER_MARK_DEFAULT 5
-#define NBIT_DEFAULT 8
-
+// Initial config for port
 #define DISABLE_MODE 0 //disable port interrupts for uart's pins
-
 #define UART_MUX 3
 
-#define RX_BUFFER_LEN 8000
-#define TX_BUFFER_LEN 2000
+#define RX_BUFFER_LEN 4000//Buffers len RX
+
+#define TX_BUFFER_LEN 4000//Buffers len TX
+
 
 #define EMPTY 0
+/*******************************************************************************
+ * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
+ ******************************************************************************/
 
-static uint8_t UART_RX_PORTS[] = { PB, PC, PD, PC, PE };
-static uint8_t UART_RX_BITS[] = { 16, 3, 2, 16, 24 };
-//static uint8_t uartRXpins[] = { PORTNUM2PIN(PB, 16), PORTNUM2PIN(PC, 3),
-//		PORTNUM2PIN(PD, 2), PORTNUM2PIN(PC, 16), PORTNUM2PIN(PE, 24) };
-
-static uint8_t UART_TX_PORTS[] = { PB, PC, PD, PC, PE };
-static uint8_t UART_TX_BITS[] = { 17, 4, 3, 17, 25 };
-
-//static uint8_t uartTXpins[] = { PORTNUM2PIN(PB, 17), PORTNUM2PIN(PC, 4),
-//		PORTNUM2PIN(PD, 3), PORTNUM2PIN(PC, 17), PORTNUM2PIN(PE, 25) };
-
-static uint8_t uartMode[UART_CANT_IDS] = { BLOCKING, BLOCKING, BLOCKING,
-		BLOCKING, BLOCKING };
+//Selected mode of each uart. blocking is the default
+static uint8_t uartMode[UART_CANT_IDS] = { BLOCKING, BLOCKING, BLOCKING,BLOCKING, BLOCKING };
 
 static const UART_Type * UART_POINTERS[] = UART_BASE_PTRS;
 
 //variables de RX
-static char RX_buffers[UART_CANT_IDS][RX_BUFFER_LEN];
-static int markers_RX_buffer[UART_CANT_IDS] = { EMPTY, EMPTY, EMPTY, EMPTY,
-EMPTY };
-static bool flags_reading[UART_CANT_IDS] = { false, false, false, false, false };
+static uint8_t UART_RX_PORTS[] = { PB, PC, PD, PC, PE };
+static uint8_t UART_RX_BITS[] = { 16, 3, 2, 16, 24 };//Port and bit of the RX UART modules
+
+static char RX_buffers[UART_CANT_IDS][RX_BUFFER_LEN]; //buffers for the uarts modules
+
+static int latest_ch_rec_cnt_RX[UART_CANT_IDS] = { EMPTY, EMPTY, EMPTY, EMPTY,EMPTY };
+
+static bool flags_reading[UART_CANT_IDS] = { false, false, false, false, false }; //Flag for the reading
 static uint8_t counters_RX_failed[UART_CANT_IDS] = { 0, 0, 0, 0, 0 };
 
-//variables de TX
-static char TX_buffers[UART_CANT_IDS][TX_BUFFER_LEN];
-static uint8_t out_Markers_TX_buffer[UART_CANT_IDS] = { 0, 0, 0, 0, 0 };
-static uint8_t in_markers_TX_buffer[UART_CANT_IDS] = { 0, 0, 0, 0, 0 };
-static uint8_t lens_TX_buffer[UART_CANT_IDS] = { 0, 0, 0, 0, 0 };
 
-//
+//variables de TX
+static uint8_t UART_TX_PORTS[] = { PB, PC, PD, PC, PE };
+static uint8_t UART_TX_BITS[] = { 17, 4, 3, 17, 25 };//Port and bit of the TX UART modules
+
+static char TX_buffers[UART_CANT_IDS][TX_BUFFER_LEN];
+static uint32_t latest_ch_sent_cnt_TX[UART_CANT_IDS] = { 0, 0, 0, 0, 0 };
+static uint32_t latest_ch_rec_cnt_TX[UART_CANT_IDS] = { 0, 0, 0, 0, 0 };
+static uint32_t lens_TX_buffer[UART_CANT_IDS] = { 0, 0, 0, 0, 0 };
+
+//interruptions
 uint8_t uartIRQs_TX_RX[] = UART_RX_TX_IRQS;
 uint8_t uartIRQs_ERR[] = UART_ERR_IRQS;
-
+/*******************************************************************************
+ * FUNCTION PROTOTYPES WITH FILE SCOPE DECLARATION
+ ******************************************************************************/
 void UART_setBaudRate(UART_Type * uart_p, uint32_t baudRate);
 
 void UARTX_RX_TX_IRQHandler(uint8_t id);
-void UARTX_ERR_IRQHandler(uint8_t id);
-
 void UART0_RX_TX_IRQHandler(void);
-void UART0_ERR_IRQHandler(void);
 void UART1_RX_TX_IRQHandler(void);
-void UART1_ERR_IRQHandler(void);
 void UART2_RX_TX_IRQHandler(void);
-void UART2_ERR_IRQHandler(void);
 void UART3_RX_TX_IRQHandler(void);
-void UART3_ERR_IRQHandler(void);
 void UART4_RX_TX_IRQHandler(void);
+
+void UARTX_ERR_IRQHandler(uint8_t id);
+void UART0_ERR_IRQHandler(void);
+void UART1_ERR_IRQHandler(void);
+void UART2_ERR_IRQHandler(void);
+void UART3_ERR_IRQHandler(void);
 void UART4_ERR_IRQHandler(void);
 
-void copyTXmsg(uint8_t id, const char * msg, uint8_t len);
 
+void copyTXmsg(uint8_t id, const char * msg, uint32_t len);
+
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES WITH GLOBAL SCOPE DEFINITION
+ *******************************************************************************/
 void uartInit(uint8_t id, uart_cfg_t config) {
 	SIM_Type * sim = SIM; //
 	UART_Type * UART_POINTERS[] = UART_BASE_PTRS;
@@ -156,15 +163,18 @@ void uartInit(uint8_t id, uart_cfg_t config) {
 		(PORT_POINTERS[portTX]->PCR)[num_bit_TX] |= PORT_PCR_IRQC(DISABLE_MODE);
 
 		if (config.mode != BLOCKING) {
-			NVIC_EnableIRQ(uartIRQs_TX_RX[id]); //enable inerrupt
+			NVIC_EnableIRQ(uartIRQs_TX_RX[id]); //enable interrupt
 			NVIC_EnableIRQ(uartIRQs_ERR[id]);
-			uart_p->C2 |= UART_C2_RIE_MASK; //Receiver Full Interrupt or DMA Transfer Enable
-			//RDRF interrupt or DMA transfer requests enabled
+			uart_p->C2 |= UART_C2_RIE_MASK;
+			/*
+			 * Receiver Full Interrupt or DMA Transfer Enable
+			 Enables S1[RDRF] to generate interrupt requests or DMA transfer requests, based on the state of
+			 C5[RDMAS].
+			 0 RDRF interrupt and DMA transfer requests disabled.
+			 1 RDRF interrupt or DMA transfer requests enabled*/
 		}
 		uart_p->C2 |= (UART_C2_RE_MASK);			//activation of RX mode
-
 	}
-
 	uartMode[id] = config.mode;
 }
 
@@ -173,8 +183,8 @@ bool uartIsRxMsg(uint8_t id) {
 	uart_p = UART_POINTERS[id];
 	bool ret = false;
 	if ((uartMode[id] == NON_BLOCKING)) {
-		if (markers_RX_buffer[id] == EMPTY) {
-			ret = false; //cecks if there is new info
+		if (latest_ch_rec_cnt_RX[id] == EMPTY) {
+			ret = false; //checks if there is new info
 		} else {
 			ret = true;
 		}
@@ -184,12 +194,12 @@ bool uartIsRxMsg(uint8_t id) {
 	return ret;
 }
 
-uint8_t uartGetRxMsgLength(uint8_t id) {
-	return (markers_RX_buffer[id] + 1); //
+uint32_t uartGetRxMsgLength(uint8_t id) {
+	return (latest_ch_rec_cnt_RX[id] + 1); //
 }
 
-uint8_t uartReadMsg(uint8_t id, char* msg, uint8_t len) {
-	uint8_t ret = 0;
+uint32_t uartReadMsg(uint8_t id, char* msg, uint32_t len) {
+	uint32_t ret = 0;
 	UART_Type * uart_p = UART_POINTERS[id];
 	uint32_t i = 0, j;
 	if ((id >= 0) && (id < UART_CANT_IDS)) {
@@ -200,16 +210,16 @@ uint8_t uartReadMsg(uint8_t id, char* msg, uint8_t len) {
 			}
 			ret = i;
 		} else if (((uartMode[id] == NON_BLOCKING))
-				&& (markers_RX_buffer[id] != EMPTY)) {
+				&& (latest_ch_rec_cnt_RX[id] != EMPTY)) {
 			flags_reading[id] = true; //to not be interrupted while doing this
-			for (i = 0; (i < len) && (i <= markers_RX_buffer[id]); i++) {
+			for (i = 0; (i < len) && (i <= latest_ch_rec_cnt_RX[id]); i++) {
 				msg[i] = RX_buffers[id][i]; // reads the buffer
 			}
 			//shift the data "len" times
-			for (j = 0; j < (markers_RX_buffer[id] + 1 - len); j++) {
+			for (j = 0; j < (latest_ch_rec_cnt_RX[id] + 1 - len); j++) {
 				RX_buffers[id][j] = RX_buffers[id][len + j];
 			}
-			markers_RX_buffer[id] = (j == 0 ? EMPTY : (j - 1)); //corrects the counter
+			latest_ch_rec_cnt_RX[id] = (j == 0 ? EMPTY : (j - 1)); //corrects the counter
 			flags_reading[id] = false; //finished
 			ret = i;
 		}
@@ -217,7 +227,7 @@ uint8_t uartReadMsg(uint8_t id, char* msg, uint8_t len) {
 	return ret;
 }
 
-uint8_t uartWriteMsg(uint8_t id, const char* msg, uint8_t len) {
+uint32_t uartWriteMsg(uint8_t id, const char* msg, uint32_t len) {
 	UART_Type * uart_p = UART_POINTERS[id];
 	uint32_t i = 0;
 	uint8_t len_TX = 0;
@@ -255,7 +265,7 @@ uint8_t uartWriteMsg(uint8_t id, const char* msg, uint8_t len) {
 	return len_TX;
 }
 
-uint8_t uartIsTxMsgComplete(uint8_t id) {
+uint32_t uartIsTxMsgComplete(uint8_t id) {
 	UART_Type * uart_p;
 	uint8_t ret = 0;
 	if ((id >= 0) && (id < UART_CANT_IDS)) {
@@ -265,20 +275,18 @@ uint8_t uartIsTxMsgComplete(uint8_t id) {
 	return ret;
 }
 
-void flushRXbuffer(uint8_t id) {
-	if (uartMode[id] != BLOCKING) {
-		markers_RX_buffer[id] = -1;
-	}
-}
 
-void copyTXmsg(uint8_t id, const char * msg, uint8_t len) {
-	uint8_t i;
+/*******************************************************************************
+ * FUNCTION PROTOTYPES WITH FILE SCOPE DEFINITION
+ *******************************************************************************/
+void copyTXmsg(uint8_t id, const char * msg, uint32_t len) {
+	uint32_t i;
 	for (i = 0; i < len; i++) {
-		TX_buffers[id][in_markers_TX_buffer[id]] = msg[i];
-		if (in_markers_TX_buffer[id] < TX_BUFFER_LEN - 1) {
-			in_markers_TX_buffer[id]++; //if im not finished advance one position
+		TX_buffers[id][latest_ch_rec_cnt_TX[id]] = msg[i];
+		if (latest_ch_rec_cnt_TX[id] < TX_BUFFER_LEN - 1) {
+			latest_ch_rec_cnt_TX[id]++; //if im not finished advance one position
 		} else
-			in_markers_TX_buffer[id] = 0; //im finished
+			latest_ch_rec_cnt_TX[id] = 0; //im finished
 		(lens_TX_buffer[id])++;
 	}
 }
@@ -286,42 +294,23 @@ void copyTXmsg(uint8_t id, const char * msg, uint8_t len) {
 void UARTX_RX_TX_IRQHandler(uint8_t id) {
 
 	UART_Type * uart_p = UART_POINTERS[id];
-	uint8_t i = 0, limit_FIFO_K64 = 0, limit_FIFO_soft = 0;
-	if (uart_p->S1 & UART_S1_RDRF_MASK){ //recibi data
-		if (!flags_reading[id]) {
-//			if (uart_p->PFIFO & UART_PFIFO_RXFE_MASK) //si implemento FIFO interna del microcontrolador, defino los limites de cuantos datos voy a leer
-//			{
-//				limit_FIFO_K64 = uart_p->RCFIFO;
-//				limit_FIFO_soft = RX_BUFFER_LEN - 1 - markers_RX_buffer[id];
-//			}
-/*
- * VER VER VER VER VER VER VER VER VER VER VER VER VER VER VER VER VER VER
-*/
-			do {
-				if (markers_RX_buffer[id] < RX_BUFFER_LEN - 1){
-					(markers_RX_buffer[id])++; //preparo el marker para escribir. El marker queda apuntando a la posición del último dato ingresado.
-					RX_buffers[id][(markers_RX_buffer[id])] = uart_p->D;
-					counters_RX_failed[id] = 0;
-				} else {
-					(counters_RX_failed[id])++;
-				}
-			} while ((i < limit_FIFO_K64) && (i < limit_FIFO_soft)); //se hace una sola vez si no esta implementada FIFO del micro. Si no, se repite segun cuanto haya en la FIFO
-//aca estaría bueno chequear de sacarle el while dado que no usamos la fifo de la kinetis sino que la armamos en memoria
-/*
- * VER VER VER VER VER VER VER VER VER VER VER VER VER VER VER VER VER VER
-*/
-		}
-	} else if (uart_p->S1 & UART_S1_TDRE_MASK){ //Transmit Data Register Empty Flag
-		if (lens_TX_buffer[id] > 0){ //if theres stuff in the buffer
-			do {
-				uart_p->D = TX_buffers[id][out_Markers_TX_buffer[id]];
-				if (out_Markers_TX_buffer[id] < TX_BUFFER_LEN - 1){(out_Markers_TX_buffer[id])++;}
-				else {out_Markers_TX_buffer[id] = 0;}
-				lens_TX_buffer[id]--;
-				i++;
-			} while ((i < limit_FIFO_K64) && (i < limit_FIFO_soft));
 
-		} else{
+	if (uart_p->S1 & UART_S1_RDRF_MASK) { //recibi data
+		if (!flags_reading[id]) {
+			if (latest_ch_rec_cnt_RX[id] < RX_BUFFER_LEN - 1) {
+				(latest_ch_rec_cnt_RX[id])++; //Points to the position of hte latest ch entered
+				RX_buffers[id][(latest_ch_rec_cnt_RX[id])] = uart_p->D;
+				counters_RX_failed[id] = 0;
+			} else {(counters_RX_failed[id])++;}
+
+		}
+	} else if (uart_p->S1 & UART_S1_TDRE_MASK) { //Transmit Data Register Empty Flag
+		if (lens_TX_buffer[id] > 0) { //if theres stuff in the buffer
+			uart_p->D = TX_buffers[id][latest_ch_sent_cnt_TX[id]];
+			if (latest_ch_sent_cnt_TX[id] < TX_BUFFER_LEN - 1) {(latest_ch_sent_cnt_TX[id])++;}
+			else {latest_ch_sent_cnt_TX[id] = 0;}
+			lens_TX_buffer[id]--;
+		} else {
 			uart_p->C2 = (uart_p->C2 & (~UART_C2_TE_MASK));
 			uart_p->C2 = uart_p->C2 & (~UART_C2_TIE_MASK);
 		}

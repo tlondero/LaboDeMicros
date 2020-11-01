@@ -16,6 +16,7 @@
 #include "header/gpio.h"
 #include "MK64F12.h"
 #include "header/board.h"
+#include "timer.h"
 #include "hardware.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -41,74 +42,58 @@
  ******************************************************************************/
 
 //static void update_baliza(int period);
+void UartTB(void);
+void UartTBInit(void);
+
+static int8_t bt1;
+static bool free_running=true;
 
 void App_Init(void) {
+	UartTBInit();
+}
+
+/* Función que se llama constantemente en un ciclo infinito */
+
+
+void App_Run(void) {
+	UartTB();
+}
+void UartTBInit(void){
 	uart_cfg_t init_config;
 	init_config.baudRate = 9600;
 	init_config.mode = NON_BLOCKING;
 	init_config.parity = NO_PARITY_UART;
 	init_config.nBits = NBITS_8;
 	uartInit(U0, init_config);
+	timerInit();
+	bt1 = ButtonInit(PIN_SW3, INPUT_PULLUP);
 }
-
-/* Función que se llama constantemente en un ciclo infinito */
-char msg_buffer[100];
-
-void App_Run(void) {
+void UartTB(void) {
+	static char msg_buffer[5000];
+	static bool first = true;
 	uint8_t len = 0;
-	if (uartIsRxMsg(U0)) {
-		len = uartGetRxMsgLength(U0);
-		char pija[3]={msg_buffer[0],msg_buffer[0],msg_buffer[0]};
-		len =uartReadMsg(U0, msg_buffer, len);
-		uartWriteMsg(U0, "patas\n\r", 7);
+	if (first) {
+		first = false;
+		uartWriteMsg(U0, "Welcome to the UART Test bench, There are two switches in the FRDM board, the SW3 is used to alternate between free running mode and buffer mode\r\n", 147);
+		uartWriteMsg(U0, "Free Running mode: Every character typed will be sent to the screen\r\n",70);//nice
+		uartWriteMsg(U0, "Buffer mode: Will collect every character typed until the SW2 is pressed, by pressing the buffer will be sent to screen\r\n",122);
 	}
-}
+	const ButtonEvent * evsw2 = ButtonGetEvent(bt1);
+	if (free_running && uartIsRxMsg(U0)) {
 
-//
-//void ButtonTB(void){
-//
-//	const ButtonEvent * evsw1 = ButtonGetEvent(idButton1);
-//
-//	static int a=0;
-//
-//    while((*evsw1) != EOQ){
-//	switch (*evsw1){
-//		case LKP:
-//			gpioWrite(PIN_LED_RED, HIGH);
-//			gpioWrite(PIN_LED_BLUE, LOW);
-//			gpioWrite(PIN_LED_GREEN, HIGH);
-//			a++;
-//			break;
-//		case PRESS:
-//			gpioWrite(PIN_LED_RED, HIGH); //PRESS VERDEE
-//			gpioWrite(PIN_LED_BLUE, HIGH);
-//			gpioWrite(PIN_LED_GREEN, LOW);
-//			break;
-//
-//		case RELEASE:
-//			gpioWrite(PIN_LED_RED, LOW);  //ROJO RELEASE
-//			gpioWrite(PIN_LED_BLUE, HIGH);
-//			gpioWrite(PIN_LED_GREEN, HIGH);
-//
-//			break;
-//		case SKP:
-//			gpioWrite(PIN_LED_RED, LOW);  //ROJO RELEASE
-//			gpioWrite(PIN_LED_BLUE, LOW);
-//			gpioWrite(PIN_LED_GREEN, LOW);
-//			break;
-//		default:
-//
-//			break;
-//		}
-//	evsw1++;
-//    }
-//    if(a==2){
-//    	a=0;
-//    }
-//	gpioWrite(PIN_LED_RED, HIGH);
-//	gpioWrite(PIN_LED_BLUE, HIGH);
-//	gpioWrite(PIN_LED_GREEN, HIGH);
-//
-//
-//}
+			len = uartGetRxMsgLength(U0);
+			len = uartReadMsg(U0, msg_buffer, len);
+			uartWriteMsg(U0, msg_buffer, len);
+	}
+	while ((*evsw2) != EOQ) {
+				switch (*evsw2) {
+				case PRESS:
+					free_running = !free_running;
+					break;
+				default:
+					break;
+				}
+				evsw2++;
+			}
+}
 

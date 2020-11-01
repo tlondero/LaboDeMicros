@@ -1,9 +1,8 @@
-/*
- * uart.h
- *
- *  Created on: Oct 30, 2020
- *      Author: Guido
- */
+/***************************************************************************/ /**
+  @file     uart.h
+  @brief
+  @author   MAGT
+ ******************************************************************************/
 
 #ifndef UART_H_
 #define UART_H_
@@ -36,8 +35,6 @@ typedef struct {
     uint8_t mode;
     uint8_t parity;
     uint8_t nBits;
-    int txWaterMark;
-    int rxWaterMark;
 } uart_cfg_t;
 
 
@@ -69,7 +66,7 @@ bool uartIsRxMsg(uint8_t id);
  * @param id UART's number
  * @return Quantity of received bytes
 */
-uint8_t uartGetRxMsgLength(uint8_t id);
+uint32_t uartGetRxMsgLength(uint8_t id);
 
 /**
  * @brief Read a received message. Non-Blocking
@@ -78,7 +75,7 @@ uint8_t uartGetRxMsgLength(uint8_t id);
  * @param cant Desired quantity of bytes to be pasted
  * @return Real quantity of pasted bytes
 */
-uint8_t uartReadMsg(uint8_t id, char* msg, uint8_t cant);
+uint32_t uartReadMsg(uint8_t id, char* msg, uint32_t cant);
 
 /**
  * @brief Write a message to be transmitted. Non-Blocking
@@ -87,19 +84,14 @@ uint8_t uartReadMsg(uint8_t id, char* msg, uint8_t cant);
  * @param cant Desired quantity of bytes to be transfered
  * @return Real quantity of bytes to be transfered
 */
-uint8_t uartWriteMsg(uint8_t id, const char* msg, uint8_t cant);
+uint32_t uartWriteMsg(uint8_t id, const char* msg, uint32_t cant);
 /**
  * @brief Check if all bytes were transfered
  * @param id UART's number
  * @return All bytes were transfered
 */
-uint8_t uartIsTxMsgComplete(uint8_t id);
+uint32_t uartIsTxMsgComplete(uint8_t id);
 
-/**
- * @brief flushes the rx buffer
- * @param id UART's number
-*/
-void flushRXbuffer(uint8_t id);
 
 
 /*******************************************************************************
