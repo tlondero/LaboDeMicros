@@ -1,5 +1,5 @@
 
-#include "drivers/headers/PORT.h"
+#include "header/PORT.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -102,7 +102,7 @@ void PORT_Configure(PORT_t port, PORTBit_t bit, bool pr, bool pu, bool od, bool 
 // This is a to do function see led.c
 void PORT_Configure2(PORT_t port, PORTBit_t bit, PCRstr UserPCR)
 {
-	port->PCR[bit] |= UserPCR.PCR;
+	port->PCR[bit] = UserPCR.PCR;
 }
 
 PORTFlags_t PORT_GetPortFlags(PORT_t port)
