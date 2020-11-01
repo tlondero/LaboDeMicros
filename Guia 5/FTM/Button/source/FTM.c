@@ -330,7 +330,7 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
  * @param cnv
  */
 void FTMSetCnV(uint8_t id, uint16_t cnv){
-	if(FTMX_INIT[module]){
+	if(FTMX_INIT[FTM_PINOUT[id].MODULE]){
 		FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnV = FTM_CnV_VAL(cnv);
 	}
 }
@@ -340,7 +340,7 @@ void FTMSetCnV(uint8_t id, uint16_t cnv){
  * @param PSC
  */
 void FTMSetPSC(uint8_t id, uint16_t PSC){
-	if(FTMX_INIT[module]){
+	if(FTMX_INIT[FTM_PINOUT[id].MODULE]){
 		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(PSC);
 	}
 }
@@ -350,7 +350,7 @@ void FTMSetPSC(uint8_t id, uint16_t PSC){
  * @param MOD
  */
 void FTMSetMOD(uint8_t id, uint16_t MOD){
-	if(FTMX_INIT[module]){
+	if(FTMX_INIT[FTM_PINOUT[id].MODULE]){
 		FTM_POINTERS[FTM_PINOUT[id].MODULE]->MOD = MOD;
 	}
 }
@@ -360,7 +360,7 @@ void FTMSetMOD(uint8_t id, uint16_t MOD){
  * @param mode: 1 para habilitar, 0 para deshabilitar
  */
 void FTMSetInterruptMode(uint8_t id, uint8_t mode){
-	if(FTMX_INIT[module]){
+	if(FTMX_INIT[FTM_PINOUT[id].MODULE]){
 		FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC
 				& ~FTM_CnSC_CHIE_MASK) | FTM_CnSC_CHIE(mode);
 	}
@@ -371,7 +371,7 @@ void FTMSetInterruptMode(uint8_t id, uint8_t mode){
  * @param  id: id de la FTM
  */
 void FTMSetSoftwareSync(uint8_t id){
-	if(FTMX_INIT[module]){
+	if(FTMX_INIT[FTM_PINOUT[id].MODULE]){
 		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNCONF |= ((FTM_SYNCONF_SYNCMODE(1) | FTM_SYNCONF_SWWRBUF(1) | FTM_SYNCONF_SWRSTCNT(1)));
 		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_CNTMAX(1);
 
@@ -404,7 +404,7 @@ void FTMSetSoftwareSync(uint8_t id){
  * @param cnv
  */
 void FTMSetSWSYNC(uint8_t id){
-	if(FTMX_INIT[module]){
+	if(FTMX_INIT[FTM_PINOUT[id].MODULE]){
 		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_SWSYNC(1);
 	}
 }
