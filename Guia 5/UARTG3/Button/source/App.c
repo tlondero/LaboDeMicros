@@ -53,13 +53,14 @@ void App_Init(void) {
 
 /* Función que se llama constantemente en un ciclo infinito */
 char msg_buffer[100];
+
 void App_Run(void) {
 	uint8_t len = 0;
-
 	if (uartIsRxMsg(U0)) {
 		len = uartGetRxMsgLength(U0);
+		char pija[3]={msg_buffer[0],msg_buffer[0],msg_buffer[0]};
 		len =uartReadMsg(U0, msg_buffer, len);
-		uartWriteMsg(U0, msg_buffer, len);
+		uartWriteMsg(U0, "patas\n\r", 7);
 	}
 }
 

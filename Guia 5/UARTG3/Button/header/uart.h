@@ -23,15 +23,6 @@
 
 
 
-#define MAX_BAUD_RATE_UART 11200
-#define MIN_BAUD_RATE_UART 0
-
-#define IS_VALID_BAUD_RATE(x) ( (x >= MIN_BAUD_RATE_UART) && (x <= MAX_BAUD_RATE_UART) )
-
-
-
-//#define MAX_MSG_LEN 8
-
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
