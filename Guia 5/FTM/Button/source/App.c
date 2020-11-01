@@ -66,9 +66,14 @@ void App_Init (void)
 	data.MODE = FTM_mPulseWidthModulation;
 	data.MODULO = 0xFFFF;
 	data.PSC = FTM_PSC_x1;
-	ftmid7 = FTMInit(PC, 3, data);
-	ftmid8 = FTMInit(PC, 2, data);
+	ftmid4 = FTMInit(PC, 9, data);
+	ftmid5 = FTMInit(PC, 8, data);
+	ftmid6 = FTMInit(PC, 1, data);
+	ftmid7 = FTMInit(PB, 19, data);
+	ftmid8 = FTMInit(PB, 18, data);
 	FTMStartClock(0);
+	FTMStartClock(2);
+	FTMStartClock(3);
 }
 
 /* Función que se llama constantemente en un ciclo infinito */

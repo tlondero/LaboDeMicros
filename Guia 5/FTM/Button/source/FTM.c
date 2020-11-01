@@ -40,14 +40,14 @@ typedef struct {
 enum { PA, PB, PC, PD, PE };
 
 static const FTM_Pinout_t FTM_PINOUT[FTM_PIN_CANT]={{0,0,0,3,37,0,PA,3},
-							 {0,0,1,4,71,1,PC,1},
+							 {0,0,1,4,71,1,PC,1},//
 							 {0,1,0,3,38,2,PA,4},
 							 {0,1,1,4,72,3,PC,2},
 							 {0,2,0,3,39,4,PA,5},
 							 {0,2,1,4,73,5,PC,3},
 							 {0,3,0,4,76,6,PC,4},
 							 {0,4,0,4,97,7,PD,4},
-							 {0,5,0,3,34,8,PA,0}, //{0,5,0,4,34,8,PA,0},
+							 {0,5,0,3,34,8,PA,0},
 							 {0,5,1,4,98,9,PD,5},
 							 {0,6,0,3,35,10,PA,1},
 							 {0,6,1,4,99,11,PD,6},
@@ -57,16 +57,16 @@ static const FTM_Pinout_t FTM_PINOUT[FTM_PIN_CANT]={{0,0,0,3,37,0,PA,3},
 							 {1,0,1,3,53,15,PB,0},
 							 {1,1,0,3,43,16,PA,13},
 							 {1,1,1,3,54,17,PB,1},
-							 {2,0,0,3,64,18,PB,18},
-							 {2,1,0,3,65,19,PB,19},
+							 {2,0,0,3,64,18,PB,18},//
+							 {2,1,0,3,65,19,PB,19},//
 							 {3,0,0,6,6,20,PE,5},
 							 {3,0,1,4,93,21,PD,0},
 							 {3,1,0,6,7,22,PE,6},
 							 {3,1,1,4,94,23,PD,1},
 							 {3,2,0,4,95,24,PD,2},
 							 {3,3,0,4,96,25,PD,3},
-							 {3,4,0,3,80,26,PC,8},
-							 {3,5,0,3,81,27,PC,9},
+							 {3,4,0,3,80,26,PC,8},//
+							 {3,5,0,3,81,27,PC,9},//
 							 {3,6,0,3,82,28,PC,10},
 							 {3,7,0,3,83,29,PC,11}};
 #if CALLBACK_MODE == 1
@@ -179,14 +179,18 @@ __ISR__ FTM3_IRQHandler(void) {
  * @param  module: a que modulo se le quiere parar el clock.
  */
 void FTMStartClock(uint8_t module) {
-	FTM_POINTERS[module]->SC |= FTM_SC_CLKS(SC_CLKS_SYSCLK);
+	if(FTMX_INIT[module]){
+		FTM_POINTERS[module]->SC |= FTM_SC_CLKS(SC_CLKS_SYSCLK);
+	}
 }
 
 /* @brief: Para el clock de FTM para un modulo entero.
  * @param  module: que modulo se le quiere parar el clock.
  */
 void FTMStopClock(uint8_t module) {
-	FTM_POINTERS[module]->SC |= FTM_SC_CLKS(SC_CLKS_OFF);
+	if(FTMX_INIT[module]){
+		FTM_POINTERS[module]->SC |= FTM_SC_CLKS(SC_CLKS_OFF);
+	}
 }
 
 /* @brief: Inicializa un pin con las especificaciones pedidas en data.
@@ -326,7 +330,9 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
  * @param cnv
  */
 void FTMSetCnV(uint8_t id, uint16_t cnv){
-	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnV = FTM_CnV_VAL(cnv);
+	if(FTMX_INIT[module]){
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnV = FTM_CnV_VAL(cnv);
+	}
 }
 
 /* @brief: Set del prescaler o divisor de frecuencias
@@ -334,7 +340,9 @@ void FTMSetCnV(uint8_t id, uint16_t cnv){
  * @param PSC
  */
 void FTMSetPSC(uint8_t id, uint16_t PSC){
-	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(PSC);
+	if(FTMX_INIT[module]){
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(PSC);
+	}
 }
 
 /* @brief: Set del MODULO
@@ -342,8 +350,9 @@ void FTMSetPSC(uint8_t id, uint16_t PSC){
  * @param MOD
  */
 void FTMSetMOD(uint8_t id, uint16_t MOD){
-	FTM_POINTERS[FTM_PINOUT[id].MODULE]->MOD = MOD;
-
+	if(FTMX_INIT[module]){
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->MOD = MOD;
+	}
 }
 
 /* @brief: Habilita (1) o deshabilita (0) las interrupciones
@@ -351,8 +360,10 @@ void FTMSetMOD(uint8_t id, uint16_t MOD){
  * @param mode: 1 para habilitar, 0 para deshabilitar
  */
 void FTMSetInterruptMode(uint8_t id, uint8_t mode){
-	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC
-		& ~FTM_CnSC_CHIE_MASK) | FTM_CnSC_CHIE(mode);
+	if(FTMX_INIT[module]){
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC
+				& ~FTM_CnSC_CHIE_MASK) | FTM_CnSC_CHIE(mode);
+	}
 }
 
 /* @brief: configura los registros de SYNC y SYNCONF para poder
@@ -360,31 +371,31 @@ void FTMSetInterruptMode(uint8_t id, uint8_t mode){
  * @param  id: id de la FTM
  */
 void FTMSetSoftwareSync(uint8_t id){
-	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNCONF |= ((FTM_SYNCONF_SYNCMODE(1) | FTM_SYNCONF_SWWRBUF(1) | FTM_SYNCONF_SWRSTCNT(1)));
-	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_CNTMAX(1);
+	if(FTMX_INIT[module]){
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNCONF |= ((FTM_SYNCONF_SYNCMODE(1) | FTM_SYNCONF_SWWRBUF(1) | FTM_SYNCONF_SWRSTCNT(1)));
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_CNTMAX(1);
 
-	switch(FTM_PINOUT[id].CHANNEL){
-	case 0:
-	case 1:
-		FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN0(1);
-		break;
-	case 2:
-	case 3:
-		FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN1(1);
-		break;
-	case 4:
-	case 5:
-		FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN2(1);
-		break;
-	case 6:
-	case 7:
-		FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN3(1);
-		break;
+		switch(FTM_PINOUT[id].CHANNEL){
+		case 0:
+		case 1:
+			FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN0(1);
+			break;
+		case 2:
+		case 3:
+			FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN1(1);
+			break;
+		case 4:
+		case 5:
+			FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN2(1);
+			break;
+		case 6:
+		case 7:
+			FTM_POINTERS[FTM_PINOUT[id].MODULE]->COMBINE |= FTM_COMBINE_SYNCEN3(1);
+			break;
 
-	default: break;
+		default: break;
+		}
 	}
-
-
 }
 
 /* @brief: Set del bit que comienza la sincronización para la escritura
@@ -393,5 +404,7 @@ void FTMSetSoftwareSync(uint8_t id){
  * @param cnv
  */
 void FTMSetSWSYNC(uint8_t id){
-	FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_SWSYNC(1);
+	if(FTMX_INIT[module]){
+		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_SWSYNC(1);
+	}
 }
