@@ -8,19 +8,23 @@
  * ENUMS and TYPEDEF
  *****************************/
 
+
+
 typedef enum {
 	IDLE, RUNNING, PAUSED, GAME_OVER
 } game_status;
 
 typedef enum {
 	R0, R90, R180, R270
-} tetro_rotation;
+} _tetro_rotation;
 
-typedef struct tetris_t{
+typedef uint8_t* _board_ptr;
+
+typedef struct tetris_t {
 	//Board
 	uint8_t board_w;
 	uint8_t board_h;
-	unsigned char* board;
+	_board_ptr board;
 
 	//Game settings
 	game_difficulty difficulty;
@@ -28,7 +32,7 @@ typedef struct tetris_t{
 	//Game info
 	uint8_t current_x_pos;	//CURRENT TOP LEFT CORNER OF THE TETROMINO PIECE
 	uint8_t current_y_pos;
-	uint8_t current_rotation; //R0 R90 R180 R270
+	_tetro_rotation current_rotation; //R0 R90 R180 R270
 	uint8_t current_piece;   //0...6
 	uint8_t game_status;	//RUNNING PAUSED GAME_OVER IDLE
 
@@ -40,10 +44,22 @@ typedef struct tetris_t{
 	uint8_t score;
 }Tetris;
 
-//PRIVATE TETRIS API DECLARATIONS
-void _tetris_clean_board(void);
-uint8_t _tetris_rotate(uint8_t px, uint8_t py, tetro_rotation r);
+/********************************
+* PRIVATE API DECLARATIONS
+********************************/
 
+//BOARD METHODS
+void _tetris_clean_board(void);
+void _tetris_set_board_borders(void);
+
+//TETROMINOS METHODS
+uint8_t _tetris_rotate(uint8_t px, uint8_t py, _tetro_rotation r);
+static uint8_t _tetris_rotate(uint8_t px, uint8_t py, _tetro_rotation r);
+
+//DEBUG METHODS
+#if DEV_MODE
+void _tetris_print_board(void); //Prints the current board to the console
+#endif
 
 /************** TETRIS GAME ********************/
 static Tetris tetris_game;
@@ -79,20 +95,18 @@ void fill_board(void) {
 
 #endif
 
-//PUBLIC TETRIS API
-/*******Game control********/
-//void tetris_move_right(void) {
-//
-//}
-//void tetris_move_left(void);
-//void tetris_move_down(void);
-//void tetris_rotate_piece(void);
+/*****************************
+* PUBLIC API DEFINITIONS
+******************************/
 
 /*********Context control******/
 void tetris_init(uint8_t board_w, uint8_t board_h) {
+	//Get boad ready
 	tetris_game.board_h = board_h;
 	tetris_game.board_w = board_w;
 	tetris_game.board = (unsigned char*)calloc(board_h * board_w, sizeof(unsigned char));
+	_tetris_set_board_borders(); //Sets the board boundaries and the rest of the elements are set to empty
+
 	tetris_game.score = 0;
 	tetris_game.game_status = IDLE;
 	tetris_set_difficulty(EASY);
@@ -122,28 +136,75 @@ void tetris_set_difficulty(game_difficulty difficulty) {
 	tetris_game.difficulty = difficulty;
 }
 
-/******Game status******/
+/*******Game control********/
+void tetris_move_right(void) {
+	tetris_game.current_x_pos += _tetris_piece_fits(tetris_game.current_x_pos + 1, tetris_game.current_y_pos);
+}
+void tetris_move_left(void) {
+	tetris_game.current_x_pos += _tetris_piece_fits(tetris_game.current_x_pos -1, tetris_game.current_y_pos);
+}
+void tetris_move_down(void) {
+	tetris_game.current_x_pos += _tetris_piece_fits(tetris_game.current_x_pos, tetris_game.current_y_pos + 1);
+}
+void tetris_rotate_piece(void) {
+
+}
+/*********Game status*********/
 uint8_t tetris_get_score(void) {
 	return tetris_game.score;
 }
 
-
 /***Graphics engine stuff***/
 const unsigned char* tetris_get_board(void)
 {
-	return (const unsigned char*)tetris_game.board;
+	return (board_ptr)tetris_game.board;
+}
+/****Debug functions****/
+void tetris_print_board(board_ptr board) {
+	int i = 0;
+	int j = 0;
+	for (i = 0; i < tetris_game.board_h; i++) {
+		for (j = 0; j < tetris_game.board_w; j++)
+		{
+			printf("%d", board[i * tetris_game.board_w + j]);
+		}
+		printf("\n");
+	}
 }
 
-//PRIVATE TETRIS API DEFINITIONS
-void _tetris_clean_board(void) {
-	// TODO:implementar
-	return;
+
+/*****************************
+* PRIVATE API DEFINITIONS
+******************************/
+
+//BOARD METHODS
+static void _tetris_clean_board(void) {
+	int i = 0;
+	int j = 0;
+	for (i = 0; i < tetris_game.board_h; i++) {
+		for (j = 0; j < tetris_game.board_w; j++)
+		{
+			tetris_game.board[i * tetris_game.board_w + j] = EMPTY;
+		}
+	}
 }
 
-uint8_t _tetris_rotate(uint8_t px, uint8_t py, tetro_rotation r) {
+void _tetris_set_board_borders(void) {
+	int x = 0;
+	int y = 0;
+	for (x = 0; x < tetris_game.board_w; x++) {
+		for (y = 0; y < tetris_game.board_h; y++) {
+		//Going down columns by column
+			tetris_game.board[y * tetris_game.board_w + x] = (x == 0 || x == tetris_game.board_w - 1 || y == tetris_game.board_w - 1) ? BORDER : T1;
+		}
+	}
+}
+
+//TETROMINOS METHODS
+static uint8_t _tetris_rotate(uint8_t px, uint8_t py, _tetro_rotation r) {
 
 	int pi = 0;
-	switch (r)
+	switch (r%4)
 	{
 	case R0: // 0 degrees			// 0  1  2  3
 		pi = py * 4 + px;			// 4  5  6  7
@@ -168,3 +229,47 @@ uint8_t _tetris_rotate(uint8_t px, uint8_t py, tetro_rotation r) {
 	return pi;
 }
 
+bool _tetris_piece_fits(uint8_t nPosX, uint8_t nPosY, _tetro_rotation r) {
+	// All Field cells >0 are occupied
+
+	for (int px = 0; px < 4; px++)
+		for (int py = 0; py < 4; py++)
+		{
+			// Get index into piece
+			int pi = _tetris_rotate(tetris_game.current_x_pos, tetris_game.current_y_pos, tetris_game.current_rotation);
+
+			// Get index into field
+			int fi = (nPosY + py) * tetris_game.board_w + (nPosX + px);
+
+			// Check that test is in bounds. Note out of bounds does
+			// not necessarily mean a fail, as the long vertical piece
+			// can have cells that lie outside the boundary, so we'll
+			// just ignore them
+			if (nPosX + px >= 0 && nPosX + px < tetris_game.board_w)
+			{
+				if (nPosY + py >= 0 && nPosY + py < tetris_game.board_h)
+				{
+					// In Bounds so do collision check
+					if ( (tetromino[tetris_game.current_piece][pi] != '.') && (tetris_game.board[fi] != 0) )
+						return false; // fail on first hit
+				}
+			}
+		}
+
+	return true;
+}
+
+//DEBUG METHODS
+#if DEV_MODE
+static void _tetris_print_board() {
+	int i = 0;
+	int j = 0;
+	for (i = 0; i < tetris_game.board_h; i++) {
+		for (j = 0; j < tetris_game.board_w; j++)
+		{
+			printf("%d", tetris_game.board[i * tetris_game.board_w + j]);
+		}
+		printf("\n");
+	}
+}
+#endif

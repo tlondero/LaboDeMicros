@@ -10,8 +10,8 @@ using namespace std;
 int nScreenWidth = 80;			// Console Screen Size X (columns)
 int nScreenHeight = 30;			// Console Screen Size Y (rows)
 wstring tetromino[7];
-int nFieldWidth = 8;
-int nFieldHeight = 8;
+int nFieldWidth = 9;
+int nFieldHeight = 9;
 unsigned char* pField = nullptr;
 
 int Rotate(int px, int py, int r)
@@ -75,9 +75,22 @@ bool DoesPieceFit(int nTetromino, int nRotation, int nPosX, int nPosY)
 
 int main()
 {
+	//Step 1- Init tetris
+	tetris_init(nFieldWidth, nFieldHeight);
+	//Step 2- Begin game
+	tetris_begin_game(); //Sets game mode to RUNNING
+
 	// Create Screen Buffer
 	wchar_t* screen = new wchar_t[nScreenWidth * nScreenHeight];
-	for (int i = 0; i < nScreenWidth * nScreenHeight; i++) screen[i] = L' ';
+	for (int i = 0; i < nScreenWidth * nScreenHeight; i++) { 
+		screen[i] = L' ';
+	};
+	board_ptr tetris_board = tetris_get_board(); //Allows the front end to take a peak at the game. Only watching is allowed
+	tetris_print_board(tetris_board);
+	printf(".............\n");
+	tetris_print_board(tetris_board);
+
+
 	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 	SetConsoleActiveScreenBuffer(hConsole);
 	DWORD dwBytesWritten = 0;
@@ -90,7 +103,6 @@ int main()
 	tetromino[5].append(L".X...X...XX.....");
 	tetromino[6].append(L"..X...X..XX.....");
 	
-	tetris_init(nFieldWidth, nFieldHeight);
 
 	pField = new unsigned char[nFieldWidth * nFieldHeight]; // Create play field buffer
 	for (int x = 0; x < nFieldWidth; x++) // Board Boundary
