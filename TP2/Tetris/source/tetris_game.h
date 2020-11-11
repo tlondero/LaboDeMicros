@@ -23,13 +23,10 @@ void print_tetro(void);
  *****************************/
 typedef const uint8_t* board_ptr;
 
-typedef enum {
-	EASY, MEDIUM, HELL
-} game_difficulty;
 
 //AVAILABLE TOKENS TO DRAW THE BOARD
 typedef enum {
-	EMPTY, T1, T2, T3, T4, T5, T6, BORDER
+	EMPTY=0, T1, T2, T3, T4, T5, T6, BORDER=9
 }board_token;
 
 /********************************
@@ -43,14 +40,16 @@ void tetris_move_down(void);
 void tetris_rotate_piece(void);
 
 /*********Context control******/
-void tetris_init(uint8_t board_w, uint8_t board_h);
-void tetris_begin_game(void);
+void tetris_init(uint8_t board_w, uint8_t board_h); //RUN THIS ONE FIRST
+void tetris_begin_game(void); //RUN THIS ONE THEN
 void tetris_pause_game(void);
 void tetris_resume_game(void);
 void tetris_restart_game(void);
+void tetris_update_board(void); //RUN ALWAYS AT THE END OF THE GAME LOOP
+void tetris_on_exit(void);
 
 /*********Game settings*********/
-void tetris_set_difficulty(game_difficulty difficulty); //EASY-MEDIUM-HELL
+void tetris_set_difficulty(uint8_t pieces2nextLevel); 
 
 /******Game status******/
 uint8_t tetris_get_score(void);

@@ -8,9 +8,9 @@ using namespace std;
 #include <Windows.h>
 
 int nScreenWidth = 80;			// Console Screen Size X (columns)
-int nScreenHeight = 30;			// Console Screen Size Y (rows)
+int nScreenHeight = 40;			// Console Screen Size Y (rows)
 wstring tetromino[7];
-int nFieldWidth = 9;
+int nFieldWidth = 10;
 int nFieldHeight = 9;
 unsigned char* pField = nullptr;
 
@@ -87,8 +87,6 @@ int main()
 	};
 	board_ptr tetris_board = tetris_get_board(); //Allows the front end to take a peak at the game. Only watching is allowed
 	tetris_print_board(tetris_board);
-	printf(".............\n");
-	tetris_print_board(tetris_board);
 
 
 	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
@@ -110,8 +108,8 @@ int main()
 			pField[y * nFieldWidth + x] = (x == 0 || x == nFieldWidth - 1 || y == nFieldHeight - 1) ? 9 : 0; //fill boundary with 9, 0 otherwise
 
 	// Game Logic
-	bool bKey[4];
-	int nCurrentPiece = 0;
+	bool bKey[5];
+	int nCurrentPiece = 3;
 	int nCurrentRotation = 0;
 	int nCurrentX = nFieldWidth / 2;
 	int nCurrentY = 0;
@@ -126,121 +124,57 @@ int main()
 
 	while (!bGameOver) // Main Loop
 	{
-		// Timing =======================
 		this_thread::sleep_for(50ms); // Small Step = 1 Game Tick
-		nSpeedCount++;
-		bForceDown = (nSpeedCount == nSpeed);
 
 		// Input ========================
-		for (int k = 0; k < 4; k++)								// R   L   D Z
-			bKey[k] = (0x8000 & GetAsyncKeyState((unsigned char)("\x27\x25\x28Z"[k]))) != 0;
-
-		// Game Logic ===================
+		for (int k = 0; k < 5; k++)								// R   L   D Z
+			bKey[k] = (0x8000 & GetAsyncKeyState((unsigned char)("\x27\x25\x28ZS"[k]))) != 0;
 
 		// Handle player movement
+		
 		nCurrentX += (bKey[0] && DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX + 1, nCurrentY)) ? 1 : 0;
 		nCurrentX -= (bKey[1] && DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX - 1, nCurrentY)) ? 1 : 0;
 		nCurrentY += (bKey[2] && DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1)) ? 1 : 0;
+
+		if (bKey[0])
+			tetris_move_right();
+		if (bKey[1])
+			tetris_move_left();
+		if (bKey[2])
+			tetris_move_down();
+		if (bKey[4])
+			bGameOver = true;
 
 		// Rotate, but latch to stop wild spinning
 		if (bKey[3])
 		{
 			nCurrentRotation += (bRotateHold && DoesPieceFit(nCurrentPiece, nCurrentRotation + 1, nCurrentX, nCurrentY)) ? 1 : 0;
 			bRotateHold = false;
+			tetris_rotate_piece();
 		}
 		else
 			bRotateHold = true;
 
-		// Force the piece down the playfield if it's time
-		if (bForceDown)
-		{
-			// Update difficulty every 50 pieces
-			nSpeedCount = 0;
-			nPieceCount++;
-			if (nPieceCount % 50 == 0)
-				if (nSpeed >= 10) nSpeed--;
-
-			// Test if piece can be moved down
-			if (DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1))
-				nCurrentY++; // It can, so do it!
-			else
-			{
-				// It can't! Lock the piece in place
-				for (int px = 0; px < 4; px++)
-					for (int py = 0; py < 4; py++)
-						if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] != L'.')
-							pField[(nCurrentY + py) * nFieldWidth + (nCurrentX + px)] = nCurrentPiece + 1;
-
-				// Check for lines
-				for (int py = 0; py < 4; py++)
-					if (nCurrentY + py < nFieldHeight - 1)
-					{
-						bool bLine = true;
-						for (int px = 1; px < nFieldWidth - 1; px++)
-							bLine &= (pField[(nCurrentY + py) * nFieldWidth + px]) != 0;
-
-						if (bLine)
-						{
-							// Remove Line, set to =
-							for (int px = 1; px < nFieldWidth - 1; px++)
-								pField[(nCurrentY + py) * nFieldWidth + px] = 8;
-							vLines.push_back(nCurrentY + py);
-						}
-					}
-
-				nScore += 25;
-				if (!vLines.empty())	nScore += (1 << vLines.size()) * 100;
-
-				// Pick New Piece
-				nCurrentX = nFieldWidth / 2;
-				nCurrentY = 0;
-				nCurrentRotation = 0;
-				nCurrentPiece = rand() % 7;
-
-				// If piece does not fit straight away, game over!
-				bGameOver = !DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY);
-			}
-		}
-
-		// Display ======================
 
 		// Draw Field
 		for (int x = 0; x < nFieldWidth; x++)
 			for (int y = 0; y < nFieldHeight; y++)
-				screen[(y + 2) * nScreenWidth + (x + 2)] = L" ABCDEFG=#"[pField[y * nFieldWidth + x]];
+				screen[y*nScreenWidth + x] = L" ABCDEFG=#"[tetris_board[y* nFieldWidth + x]];
 
 		// Draw Current Piece
 		for (int px = 0; px < 4; px++)
 			for (int py = 0; py < 4; py++)
 				if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] != L'.')
-					screen[(nCurrentY + py + 2) * nScreenWidth + (nCurrentX + px + 2)] = nCurrentPiece + 65;
+					screen[(nCurrentY + py) * nScreenWidth + (nCurrentX + px)] = L" ABCDEFG=#"[nCurrentPiece];
 
-		// Draw Score
-		swprintf_s(&screen[2 * nScreenWidth + nFieldWidth + 6], 16, L"SCORE: %8d", nScore);
-
-		// Animate Line Completion
-		if (!vLines.empty())
-		{
-			// Display Frame (cheekily to draw lines)
-			WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
-			this_thread::sleep_for(400ms); // Delay a bit
-
-			for (auto& v : vLines)
-				for (int px = 1; px < nFieldWidth - 1; px++)
-				{
-					for (int py = v; py > 0; py--)
-						pField[py * nFieldWidth + px] = pField[(py - 1) * nFieldWidth + px];
-					pField[px] = 0;
-				}
-
-			vLines.clear();
-		}
 
 		// Display Frame
 		WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
 	}
 
 	// Oh Dear
+	tetris_print_board(tetris_board);
+	tetris_on_exit();
 	CloseHandle(hConsole);
 	cout << "Game Over!! Score:" << nScore << endl;
 	system("pause");
