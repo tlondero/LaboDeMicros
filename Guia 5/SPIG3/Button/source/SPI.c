@@ -5,7 +5,7 @@
  *      Author: Acer
  */
 
-#include "board.h"
+#include "header/board.h"
 #include "MK64F12.h"
 #include <stdio.h>
 
@@ -29,7 +29,6 @@
  * VARIABLES WITH LOCAL SCOPE USING STATIC
  ******************************************************************************/
 
-static bool trasmiting=false;
 
 /*******************************************************************************
  * ENUMERATIONS, STRUCTURES AND TYPEDEFS
@@ -43,19 +42,12 @@ static PORT_Type *portPtrs[] = PORT_BASE_PTRS;
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE
  ******************************************************************************/
 
-static void startTrasmissionReception(void){
-	SPI0->MCR |= SPI_MCR_HALT(0);
-}
-static void stopTrasmissionReception(void){
-	SPI0->MCR |= SPI_MCR_HALT(1);
-}
-
 void init_spi_pin(pin_t pin)
 {
     SIM->SCGC5 |= simMasks[PIN2PORT(pin)];
     PORT_Type *port = portPtrs[PIN2PORT(pin)];
     port->PCR[PIN2NUM(pin)] = 0x00;
-    port->PCR[PIN2NUM(pin)] |= PORT_PCR_MUX(SPI_MODE);
+    port->PCR[PIN2NUM(pin)] |= PORT_PCR_MUX(SPI_MUX);
 }
 
 /*******************************************************************************
@@ -63,10 +55,10 @@ void init_spi_pin(pin_t pin)
  ******************************************************************************/
 
 void spi_init (void){
-	init_spi_pins(PIN_SCK);
-	init_spi_pins(PIN_MOSI);
-	init_spi_pins(PIN_MISO);
-	init_spi_pins(PIN_PCS);
+	init_spi_pin(PORTNUM2PIN(PD, 0));
+	init_spi_pin(PORTNUM2PIN(PD, 1));
+	init_spi_pin(PORTNUM2PIN(PD, 2));
+	init_spi_pin(PORTNUM2PIN(PD, 3));
 
 	//Clock gating
 	SIM->SCGC6 |= SIM_SCGC6_SPI0(1);
@@ -94,7 +86,7 @@ void spi_init (void){
 			 | SPI_CTAR_CSSCK(SPI_CSSCK) \
 			 | SPI_CTAR_PCSSCK(SPI_PCSSCK) \
 			 | SPI_CTAR_PDT(0) \
-			 SPI_CTAR_DT(0);
+			 | SPI_CTAR_DT(0);
 
 	//Enable Master chip select
 	SPI0->MCR |= SPI_MCR_PCSIS(1); //Select slave
@@ -104,14 +96,14 @@ void spi_init (void){
 
 }
 
-uint8_t spi_transaction(uint8_t * data_ptr, uint8_t size, uint8_t * recieve_ptr){
+uint8_t spi_transaction(uint8_t * data_ptr, uint8_t len, uint8_t * recieve_ptr){
 	uint32_t pushr_data = 0;
 	uint8_t data_i = 0;
 	uint8_t send_i = 0;
 
-	while(send_i < send_i){
+	while(send_i < len){
 		//Datos intermedios
-		if(send_i < size - 1){
+		if(send_i < len - 1){
 			pushr_data = SPI_PUSHR_PCS(1) \
 						|SPI_PUSHR_CONT(1) \
 						|SPI_PUSHR_TXDATA(data_ptr[send_i]);
@@ -145,6 +137,5 @@ uint8_t spi_transaction(uint8_t * data_ptr, uint8_t size, uint8_t * recieve_ptr)
 		}
 		send_i++;
 	}
-
-	return dataRecived;
+	return (data_i != 0);
 }
