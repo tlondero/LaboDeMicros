@@ -23,7 +23,7 @@ typedef enum {
 	I2C_WRITE, I2C_READ
 } i2c_mode_t;
 
-typedef void (*callbackPtr)(void);
+typedef void (*callbackptr)(void);
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
@@ -35,8 +35,8 @@ typedef void (*callbackPtr)(void);
 
 bool i2cInit(uint8_t chan);
 
-bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t* data_, uint8_t size_, i2c_mode_t mode_, callbackPtr callback_);
+bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t* data_, uint8_t size_, i2c_mode_t mode_, callbackptr callback_);
 
-void i2cISR_HANDLER();
+void i2cIsrHandler();
 
 #endif // _I2C_H_

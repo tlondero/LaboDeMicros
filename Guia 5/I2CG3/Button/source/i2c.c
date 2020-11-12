@@ -183,7 +183,7 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 	return valid;
 }
 
-void i2cISR_HANDLER() {
+void i2cIsrHandler() {
 
 	if (i2cptr->FLT & I2C_FLT_STOPF_MASK) {		//Stop flag
 		i2cptr->FLT |= I2C_FLT_STOPF_MASK;		//Clear stop
@@ -195,7 +195,7 @@ void i2cISR_HANDLER() {
 		callback();
 	} else {
 
-		if (i2cptr->FLT & FLT & I2C_FLT_STARTF_MASK) {		//Start flag
+		if (i2cptr->FLT & I2C_FLT_STARTF_MASK) {		//Start flag
 
 			i2cptr->FLT |= I2C_FLT_STARTF_MASK;				//Clear star
 			i2cptr->S |= I2C_S_IICIF_MASK;					//Clear interrupt
