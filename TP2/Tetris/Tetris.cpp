@@ -77,33 +77,40 @@ int main()
 {
 	time_t t;
 	srand((unsigned)time(&t));
+
+	/***************TETRIS*******************/
 	//Step 1- Init tetris
 	tetris_init(nFieldWidth, nFieldHeight);
 	//Step 2- Begin game
 	tetris_begin_game(); //Sets game mode to RUNNING
+	tetris_set_difficulty(HELL);
+	/***************TETRIS*******************/
 
 	// Create Screen Buffer
 	wchar_t* screen = new wchar_t[nScreenWidth * nScreenHeight];
 	for (int i = 0; i < nScreenWidth * nScreenHeight; i++) { 
 		screen[i] = L' ';
 	};
+	
+	/***************TETRIS*******************/
 	board_ptr tetris_board = tetris_get_board(); //Allows the front end to take a peak at the game. Only watching is allowed
 	tetris_print_board(tetris_board);
+	/***************TETRIS*******************/
+
 
 
 	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 	SetConsoleActiveScreenBuffer(hConsole);
 	DWORD dwBytesWritten = 0;
-		// Game Logic
+	// Game Logic
 	bool bKey[5];
 	bool bForceDown = false;
 	bool bRotateHold = true;
-	vector<int> vLines;
 	bool bGameOver = false;
 
-	while (!bGameOver) // Main Loop
+	while ((tetris_get_game_status() == TETRIS_RUNNING_ST) && !bGameOver) // Main Loop
 	{
-		this_thread::sleep_for(100ms); // Small Step = 1 Game Tick
+		this_thread::sleep_for(50ms); // Small Step = 1 Game Tick
 
 		// Input ========================
 		for (int k = 0; k < 5; k++)								// R   L   D Z
@@ -117,7 +124,10 @@ int main()
 		if (bKey[2])
 			tetris_move_down();
 		if (bKey[4])
+		{
 			bGameOver = true;
+			tetris_end_game();
+		}
 
 		// Rotate, but latch to stop wild spinning
 		if (bKey[3])
@@ -138,9 +148,12 @@ int main()
 		WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
 	}
 
-	// Oh Dear
+	/***************TETRIS*******************/
 	tetris_print_board(tetris_board);
 	tetris_on_exit();
+	/***************TETRIS*******************/
+	if (tetris_get_game_status() == TETRIS_GAME_OVER_ST)
+		cout << "GAME OVERRRR" << endl;
 	CloseHandle(hConsole);
 	system("pause");
 	return 0;
