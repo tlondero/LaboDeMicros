@@ -1,38 +1,65 @@
+/*
+ * i2c.c
+ *
+ *  Created on: 31 ago. 2020
+ *      Author: MAGT
+ */
+
 #include "header/i2c.h"
 
+/*******************************************************************************
+ * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
+ ******************************************************************************/
+#define DEBUG 1
+
+#if define(DEBUG)
+	#define assert(x)
+		if(x) {
+			__asm("bkpt #0");
+		}
+#else
+#define assert(x) do {} while(0);
+#endif
+
+/*******************************************************************************
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+ ******************************************************************************/
+
 typedef enum {
-	SR, ST, DATA
+	ST, SR, DATA
 } i2c_states_t;
 
 typedef struct {
-
 	bool finish;
 	uint8_t start;
 	uint8_t slave;
 	uint8_t reg;
 	uint8_t *data;
 	uint8_t data_size;
-
 	i2c_mode_t mode;
 	i2c_states_t state;
-
 } i2c_buffer_t;
+
+/*******************************************************************************
+ * GLOBAL VARIABLES WITH LOCAL SCOPE
+ ******************************************************************************/
 
 callbackPtr callback;
 static bool isInit = false;
 static I2C_Type *i2cptr;
 static i2c_buffer_t buffer;
 
-/*
- #if define(DEBUG)
- #define assert(x)
- if(x) {
- __asm("bkpt #0");
- }
- #else
- #define assert(x) do {} while(0);
- #endif
- */
+/*******************************************************************************
+ * FUNCTION PROTOTYPES WITH LOCAL SCOPE
+ ******************************************************************************/
+
+/*******************************************************************************
+ * FUNCTION DEFINITIONS WITH LOCAL SCOPE
+ ******************************************************************************/
+
+/*******************************************************************************
+ * FUNCTION DEFINITIONS WITH GLOBAL SCOPE
+ ******************************************************************************/
 
 bool i2cInit(uint8_t chan) {
 	if ((chan < I2C_COUNT) && (isInit == false)) {
@@ -122,7 +149,7 @@ bool i2cInit(uint8_t chan) {
 		i2cptr->C1 = 0;
 		i2cptr->C1 = I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;	//module on
 		i2cptr->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;			//interrupt on
-		i2cptr->FLT |= I2C_FLT_SSIE_MASK;						//startf stopf on
+		i2cptr->FLT |= I2C_FLT_SSIE_MASK;					//startf stopf on
 
 		isInit = true;
 	}
@@ -130,7 +157,8 @@ bool i2cInit(uint8_t chan) {
 	return isInit;
 }
 
-bool i2cTransaction(uint8_t slave, uint8_t reg, uint8_t *data, uint8_t dSize, i2c_mode_t mode_, callbackPtr callback_) {
+bool i2cTransaction(uint8_t slave, uint8_t reg, uint8_t *data, uint8_t dSize,
+		i2c_mode_t mode_, callbackPtr callback_) {
 
 	bool valid = false;
 
@@ -138,7 +166,7 @@ bool i2cTransaction(uint8_t slave, uint8_t reg, uint8_t *data, uint8_t dSize, i2
 		buffer.finish = false;
 		buffer.mode = mode_;
 		buffer.state = SR;
-		buffer.start = 0;
+		buffer.count = 0;
 		buffer.slave = slave;
 		buffer.reg = reg;
 		buffer.data = data;
@@ -155,8 +183,93 @@ bool i2cTransaction(uint8_t slave, uint8_t reg, uint8_t *data, uint8_t dSize, i2
 	return valid;
 }
 
-void i2cISR_HANDLER(){
+void i2cISR_HANDLER() {
 
+	if (i2cptr->FLT & I2C_FLT_STOPF_MASK) {		//Stop flag
+		i2cptr->FLT |= I2C_FLT_STOPF_MASK;		//Clear stop
+		i2cptr->S |= I2C_S_IICIF_MASK;			//Clear interrupt
+		i2cptr->C1 &= ~I2C_C1_TXAK_MASK;		//Unset NAK
+
+		buffer.count = 0;
+		buffer.finish = true;
+		callback();
+	} else {
+
+		if (i2cptr->FLT & FLT & I2C_FLT_STARTF_MASK) {		//Start flag
+
+			i2cptr->FLT |= I2C_FLT_STARTF_MASK;				//Clear star
+			i2cptr->S |= I2C_S_IICIF_MASK;					//Clear interrupt
+
+			buffer.count++;
+			if (buffer.count == 1) {
+				i2cptr->D = buffer.slave << 1 | 0;
+			} else {
+				i2cptr->D = buffer.slave << 1 | 1;
+			}
+		} else {
+			i2cptr->S |= I2C_S_IICIF_MASK;					//Clear interrupt
+
+			if (i2cptr->C1 & I2C_C1_TX_MASK == I2C_C1_TX_MASK) {	//TX
+
+				if (!(~(i2cptr->S & I2C_S_RXAK_MASK))) {	//! Receive AK
+					i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
+					buffer.finish = true;
+
+				} else {
+					switch (buffer.state) {
+					case ST:
+						i2cptr->D = buffer.reg;
+						if (buffer.dir == I2C_READ) {
+							buffer.state = SR;
+						} else {
+							buffer.state = DATA;
+						}
+						break;
+					case SR:
+						i2cptr->C1 |= I2C_C1_TX_MASK;
+						i2cptr->C1 |= I2C_C1_RSTA_MASK;
+						buffer.state = DATA;
+						break;
+					case DATA:
+						if (buffer.dir == I2C_READ) {
+							i2cptr->C1 &= ~I2C_C1_TX_MASK;		//RX
+							if (buffer.data_size == 1) {
+								i2cptr->C1 |= I2C_C1_TXAK_MASK;			//NAK
+							}
+							/*
+							 uint8_t tuvi = i2cptr->D;
+							 tuvi++;
+							 */
+						} else {
+							if (buffer.data_size == 0) {
+								i2cptr->C1 &= ~I2C_C1_MST_MASK;		//Send stop
+							} else {
+								i2cptr->D = *buffer.data;
+								buffer.data++;
+								buffer.data_size--;
+							}
+						}
+
+						//buffer.state = DATA;
+
+						break;
+					default:
+						break;
+					}
+				}
+			} else {
+
+				if ((buffer.state == DATA) && (buffer.data_size == 1)) {
+					i2cptr->C1 &= ~I2C_C1_MST_MASK;		//Send stop
+				} else if ((buffer.state == DATA) && (buffer.data_size == 2)) {
+					i2cptr->C1 |= I2C_C1_TXAK_MASK;			//NAK
+				}
+				*buffer.data = i2cptr->D;
+				buffer.data++;
+				buffer.data_size--;
+			}
+		}
+	}
 }
 
 /*
