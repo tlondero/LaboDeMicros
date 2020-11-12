@@ -13,12 +13,15 @@ typedef enum {
 	IDLE, RUNNING, PAUSED, GAME_OVER
 } game_status;
 typedef enum {
-	EASY=50, MEDIUM=25, HELL=5
+	EASY = 50, MEDIUM = 25, HELL = 5
 } difficulty;
 typedef enum {
 	R0, R90, R180, R270
 } _tetro_rotation;
 
+typedef enum {
+	BACK, FRONT
+}which_board;
 typedef uint8_t* _board_ptr;
 
 typedef struct tetris_t {
@@ -33,8 +36,8 @@ typedef struct tetris_t {
 	uint8_t pieces2nextLevel;
 
 	//Game info
-	uint8_t current_x;	//CURRENT TOP LEFT CORNER OF THE TETROMINO PIECE
-	uint8_t current_y;
+	int8_t current_x;	//CURRENT TOP LEFT CORNER OF THE TETROMINO PIECE
+	int8_t current_y;
 	uint8_t current_rotation; //R0 R90 R180 R270
 	uint8_t current_piece;   //1...6
 	uint8_t game_status;	//RUNNING PAUSED GAME_OVER IDLE
@@ -55,10 +58,13 @@ typedef struct tetris_t {
 static _board_ptr _create_board(uint8_t board_w, uint8_t board_h);
 static void _tetris_clean_board(void);
 static void _tetris_set_board_borders(void);
-
+static void _tetris_lock_piece_down(void);
+static void _tetris_draw_current_piece(which_board board);
+static void _tetris_check_for_lines(void);
+static void _tetris_update_score(uint8_t lines_completed);
 //TETROMINOS METHODS
 static uint8_t _tetris_rotate(uint8_t px, uint8_t py, uint8_t r);
-bool _tetris_piece_fits(uint8_t nPosX, uint8_t nPosY, uint8_t r);
+static bool _tetris_piece_fits(int8_t nPosX, int8_t nPosY, uint8_t r);
 //DEBUG METHODS
 #if DEV_MODE
 void _tetris_print_board(void); //Prints the current board to the console
@@ -121,7 +127,7 @@ void tetris_init(uint8_t board_w, uint8_t board_h) {
 
 void tetris_begin_game(void) {
 	tetris_game.game_status = RUNNING;
-	tetris_game.current_piece = T3;//7*rand()-1
+	tetris_game.current_piece = rand() % 7;
 }
 
 void tetris_pause_game(void) {
@@ -145,10 +151,7 @@ void tetris_update_board(void)
 	memcpy(tetris_game.board_front, (board_ptr)tetris_game.board_back, sizeof(tetris_game.board_back[0]) * tetris_game.board_size);
 
 	//Draw current piece
-	for (int px = 0; px < 4; px++)
-		for (int py = 0; py < 4; py++)
-			if (tetromino[tetris_game.current_piece][_tetris_rotate(tetris_game.current_x, tetris_game.current_y, tetris_game.current_rotation)] != L'.')
-				tetris_game.board_front[py* tetris_game.board_w + px] = tetris_game.current_piece;
+	_tetris_draw_current_piece(FRONT);
 }
 
 void tetris_on_exit(void) {
@@ -165,25 +168,21 @@ void tetris_set_difficulty(uint8_t pieces2nextLevel) {
 void tetris_move_right(void) {
 	tetris_game.current_x += _tetris_piece_fits(tetris_game.current_x + 1, tetris_game.current_y, tetris_game.current_rotation);
 }
+
 void tetris_move_left(void) {
-	tetris_game.current_x += _tetris_piece_fits(tetris_game.current_x -1, tetris_game.current_y, tetris_game.current_rotation);
+	tetris_game.current_x -= _tetris_piece_fits(tetris_game.current_x - 1, tetris_game.current_y, tetris_game.current_rotation);
 }
+
 void tetris_move_down(void) {
 	if (_tetris_piece_fits(tetris_game.current_x, tetris_game.current_y + 1, tetris_game.current_rotation))
 		tetris_game.current_y += 1;
 	else
-	{//Lock piece in position
-		int px, py;
-		for (px = 0; px < 4; px++)
-			for (py = 0; py < 4; py++)
-				if (tetromino[tetris_game.current_piece][_tetris_rotate(px, py, tetris_game.current_rotation)] != L'.')
-					tetris_game.board_back[(tetris_game.current_y + py) * tetris_game.board_w + (tetris_game.current_x + px)] = tetris_game.current_piece;
-		
-		tetris_game.current_piece = rand()%6;
-		tetris_game.current_x = tetris_game.board_w / 2; //Begin in the middle of the board
-		tetris_game.current_y = 0; //Begin at the top
+	{
+		//Lock piece in position
+		_tetris_lock_piece_down();
 	}
 }
+
 void tetris_rotate_piece(void) {
 	tetris_game.current_rotation += _tetris_piece_fits(tetris_game.current_x, tetris_game.current_y + 1, tetris_game.current_rotation + 1);
 }
@@ -191,6 +190,15 @@ void tetris_rotate_piece(void) {
 uint8_t tetris_get_score(void) {
 	return tetris_game.score;
 }
+
+uint8_t tetris_get_current_piece(void) {
+	return tetris_game.current_piece;
+}
+
+uint8_t tetris_get_current_rotation(void) {
+	return tetris_game.current_rotation;
+}
+
 
 /***Graphics engine stuff***/
 const unsigned char* tetris_get_board(void)
@@ -232,12 +240,12 @@ static void _tetris_clean_board(void) {
 	}
 }
 
-void _tetris_set_board_borders(void) {
+static void _tetris_set_board_borders(void) {
 	int x = 0;
 	int y = 0;
 	for (y = 0; y < tetris_game.board_h; y++) {
 		for (x = 0; x < tetris_game.board_w; x++) {
-		//Going down columns by column
+			//Going down columns by column
 			tetris_game.board_back[y * tetris_game.board_w + x] = (x == 0 || x == tetris_game.board_w - 1 || y == tetris_game.board_h - 1) ? BORDER : EMPTY;
 		}
 	}
@@ -245,11 +253,65 @@ void _tetris_set_board_borders(void) {
 
 }
 
+static void _tetris_lock_piece_down(void) {
+	_tetris_draw_current_piece(BACK);
+	_tetris_check_for_lines();
+	tetris_game.current_piece = rand() % 7;
+	tetris_game.current_x = tetris_game.board_w / 2; //Begin in the middle of the board
+	tetris_game.current_y = 0; //Begin at the top
+
+	return;
+}
+
+static void _tetris_draw_current_piece(which_board board) {
+	uint8_t px, py;
+	
+	for (py = 0; py < 4; py++)
+		for (px = 0; px < 4; px++)
+			if (tetromino[tetris_game.current_piece][_tetris_rotate(px, py, tetris_game.current_rotation)] != L'.')
+			{
+				if(board ==BACK)
+					tetris_game.board_back[(tetris_game.current_y + py) * tetris_game.board_w + (tetris_game.current_x + px)] = tetris_game.current_piece + 1;
+				else if(board == FRONT)
+				{
+					tetris_game.board_front[(tetris_game.current_y + py) * tetris_game.board_w + (tetris_game.current_x + px)] = tetris_game.current_piece + 1;
+				}
+			}
+}
+
+static void _tetris_check_for_lines(void) {
+	uint8_t px, py, lines_completed;
+	lines_completed = 0;
+	for (py = 0; py < 4; py++)
+		if (tetris_game.current_y + py < tetris_game.board_h - 1)
+		{
+			bool bLine = true;
+			for (px = 1; px < tetris_game.board_w - 1; px++)
+				bLine &= (tetris_game.board_back[(tetris_game.current_y + py) * tetris_game.board_w + px]) != EMPTY;
+
+			if (bLine)
+			{
+				// Remove Line, set to =
+				for (int px = 1; px < tetris_game.board_w - 1; px++)
+					tetris_game.board_back[(tetris_game.current_y + py) * tetris_game.board_w + px] = LINE;
+				lines_completed++;
+			}
+
+		}
+	_tetris_update_score(lines_completed);
+}
+
+static void _tetris_update_score(uint8_t lines_completed) {
+	//TODO
+	return;
+}
+
+
 //TETROMINOS METHODS
 static uint8_t _tetris_rotate(uint8_t px, uint8_t py, uint8_t r) {
 
-	int pi = 0;
-	switch (r%4)
+	uint8_t pi = 0;
+	switch (r % 4)
 	{
 	case R0: // 0 degrees			// 0  1  2  3
 		pi = py * 4 + px;			// 4  5  6  7
@@ -274,14 +336,14 @@ static uint8_t _tetris_rotate(uint8_t px, uint8_t py, uint8_t r) {
 	return pi;
 }
 
-bool _tetris_piece_fits(uint8_t nPosX, uint8_t nPosY, uint8_t r) {
+static bool _tetris_piece_fits(int8_t nPosX, int8_t nPosY, uint8_t r) {
 	// All Field cells >0 are occupied
 
 	for (int px = 0; px < 4; px++)
 		for (int py = 0; py < 4; py++)
 		{
 			// Get index into piece
-			int pi = _tetris_rotate(tetris_game.current_x, tetris_game.current_y, tetris_game.current_rotation);
+			int pi = _tetris_rotate(px, py, r);
 
 			// Get index into field
 			int fi = (nPosY + py) * tetris_game.board_w + (nPosX + px);
@@ -295,7 +357,7 @@ bool _tetris_piece_fits(uint8_t nPosX, uint8_t nPosY, uint8_t r) {
 				if (nPosY + py >= 0 && nPosY + py < tetris_game.board_h)
 				{
 					// In Bounds so do collision check
-					if ( (tetromino[tetris_game.current_piece][pi] != '.') && (tetris_game.board_back[fi] != EMPTY) )
+					if ((tetromino[tetris_game.current_piece][pi] != '.') && (tetris_game.board_back[fi] != EMPTY))
 						return false; // fail on first hit
 				}
 			}

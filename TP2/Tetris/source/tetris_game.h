@@ -26,8 +26,14 @@ typedef const uint8_t* board_ptr;
 
 //AVAILABLE TOKENS TO DRAW THE BOARD
 typedef enum {
-	EMPTY=0, T1, T2, T3, T4, T5, T6, BORDER=9
+	EMPTY, T1, T2, T3, T4, T5, T6, T7, LINE ,BORDER
 }board_token;
+/*
+EMPTY: describes the empty cell
+[T1 ... T7]: Tetrominoe pieces
+LINE: symbol utilized to represent the completion of a line
+BORDER: border
+*/
 
 /********************************
 * PUBLIC TETRIS API DECLARATIONS
@@ -53,7 +59,8 @@ void tetris_set_difficulty(uint8_t pieces2nextLevel);
 
 /******Game status******/
 uint8_t tetris_get_score(void);
-
+uint8_t tetris_get_current_piece(void);
+uint8_t tetris_get_current_rotation(void);
 /***Graphics engine stuff***/
 //Gives the front end access to the board but cannot change it
 board_ptr tetris_get_board(void);
