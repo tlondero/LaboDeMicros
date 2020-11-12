@@ -21,12 +21,15 @@ void print_tetro(void);
 /******************************
  * ENUMS and TYPEDEF
  *****************************/
-typedef const uint8_t* board_ptr;
+typedef enum {
+	TETRIS_IDLE_ST, TETRIS_RUNNING_ST, TETRIS_PAUSED_ST, TETRIS_GAME_OVER_ST
+} game_status;
 
+typedef const uint8_t* board_ptr;
 
 //AVAILABLE TOKENS TO DRAW THE BOARD
 typedef enum {
-	EMPTY, T1, T2, T3, T4, T5, T6, T7, LINE ,BORDER
+	EMPTY, T1, T2, T3, T4, T5, T6, T7, LINE, BORDER
 }board_token;
 /*
 EMPTY: describes the empty cell
@@ -34,6 +37,10 @@ EMPTY: describes the empty cell
 LINE: symbol utilized to represent the completion of a line
 BORDER: border
 */
+
+typedef enum {
+	EASY = 25, MEDIUM = 15, HELL = 5
+} difficulty;
 
 /********************************
 * PUBLIC TETRIS API DECLARATIONS
@@ -51,16 +58,19 @@ void tetris_begin_game(void); //RUN THIS ONE THEN
 void tetris_pause_game(void);
 void tetris_resume_game(void);
 void tetris_restart_game(void);
+void tetris_end_game(void);
 void tetris_update_board(void); //RUN ALWAYS AT THE END OF THE GAME LOOP
 void tetris_on_exit(void);
 
 /*********Game settings*********/
-void tetris_set_difficulty(uint8_t pieces2nextLevel); 
+void tetris_set_difficulty(uint8_t difficulty);
 
 /******Game status******/
 uint8_t tetris_get_score(void);
 uint8_t tetris_get_current_piece(void);
 uint8_t tetris_get_current_rotation(void);
+game_status tetris_get_game_status(void);
+
 /***Graphics engine stuff***/
 //Gives the front end access to the board but cannot change it
 board_ptr tetris_get_board(void);
