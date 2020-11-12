@@ -1,12 +1,27 @@
-#include "headers/i2c.h"
+#include "header/i2c.h"
 
-//ALT5 //ALT1 //ALT5
-enum {
-	I2C_0, I2C_1, I2C_2, I2C_COUNT
-};
+typedef enum {
+	SR, ST, DATA
+} i2c_states_t;
 
+typedef struct {
+
+	bool finish;
+	uint8_t start;
+	uint8_t slave;
+	uint8_t reg;
+	uint8_t *data;
+	uint8_t data_size;
+
+	i2c_mode_t mode;
+	i2c_states_t state;
+
+} i2c_buffer_t;
+
+callbackPtr callback;
 static bool isInit = false;
 static I2C_Type *i2cptr;
+static i2c_buffer_t buffer;
 
 /*
  #if define(DEBUG)
@@ -40,10 +55,10 @@ bool i2cInit(uint8_t chan) {
 			sim->SCGC4 |= SIM_SCGC4_I2C0_MASK;
 			sim->SCGC5 |= SIM_SCGC5_PORTE_MASK;
 
-			sdaptr = PIN2PORT(PORTNUM2PIN(PE, 25));
-			sdaPinum = PIN2PORT(PORTNUM2PIN(PE, 25));
-			sclptr = PIN2PORT(PORTNUM2PIN(PE, 24));
-			sclPinum = PIN2PORT(PORTNUM2PIN(PE, 24));
+			sdaptr = PE; //PIN2PORT(PORTNUM2PIN(PE, 25));
+			sdaPinum = 25; //PIN2NUM(PORTNUM2PIN(PE, 25));
+			sclptr = PE; //PIN2PORT(PORTNUM2PIN(PE, 24));
+			sclPinum = 24; //PIN2NUM(PORTNUM2PIN(PE, 24));
 
 			break;
 		case I2C_1:
@@ -51,20 +66,20 @@ bool i2cInit(uint8_t chan) {
 			sim->SCGC5 |= SIM_SCGC5_PORTC_MASK;
 			mux = 1;
 
-			sdaptr = PIN2PORT(PORTNUM2PIN(PC, 11));
-			sdaPinum = PIN2PORT(PORTNUM2PIN(PC, 11));
-			sclptr = PIN2PORT(PORTNUM2PIN(PC, 10));
-			sclPinum = PIN2PORT(PORTNUM2PIN(PC, 10));
+			sdaptr = PC; //PIN2PORT(PORTNUM2PIN(PC, 11));
+			sdaPinum = 11; //PIN2NUM(PORTNUM2PIN(PC, 11));
+			sclptr = PC; //PIN2PORT(PORTNUM2PIN(PC, 10));
+			sclPinum = 10; //PIN2NUM(PORTNUM2PIN(PC, 10));
 
 			break;
 		case I2C_2:
 			sim->SCGC1 |= SIM_SCGC1_I2C2_MASK;
 			sim->SCGC5 |= SIM_SCGC5_PORTA_MASK;
 
-			sdaptr = PIN2PORT(PORTNUM2PIN(PA, 13));
-			sdaPinum = PIN2PORT(PORTNUM2PIN(PA, 13));
-			sclptr = PIN2PORT(PORTNUM2PIN(PA, 14));
-			sclPinum = PIN2PORT(PORTNUM2PIN(PA, 14));
+			sdaptr = PA; //PIN2PORT(PORTNUM2PIN(PA, 13));
+			sdaPinum = 13; //PIN2NUM(PORTNUM2PIN(PA, 13));
+			sclptr = PA; //PIN2PORT(PORTNUM2PIN(PA, 14));
+			sclPinum = 14; //PIN2NUM(PORTNUM2PIN(PA, 14));
 
 			break;
 		default:
@@ -104,10 +119,10 @@ bool i2cInit(uint8_t chan) {
 
 		NVIC_EnableIRQ(I2C_IRQS[chan]);
 
-		i2c->C1 = 0;
-		i2c->C1 = I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;	//module on
-		i2c->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;			//interrupt on
-		i2c->FLT |= I2C_FLT_SSIE_MASK;						//startf stopf on
+		i2cptr->C1 = 0;
+		i2cptr->C1 = I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;	//module on
+		i2cptr->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;			//interrupt on
+		i2cptr->FLT |= I2C_FLT_SSIE_MASK;						//startf stopf on
 
 		isInit = true;
 	}
@@ -115,12 +130,32 @@ bool i2cInit(uint8_t chan) {
 	return isInit;
 }
 
-bool i2cStartTransaction( address, bytesToWrite, writeBuffer, bytesToRead,
-		readBuffer) {
+bool i2cTransaction(uint8_t slave, uint8_t reg, uint8_t *data, uint8_t dSize, i2c_mode_t mode_, callbackPtr callback_) {
 
+	bool valid = false;
+
+	if (!(i2cptr->S & I2C_S_BUSY_MASK)) {
+		buffer.finish = false;
+		buffer.mode = mode_;
+		buffer.state = SR;
+		buffer.start = 0;
+		buffer.slave = slave;
+		buffer.reg = reg;
+		buffer.data = data;
+		buffer.data_size = dSize;
+
+		callback = callback_;
+
+		i2cptr->C1 |= I2C_C1_TX_MASK;
+		i2cptr->C1 |= I2C_C1_MST_MASK;
+
+		valid = true;
+	}
+
+	return valid;
 }
 
-bool i2cQueryTransaction() {
+void i2cISR_HANDLER(){
 
 }
 
