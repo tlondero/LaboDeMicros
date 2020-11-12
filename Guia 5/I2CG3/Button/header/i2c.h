@@ -15,9 +15,9 @@
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
-enum {
+typedef enum {
 	I2C_0, I2C_1, I2C_2, I2C_COUNT
-};
+} ic2_channel_t;
 
 typedef enum {
 	I2C_WRITE, I2C_READ
@@ -33,10 +33,10 @@ typedef void (*callbackptr)(void);
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
-bool i2cInit(uint8_t chan);
+bool i2cInit(ic2_channel_t chan);
 
 bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t* data_, uint8_t size_, i2c_mode_t mode_, callbackptr callback_);
 
-void i2cIsrHandler();
+void i2cIsrRoutine();
 
 #endif // _I2C_H_
