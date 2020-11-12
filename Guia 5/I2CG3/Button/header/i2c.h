@@ -35,7 +35,7 @@ typedef void (*callbackPtr)(void);
 
 bool i2cInit(uint8_t chan);
 
-bool i2cTransaction(uint8_t slave, uint8_t reg, uint8_t* data, uint8_t dSize, i2c_mode_t mode_, callbackPtr callback_);
+bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t* data_, uint8_t size_, i2c_mode_t mode_, callbackPtr callback_);
 
 void i2cISR_HANDLER();
 

@@ -31,11 +31,11 @@ typedef enum {
 
 typedef struct {
 	bool finish;
-	uint8_t start;
+	uint8_t count;
 	uint8_t slave;
 	uint8_t reg;
 	uint8_t *data;
-	uint8_t data_size;
+	uint8_t size;
 	i2c_mode_t mode;
 	i2c_states_t state;
 } i2c_buffer_t;
@@ -142,7 +142,7 @@ bool i2cInit(uint8_t chan) {
 		(portPointers[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
 
 		//baudrate
-		i2c->F = I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
+		i2cptr->F = I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
 
 		NVIC_EnableIRQ(I2C_IRQS[chan]);
 
@@ -157,7 +157,7 @@ bool i2cInit(uint8_t chan) {
 	return isInit;
 }
 
-bool i2cTransaction(uint8_t slave, uint8_t reg, uint8_t *data, uint8_t dSize,
+bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 		i2c_mode_t mode_, callbackPtr callback_) {
 
 	bool valid = false;
@@ -167,10 +167,10 @@ bool i2cTransaction(uint8_t slave, uint8_t reg, uint8_t *data, uint8_t dSize,
 		buffer.mode = mode_;
 		buffer.state = SR;
 		buffer.count = 0;
-		buffer.slave = slave;
-		buffer.reg = reg;
-		buffer.data = data;
-		buffer.data_size = dSize;
+		buffer.slave = slave_;
+		buffer.reg = reg_;
+		buffer.data = data_;
+		buffer.size = size_;
 
 		callback = callback_;
 
@@ -211,11 +211,8 @@ void i2cISR_HANDLER() {
 
 			if (i2cptr->C1 & I2C_C1_TX_MASK == I2C_C1_TX_MASK) {	//TX
 
-				if (!(~(i2cptr->S & I2C_S_RXAK_MASK))) {	//! Receive AK
-					i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
-					buffer.finish = true;
+				if (~(i2cptr->S & I2C_S_RXAK_MASK)) {	//Receive AK
 
-				} else {
 					switch (buffer.state) {
 					case ST:
 						i2cptr->D = buffer.reg;
@@ -232,21 +229,21 @@ void i2cISR_HANDLER() {
 						break;
 					case DATA:
 						if (buffer.dir == I2C_READ) {
-							i2cptr->C1 &= ~I2C_C1_TX_MASK;		//RX
-							if (buffer.data_size == 1) {
-								i2cptr->C1 |= I2C_C1_TXAK_MASK;			//NAK
+							i2cptr->C1 &= ~I2C_C1_TX_MASK;			//RX
+							if (buffer.size == 1) {
+								i2cptr->C1 |= I2C_C1_TXAK_MASK;		//NAK
 							}
 							/*
 							 uint8_t tuvi = i2cptr->D;
 							 tuvi++;
 							 */
 						} else {
-							if (buffer.data_size == 0) {
+							if (buffer.size == 0) {
 								i2cptr->C1 &= ~I2C_C1_MST_MASK;		//Send stop
 							} else {
 								i2cptr->D = *buffer.data;
 								buffer.data++;
-								buffer.data_size--;
+								buffer.size--;
 							}
 						}
 
@@ -256,17 +253,20 @@ void i2cISR_HANDLER() {
 					default:
 						break;
 					}
+				} else {
+					i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
+					buffer.finish = true;
 				}
 			} else {
 
-				if ((buffer.state == DATA) && (buffer.data_size == 1)) {
-					i2cptr->C1 &= ~I2C_C1_MST_MASK;		//Send stop
-				} else if ((buffer.state == DATA) && (buffer.data_size == 2)) {
+				if ((buffer.state == DATA) && (buffer.size == 1)) {
+					i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
+				} else if ((buffer.state == DATA) && (buffer.size == 2)) {
 					i2cptr->C1 |= I2C_C1_TXAK_MASK;			//NAK
 				}
 				*buffer.data = i2cptr->D;
 				buffer.data++;
-				buffer.data_size--;
+				buffer.size--;
 			}
 		}
 	}
