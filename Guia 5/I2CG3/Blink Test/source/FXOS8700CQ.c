@@ -26,8 +26,8 @@
 /*******************************************************************************
  CALLBACK DECLARATIONS
  ******************************************************************************/
-static void callback_init(void);
-static void callback_read(void);
+void callback_init(void);
+void callback_read(void);
 /*******************************************************************************
  GLOBAL VARIABLE DECLARATIONS
  ******************************************************************************/
@@ -143,11 +143,11 @@ void ReadAccelMagnData(read_data *data) {
 /*******************************************************************************
  CALLBACK DEFINITION
  ******************************************************************************/
-static void callback_init(void) {
+void callback_init(void) {
 	i2c_finished = true;
 }
 
-static void callback_read(void) {
+void callback_read(void) {
 	if (i2cStatus() == I2C_NO_FAULT) {
 		r_data->pAccelData->x = (int16_t) (((Buffer[1] << 8) | Buffer[2])) >> 2;
 		r_data->pAccelData->y = (int16_t) (((Buffer[3] << 8) | Buffer[4])) >> 2;

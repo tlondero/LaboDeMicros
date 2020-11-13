@@ -8,6 +8,7 @@
 #include "header/i2c.h"
 #include "header/gpio.h"
 #include "MK64F12.h"
+#include <stddef.h>
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -77,7 +78,9 @@ void I2CHandler(void) {
 
 		buffer.count = 0;
 		buffer.finish = true;
-		callback();
+		if(callback != NULL){
+			callback();
+		}
 	} else {
 
 		if (i2cptr->FLT & I2C_FLT_STARTF_MASK) {			//Start flag
@@ -164,6 +167,8 @@ void I2CHandler(void) {
 bool i2cInit(ic2_channel_t chan) {
 	if ((chan < I2C_COUNT) && (isInit == false)) {
 
+		callback = NULL;
+
 		I2C_Type *i2cPeriphPtr[] = I2C_BASE_PTRS;
 		SIM_Type *sim = SIM_BASE_PTRS;		//SIM;
 		uint8_t mux = 5;
@@ -213,6 +218,21 @@ bool i2cInit(ic2_channel_t chan) {
 			break;
 		}
 
+		i2cptr->C1 = 0;
+		i2cptr->C1 |= I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;	//module on
+		i2cptr->FLT |= I2C_FLT_SSIE_MASK;					//startf stopf on
+		i2cptr->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;			//interrupt on
+
+		i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_MST_MASK;			//Control Register 1 to enable TX and MST
+
+		//baudrate
+		i2cptr->F = I2C_F_ICR(5) | I2C_F_MULT(2);
+		//I2C_F_MULT(0) | I2C_F_ICR(0x09);
+		//I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
+
+		NVIC_EnableIRQ(I2CIRQS_[chan]);
+		//NVIC_EnableIRQ(I2C0_IRQn);
+
 		PORT_Type *portptr[] = PORT_BASE_PTRS;
 
 		//Set Mux
@@ -241,19 +261,6 @@ bool i2cInit(ic2_channel_t chan) {
 		(portptr[sdaptr]->PCR)[sdaPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
 		(portptr[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
 
-		//baudrate
-		i2cptr->F = I2C_F_ICR(5) | I2C_F_MULT(2);
-		//I2C_F_MULT(0) | I2C_F_ICR(0x09);
-		//I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
-
-		NVIC_EnableIRQ(I2CIRQS_[chan]);
-		//NVIC_EnableIRQ(I2C0_IRQn);
-
-		i2cptr->C1 = 0;
-		i2cptr->C1 = I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;		//module on
-		i2cptr->FLT |= I2C_FLT_SSIE_MASK;					//startf stopf on
-		i2cptr->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;			//interrupt on
-
 		isInit = true;
 	}
 
@@ -281,6 +288,8 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 		i2cptr->C1 |= I2C_C1_MST_MASK;
 
 		valid = true;
+	} else {
+		__asm("BKPT #0");
 	}
 
 	return valid;
