@@ -27,8 +27,7 @@ typedef void (* callbackptr) (void);
 
 typedef enum { I2C_ERROR,  I2C_OK} I2C_FAIL;
 
-typedef struct
-{
+typedef struct{
 	SRAWDATA * pMagnData;
 	SRAWDATA * pAccelData;
 	callbackptr callback;

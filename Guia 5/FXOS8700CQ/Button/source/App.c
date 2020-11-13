@@ -16,6 +16,7 @@
 #include "header/gpio.h"
 #include "MK64F12.h"
 #include "header/board.h"
+#include "header/FXOS8700CQ.h"
 #include "timer.h"
 #include "hardware.h"
 /*******************************************************************************
@@ -50,14 +51,23 @@ static int8_t bt1;
 static bool free_running=true;
 
 void App_Init(void) {
-	UartTBInit();
+	//UartTBInit();
+	_mqx_ints_FXOS8700CQ_start();
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
 
-
+read_data data;
 void App_Run(void) {
-	UartTB2();
+	//UartTB2();
+	SRAWDATA * pAccdata;
+	SRAWDATA * pmagnData;
+	static uint16_t i=0;
+	ReadAccelMagnData(&data);
+	if(i++==32){
+		pAccdata = data.pAccelData;
+		pmagnData = data.pMagnData;
+	}
 }
 void UartTBInit(void){
 	uart_cfg_t init_config;

@@ -6,20 +6,26 @@
  */
 
 #include "header/i2c.h"
+#include "header/gpio.h"
+#include "MK64F12.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
+
+/*
 #define DEBUG 1
 
-#if define(DEBUG)
+#if (DEBUG)
 	#define assert(x)
 		if(x) {
 			__asm("bkpt #0");
 		}
+
 #else
 #define assert(x) do {} while(0);
 #endif
+*/
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -48,6 +54,7 @@ callbackptr callback;
 static bool isInit = false;
 static I2C_Type *i2cptr;
 static i2c_buffer_t buffer;
+uint8_t I2CIRQS_[]= I2C_IRQS;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE
@@ -116,35 +123,33 @@ bool i2cInit(ic2_channel_t chan) {
 		PORT_Type *portptr[] = PORT_BASE_PTRS;
 
 		//Set Mux
-		(portPointers[sdaptr]->PCR)[sdaPinum] &= ~PORT_PCR_MUX_MASK;
-		(portPointers[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_MUX(mux);
+		(portptr[sdaptr]->PCR)[sdaPinum] &= ~PORT_PCR_MUX_MASK;
+		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_MUX(mux);
 
-		(portPointers[sclptr]->PCR)[sclPinum] &= ~PORT_PCR_MUX_MASK;
-		(portPointers[sclptr]->PCR)[sclPinum] |= PORT_PCR_MUX(mux);
+		(portptr[sclptr]->PCR)[sclPinum] &= ~PORT_PCR_MUX_MASK;
+		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_MUX(mux);
 
 		//Disable int
-		(portPointers[sdaptr]->PCR)[sdaPinum] &= ~PORT_PCR_IRQC_MASK;
-		(portPointers[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_IRQC(
-				IRQ_MODE_DISABLE);
+		(portptr[sdaptr]->PCR)[sdaPinum] &= ~PORT_PCR_IRQC_MASK;
+		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
 
-		(portPointers[sclptr]->PCR)[sclPinum] &= ~PORT_PCR_IRQC_MASK;
-		(portPointers[sclptr]->PCR)[sclPinum] |= PORT_PCR_IRQC(
-				IRQ_MODE_DISABLE);
+		(portptr[sclptr]->PCR)[sclPinum] &= ~PORT_PCR_IRQC_MASK;
+		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
 
 		//Set open drain
-		(portPointers[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_ODE_MASK;
-		(portPointers[sclptr]->PCR)[sclPinum] |= PORT_PCR_ODE_MASK;
+		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_ODE_MASK;
+		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_ODE_MASK;
 
-		(portPointers[sdaptr]->PCR)[sdaPinum] |= (HIGH << PORT_PCR_PE_SHIFT);
-		(portPointers[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PE_SHIFT);
+		(portptr[sdaptr]->PCR)[sdaPinum] |= (HIGH << PORT_PCR_PE_SHIFT);
+		(portptr[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PE_SHIFT);
 
-		(portPointers[sdaptr]->PCR)[sdaPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
-		(portPointers[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
+		(portptr[sdaptr]->PCR)[sdaPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
+		(portptr[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
 
 		//baudrate
 		i2cptr->F = I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
 
-		NVIC_EnableIRQ(I2C_IRQS[chan]);
+		NVIC_EnableIRQ(I2CIRQS_[chan]);
 
 		i2cptr->C1 = 0;
 		i2cptr->C1 = I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;	//module on
@@ -158,7 +163,7 @@ bool i2cInit(ic2_channel_t chan) {
 }
 
 bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
-		i2c_mode_t mode_, callbackPtr callback_) {
+		i2c_mode_t mode_, callbackptr callback_) {
 
 	bool valid = false;
 
@@ -183,13 +188,13 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 	return valid;
 }
 
-I2C_FAULT i2cStatus(void){
+I2C_FAULT i2cStatus(void) {
 
 	I2C_FAULT currentState = I2C_NO_FAULT;
 
-	if (i2cptr->S & I2C_S_BUSY_MASK){			//Busy bus
+	if (i2cptr->S & I2C_S_BUSY_MASK) {			//Busy bus
 		currentState = I2C_BUS_BUSY;
-	// } else if ((i2cptr->SMB & I2C_SMB_SHTF1_MASK) || (i2cptr->SMB & I2C_SMB_SHTF2_MASK)) {		//REVISAR
+		// } else if ((i2cptr->SMB & I2C_SMB_SHTF1_MASK) || (i2cptr->SMB & I2C_SMB_SHTF2_MASK)) {		//REVISAR
 	} else if (i2cptr->SMB & I2C_SMB_SHTF2_MASK) {
 		currentState = I2C_TIMEOUT;
 	} else if (i2cptr->S & I2C_S_ARBL_MASK) {		//REVISAR
@@ -200,7 +205,7 @@ I2C_FAULT i2cStatus(void){
 
 }
 
-void I2C0_IRQHandler() {
+void I2CHandler(void) {
 
 	if (i2cptr->FLT & I2C_FLT_STOPF_MASK) {		//Stop flag
 		i2cptr->FLT |= I2C_FLT_STOPF_MASK;		//Clear stop
@@ -234,29 +239,29 @@ void I2C0_IRQHandler() {
 					switch (buffer.state) {
 					case ST:
 						i2cptr->D = buffer.reg;
-						if (buffer.dir == I2C_READ) {
+						if (buffer.mode == I2C_READ) {
 							buffer.state = SR;
 						} else {
 							buffer.state = DATA;
 						}
 						break;
 					case SR:
-						if (buffer.dir == I2C_READ) {
+						if (buffer.mode == I2C_READ) {
 							i2cptr->C1 |= I2C_C1_TX_MASK;
 							i2cptr->C1 |= I2C_C1_RSTA_MASK;
 							buffer.state = DATA;
 						}
 						break;
 					case DATA:
-						if (buffer.dir == I2C_READ) {
+						if (buffer.mode == I2C_READ) {
 							i2cptr->C1 &= ~I2C_C1_TX_MASK;			//RX
 							if (buffer.size == 1) {
 								i2cptr->C1 |= I2C_C1_TXAK_MASK;		//NAK
 							}
 							/*
-							uint8_t tuvi = i2cptr->D;
-							tuvi++;
-							*/
+							 uint8_t tuvi = i2cptr->D;
+							 tuvi++;
+							 */
 						} else {
 							if (buffer.size == 0) {
 								i2cptr->C1 &= ~I2C_C1_MST_MASK;		//Send stop
@@ -289,6 +294,17 @@ void I2C0_IRQHandler() {
 	}
 }
 
+void I2C0_IRQHandler(void){
+	I2CHandler();
+}
+
+void I2C1_IRQHandler(void){
+	I2CHandler();
+}
+
+void I2C2_IRQHandler(void){
+	I2CHandler();
+}
 /*
  void i2cISR_HANDLER() {
  uint32_t flags = I2C->SR;
