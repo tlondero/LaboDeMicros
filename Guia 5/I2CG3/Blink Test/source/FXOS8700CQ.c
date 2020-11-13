@@ -60,11 +60,8 @@ I2C_FAIL _mqx_ints_FXOS8700CQ_start(void) {
 	i2c_finished = false;
 	i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_CTRL_REG1, &databyte, 1,
 			I2C_WRITE, callback_init);
-	while (i2c_finished == false) {
-		if (i2cStatus() != I2C_NO_FAULT) {
-			return (I2C_ERROR);
-		}
-	}
+	while (i2c_finished == false)
+		;
 	// write 0001 1111 = 0x1F to magnetometer control register 1
 	// [7]: m_acal=0: auto calibration disabled
 	// [6]: m_rst=0: no one-shot magnetic reset
@@ -75,12 +72,8 @@ I2C_FAIL _mqx_ints_FXOS8700CQ_start(void) {
 	i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_M_CTRL_REG1, &databyte, 1,
 			I2C_WRITE, callback_init);
 	i2c_finished = false;
-	while (i2c_finished == false) {
-		if (i2cStatus() != I2C_NO_FAULT) {
-			return (I2C_ERROR);
-		}
-	}
-
+	while (i2c_finished == false)
+		;
 	// write 0010 0000 = 0x20 to magnetometer control register 2
 	// [7]: reserved
 	// [6]: reserved
@@ -94,11 +87,8 @@ I2C_FAIL _mqx_ints_FXOS8700CQ_start(void) {
 	i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_M_CTRL_REG2, &databyte, 1,
 			I2C_WRITE, callback_init);
 	i2c_finished = false;
-	while (i2c_finished == false) {
-		if (i2cStatus() != I2C_NO_FAULT) {
-			return (I2C_ERROR);
-		}
-	}
+	while (i2c_finished == false)
+		;
 
 	// write 0000 0001= 0x01 to XYZ_DATA_CFG register
 	// [7]: reserved
@@ -112,12 +102,8 @@ I2C_FAIL _mqx_ints_FXOS8700CQ_start(void) {
 	i2c_finished = false;
 	i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_XYZ_DATA_CFG, &databyte, 1,
 			I2C_WRITE, callback_init);
-	while (i2c_finished == false) {
-		if (i2cStatus() != I2C_NO_FAULT) {
-			return (I2C_ERROR);
-		}
-	}
-
+	while (i2c_finished == false)
+		;
 	// write 0000 1101 = 0x0D to accelerometer control register 1
 	// [7-6]: aslp_rate=00
 	// [5-3]: dr=001 for 200Hz data rate (when in hybrid mode)
@@ -128,17 +114,14 @@ I2C_FAIL _mqx_ints_FXOS8700CQ_start(void) {
 	i2c_finished = false;
 	i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_CTRL_REG1, &databyte, 1,
 			I2C_WRITE, callback_init);
-	while (i2c_finished == false) {
-		if (i2cStatus() != I2C_NO_FAULT) {
-			return (I2C_ERROR);
-		}
-	}
+	while (i2c_finished == false)
+		;
 	return (I2C_OK);
 }
 void ReadAccelMagnData(read_data *data) {
 	r_data = data;
 	i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_STATUS, Buffer,
-			FXOS8700CQ_READ_LEN, I2C_READ, callback_read);
+	FXOS8700CQ_READ_LEN, I2C_READ, callback_read);
 }
 /*******************************************************************************
  CALLBACK DEFINITION
@@ -158,8 +141,6 @@ void callback_read(void) {
 		r_data->pMagnData->z = (int16_t) (Buffer[11] << 8) | Buffer[12];
 		r_data->error = I2C_OK;
 		r_data->callback();
-	} else {
-		r_data->error = I2C_ERROR;
 	}
 }
 
