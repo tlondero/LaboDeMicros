@@ -291,10 +291,6 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 	} else {
 		__asm("BKPT #0");
 	}
-	else {
-		__asm("BKPT #0");
-		//esta colgado el i2c
-	}
 
 	return valid;
 }
