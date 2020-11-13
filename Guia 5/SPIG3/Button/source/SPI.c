@@ -47,7 +47,8 @@ void init_spi_pin(pin_t pin)
     SIM->SCGC5 |= simMasks[PIN2PORT(pin)];
     PORT_Type *port = portPtrs[PIN2PORT(pin)];
     port->PCR[PIN2NUM(pin)] = 0x00;
-    port->PCR[PIN2NUM(pin)] |= PORT_PCR_MUX(SPI_MUX);
+    port->PCR[PIN2NUM(pin)] = PORT_PCR_MUX(SPI_MUX)
+    						|PORT_PCR_DSE(1);
 }
 
 /*******************************************************************************
@@ -119,7 +120,7 @@ uint8_t spi_transaction(uint8_t * data_ptr, uint8_t len, uint8_t * recieve_ptr){
 		SPI0->MCR |= SPI_MCR_HALT(1);	//Halt transfers
 		SPI0->SR |= SPI_SR_TCF(1); 		//TCF reset
 		SPI0->PUSHR = pushr_data;		//Write to PUSHR
-		SPI0->MCR |= SPI_MCR_HALT(0);	//Start transfers
+		SPI0->MCR &= ~SPI_MCR_HALT(1);	//Start transfers
 
 		while(!(SPI0->SR & SPI_SR_TCF_MASK)){
 			//Wait until transfer is done
