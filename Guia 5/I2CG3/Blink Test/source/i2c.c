@@ -246,8 +246,8 @@ bool i2cInit(ic2_channel_t chan) {
 		//I2C_F_MULT(0) | I2C_F_ICR(0x09);
 		//I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
 
-		//NVIC_EnableIRQ(I2CIRQS_[chan]);
-		NVIC_EnableIRQ(I2C0_IRQn);
+		NVIC_EnableIRQ(I2CIRQS_[chan]);
+		//NVIC_EnableIRQ(I2C0_IRQn);
 
 		i2cptr->C1 = 0;
 		i2cptr->C1 = I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;		//module on
