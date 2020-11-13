@@ -43,21 +43,31 @@
  ******************************************************************************/
 
 //static void update_baliza(int period);
-void I2CRun(void);
+uint8_t slave;
+uint8_t reg;
+uint8_t *data;
+uint8_t size;
+i2c_mode_t mode;
+callbackptr cback;
+bool todoPiola;
 
-
-void App_Init(void) {
+void I2CInit_tb(void) {
 	i2cInit(I2C_0);
+	todoPiola = false;
+	slave = 0;
+	reg = 0;
+	data = 0;
+	size = 8;
+	mode = I2C_WRITE;
+	cback = NULL;
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
 
-
-void App_Run(void) {
-	I2CRun();
-}
-
-void I2CRun(void){
-
+void I2CRun_tb(void) {
+	todoPiola = i2cTransaction(slave, reg, data, size, mode, cback);
+	if (todoPiola) {
+		uint8_t a = 0;
+	}
 }
 
