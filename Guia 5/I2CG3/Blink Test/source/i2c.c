@@ -16,7 +16,7 @@
 /*
 #define DEBUG 1
 
-#ifndef  DEBUG
+#if (DEBUG)
 	#define assert(x)
 		if(x) {
 			__asm("bkpt #0");
@@ -54,6 +54,7 @@ callbackptr callback;
 static bool isInit = false;
 static I2C_Type *i2cptr;
 static i2c_buffer_t buffer;
+uint8_t I2CIRQS_[]= I2C_IRQS;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE
@@ -130,10 +131,10 @@ bool i2cInit(ic2_channel_t chan) {
 
 		//Disable int
 		(portptr[sdaptr]->PCR)[sdaPinum] &= ~PORT_PCR_IRQC_MASK;
-		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_IRQC(IRQ_MODE_DISABLE);
+		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
 
 		(portptr[sclptr]->PCR)[sclPinum] &= ~PORT_PCR_IRQC_MASK;
-		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_IRQC(IRQ_MODE_DISABLE);
+		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
 
 		//Set open drain
 		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_ODE_MASK;
@@ -148,7 +149,7 @@ bool i2cInit(ic2_channel_t chan) {
 		//baudrate
 		i2cptr->F = I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
 
-		NVIC_EnableIRQ(I2C_IRQS[chan]);
+		NVIC_EnableIRQ(I2CIRQS_[chan]);
 
 		i2cptr->C1 = 0;
 		i2cptr->C1 = I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;	//module on
