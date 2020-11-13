@@ -8,15 +8,13 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-//#include <header/ejercicios_headers/BalizaSwitchSysTick/balizaSwitchSysTick.h>
-//#include "header/ejercicios_headers/Baliza/baliza.h"
-//#include "header/ejercicios_headers/BalizaSysTick/balizast.h"
+
 #include "header/Button.h"
-//#include "header/uart.h"
 #include "header/i2c.h"
 #include "header/gpio.h"
 #include "MK64F12.h"
 #include "header/board.h"
+#include "header/FXOS8700CQ.h"
 #include "timer.h"
 #include "hardware.h"
 /*******************************************************************************
@@ -42,32 +40,42 @@
  * BALIZA
  ******************************************************************************/
 
-//static void update_baliza(int period);
 uint8_t slave;
 uint8_t reg;
 uint8_t *data;
 uint8_t size;
 i2c_mode_t mode;
-callbackptr cback;
 bool todoPiola;
+bool todoPiola2;
+
+static void cback(void){
+	todoPiola2 = !todoPiola2;
+}
 
 void I2CInit_tb(void) {
+
+	_mqx_ints_FXOS8700CQ_start();
+
+	/*
 	i2cInit(I2C_0);
 	todoPiola = false;
-	slave = 0;
-	reg = 0;
+	todoPiola2 = false;
+	slave = 0x1d;
+	reg = 0x0d;
 	data = 0;
-	size = 8;
-	mode = I2C_WRITE;
-	cback = NULL;
+	size = 1;
+	mode = I2C_READ;
+	*/
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
 
 void I2CRun_tb(void) {
+	ReadAccelMagnData(data);
+	/*
 	todoPiola = i2cTransaction(slave, reg, data, size, mode, cback);
 	if (todoPiola) {
 		uint8_t a = 0;
-	}
+	}*/
 }
 
