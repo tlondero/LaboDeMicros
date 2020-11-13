@@ -57,13 +57,16 @@ void App_Init(void) {
 
 /* Función que se llama constantemente en un ciclo infinito */
 
-read_data data[1000];
+read_data data;
 void App_Run(void) {
 	//UartTB2();
-	static int i=0;
-	ReadAccelMagnData(data);
+	SRAWDATA * pAccdata;
+	SRAWDATA * pmagnData;
+	static uint16_t i=0;
+	ReadAccelMagnData(&data);
 	if(i++==32){
-		i=34;
+		pAccdata = data.pAccelData;
+		pmagnData = data.pMagnData;
 	}
 }
 void UartTBInit(void){
