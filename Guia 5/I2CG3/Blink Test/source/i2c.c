@@ -14,18 +14,18 @@
  ******************************************************************************/
 
 /*
-#define DEBUG 1
+ #define DEBUG 1
 
-#if (DEBUG)
-	#define assert(x)
-		if(x) {
-			__asm("bkpt #0");
-		}
+ #if (DEBUG)
+ #define assert(x)
+ if(x) {
+ __asm("bkpt #0");
+ }
 
-#else
-#define assert(x) do {} while(0);
-#endif
-*/
+ #else
+ #define assert(x) do {} while(0);
+ #endif
+ */
 
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
@@ -54,7 +54,7 @@ callbackptr callback;
 static bool isInit = false;
 static I2C_Type *i2cptr;
 static i2c_buffer_t buffer;
-uint8_t I2CIRQS_[]= I2C_IRQS;
+uint8_t I2CIRQS_[] = I2C_IRQS;
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH LOCAL SCOPE
@@ -224,10 +224,12 @@ bool i2cInit(ic2_channel_t chan) {
 
 		//Disable int
 		(portptr[sdaptr]->PCR)[sdaPinum] &= ~PORT_PCR_IRQC_MASK;
-		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
+		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_IRQC(
+				GPIO_IRQ_MODE_DISABLE);
 
 		(portptr[sclptr]->PCR)[sclPinum] &= ~PORT_PCR_IRQC_MASK;
-		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
+		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_IRQC(
+				GPIO_IRQ_MODE_DISABLE);
 
 		//Set open drain
 		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_ODE_MASK;
@@ -240,15 +242,16 @@ bool i2cInit(ic2_channel_t chan) {
 		(portptr[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
 
 		//baudrate
-		i2cptr->F = I2C_F_MULT(0) | I2C_F_ICR(0x09);
-					//I2C_F_ICR(5) | I2C_F_MULT(2);
-					//I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
+		i2cptr->F = I2C_F_ICR(5) | I2C_F_MULT(2);
+		//I2C_F_MULT(0) | I2C_F_ICR(0x09);
+		//I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
 
-		NVIC_EnableIRQ(I2CIRQS_[chan]);
+		//NVIC_EnableIRQ(I2CIRQS_[chan]);
+		NVIC_EnableIRQ(I2C0_IRQn);
 
 		i2cptr->C1 = 0;
 		i2cptr->C1 = I2C_C1_IICIE_MASK | I2C_C1_IICEN_MASK;		//module on
-		i2cptr->FLT |= I2C_FLT_SSIE_MASK;						//startf stopf on
+		i2cptr->FLT |= I2C_FLT_SSIE_MASK;					//startf stopf on
 		i2cptr->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;			//interrupt on
 
 		isInit = true;
@@ -300,15 +303,15 @@ I2C_FAULT i2cStatus(void) {
 
 }
 
-void I2C0_IRQHandler(void){
+void I2C0_IRQHandler(void) {
 	I2CHandler();
 }
 
-void I2C1_IRQHandler(void){
+void I2C1_IRQHandler(void) {
 	I2CHandler();
 }
 
-void I2C2_IRQHandler(void){
+void I2C2_IRQHandler(void) {
 	I2CHandler();
 }
 /*
