@@ -205,7 +205,7 @@ I2C_FAULT i2cStatus(void) {
 
 }
 
-void I2C0_IRQHandler() {
+void I2CHandler(void) {
 
 	if (i2cptr->FLT & I2C_FLT_STOPF_MASK) {		//Stop flag
 		i2cptr->FLT |= I2C_FLT_STOPF_MASK;		//Clear stop
@@ -294,6 +294,17 @@ void I2C0_IRQHandler() {
 	}
 }
 
+void I2C0_IRQHandler(void){
+	I2CHandler();
+}
+
+void I2C1_IRQHandler(void){
+	I2CHandler();
+}
+
+void I2C2_IRQHandler(void){
+	I2CHandler();
+}
 /*
  void i2cISR_HANDLER() {
  uint32_t flags = I2C->SR;
