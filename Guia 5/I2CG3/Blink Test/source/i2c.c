@@ -53,6 +53,7 @@ typedef struct {
 
 callbackptr callback;
 static bool isInit = false;
+//bool isFirstTime;
 static I2C_Type *i2cptr;
 static i2c_buffer_t buffer;
 uint8_t I2CIRQS_[] = I2C_IRQS;
@@ -68,7 +69,6 @@ void I2CHandler(void);
  ******************************************************************************/
 
 void I2CHandler(void) {
-
 	i2cptr->S |= I2C_S_IICIF_MASK;
 
 	if (i2cptr->FLT & I2C_FLT_STOPF_MASK) {		//Stop flag
@@ -168,18 +168,21 @@ bool i2cInit(ic2_channel_t chan) {
 	if ((chan < I2C_COUNT) && (isInit == false)) {
 
 		callback = NULL;
+		//isFirstTime = true;
 
 		I2C_Type *i2cPeriphPtr[] = I2C_BASE_PTRS;
+		i2cptr = i2cPeriphPtr[chan];
+
 		SIM_Type *sim = SIM_BASE_PTRS;		//SIM;
 		uint8_t mux = 5;
 
-		i2cptr = i2cPeriphPtr[chan];
+		PORT_Type *portptr[] = PORT_BASE_PTRS;
 
-		uint8_t sdaptr;
-		uint8_t sdaPinum;
+		PORT_Type *sdaPtr;
+		uint8_t sdaPin;
 
-		uint8_t sclptr;
-		uint8_t sclPinum;
+		PORT_Type *sclPtr;
+		uint8_t sclPin;
 
 		//Clk gating
 		switch (chan) {
@@ -187,10 +190,10 @@ bool i2cInit(ic2_channel_t chan) {
 			sim->SCGC4 |= SIM_SCGC4_I2C0_MASK;
 			sim->SCGC5 |= SIM_SCGC5_PORTE_MASK;
 
-			sdaptr = PE;
-			sdaPinum = 25;
-			sclptr = PE;
-			sclPinum = 24;
+			sdaPtr = portptr[PE];
+			sdaPin = 25;
+			sclPtr = portptr[PE];
+			sclPin = 24;
 
 			break;
 		case I2C_1:
@@ -198,69 +201,65 @@ bool i2cInit(ic2_channel_t chan) {
 			sim->SCGC5 |= SIM_SCGC5_PORTC_MASK;
 			mux = 1;
 
-			sdaptr = PC;
-			sdaPinum = 11;
-			sclptr = PC;
-			sclPinum = 10;
+			sdaPtr = portptr[PC];
+			sdaPin = 11;
+			sclPtr = portptr[PC];
+			sclPin = 10;
 
 			break;
 		case I2C_2:
 			sim->SCGC1 |= SIM_SCGC1_I2C2_MASK;
 			sim->SCGC5 |= SIM_SCGC5_PORTA_MASK;
 
-			sdaptr = PA;
-			sdaPinum = 13;
-			sclptr = PA;
-			sclPinum = 14;
+			sdaPtr = portptr[PA];
+			sdaPin = 13;
+			sclPtr = portptr[PA];
+			sclPin = 14;
 
 			break;
 		default:
 			break;
 		}
 
+		//baudrate
+		i2cptr->F = I2C_F_ICR(0x3F) | I2C_F_MULT(4);
+		//I2C_F_ICR(0x35) | I2C_F_MULT(2);
+		//I2C_F_MULT(0) | I2C_F_ICR(0x09);
+		//I2C_F_ICR(5) | I2C_F_MULT(2);
+
 		i2cptr->C1 = 0;
 		i2cptr->C1 |= I2C_C1_IICEN_MASK;
 		i2cptr->C1 |= I2C_C1_IICIE_MASK;	//module on
-		i2cptr->FLT |= I2C_FLT_SSIE_MASK;					//startf stopf on
+		//i2cptr->FLT |= I2C_FLT_SSIE_MASK;					//startf stopf on
 		i2cptr->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;			//interrupt on
 
-		i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_MST_MASK;			//Control Register 1 to enable TX and MST
-		//i2cptr->C1 |= I2C_C1_MST_MASK;
-
-		//baudrate
-		i2cptr->F = I2C_F_MULT(0) | I2C_F_ICR(0x09);
-		//I2C_F_ICR(5) | I2C_F_MULT(2);
-		//I2C_F_ICR(0x35) | I2C_F_MULT(0b10);
+		//i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_MST_MASK;			//Control Register 1 to enable TX and MST
 
 		NVIC_EnableIRQ(I2CIRQS_[chan]);
 
-		PORT_Type *portptr[] = PORT_BASE_PTRS;
-
 		//Set Mux
-		(portptr[sdaptr]->PCR)[sdaPinum] &= ~PORT_PCR_MUX_MASK;
-		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_MUX(mux);
+		//(sdaPtr->PCR)[sdaPin] &= ~PORT_PCR_MUX_MASK;
+		(sdaPtr->PCR)[sdaPin] |= PORT_PCR_MUX(mux);					//la posta
 		//Disable int
-		(portptr[sdaptr]->PCR)[sdaPinum] &= ~PORT_PCR_IRQC_MASK;
-		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_IRQC(
-				GPIO_IRQ_MODE_DISABLE);
+		//(sdaPtr->PCR)[sdaPin] &= ~PORT_PCR_IRQC_MASK;
+		//(sdaPtr->PCR)[sdaPin] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
 		//Set open drain
-		(portptr[sdaptr]->PCR)[sdaPinum] |= PORT_PCR_ODE_MASK;
-		(portptr[sdaptr]->PCR)[sdaPinum] |= (HIGH << PORT_PCR_PE_SHIFT);
-		(portptr[sdaptr]->PCR)[sdaPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
+		(sdaPtr->PCR)[sdaPin] |= PORT_PCR_ODE_MASK;					//la posta
+		//(sdaPtr->PCR)[sdaPin] |= (HIGH << PORT_PCR_PE_SHIFT);
+		//(sdaPtr->PCR)[sdaPin] |= (HIGH << PORT_PCR_PS_SHIFT);
 
+		//(sclPtr->PCR)[sclPin] &= ~PORT_PCR_MUX_MASK;
+		(sclPtr->PCR)[sclPin] |= PORT_PCR_MUX(mux);
 
-		(portptr[sclptr]->PCR)[sclPinum] &= ~PORT_PCR_MUX_MASK;
-		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_MUX(mux);
+		//(sclPtr->PCR)[sclPin] &= ~PORT_PCR_IRQC_MASK;
+		//(sclPtr->PCR)[sclPin] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
 
-		(portptr[sclptr]->PCR)[sclPinum] &= ~PORT_PCR_IRQC_MASK;
-		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_IRQC(
-				GPIO_IRQ_MODE_DISABLE);
-
-		(portptr[sclptr]->PCR)[sclPinum] |= PORT_PCR_ODE_MASK;
-		(portptr[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PE_SHIFT);
-		(portptr[sclptr]->PCR)[sclPinum] |= (HIGH << PORT_PCR_PS_SHIFT);
+		(sclPtr->PCR)[sclPin] |= PORT_PCR_ODE_MASK;
+		//(sclPtr->PCR)[sclPin] |= (HIGH << PORT_PCR_PE_SHIFT);
+		//(sclPtr->PCR)[sclPin] |= (HIGH << PORT_PCR_PS_SHIFT);
 
 		isInit = true;
+
 	}
 
 	return isInit;
@@ -272,6 +271,14 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 	bool valid = false;
 
 	if (!(i2cptr->S & I2C_S_BUSY_MASK)) {
+
+		/*
+		 if (isFirstTime) {
+		 isFirstTime = false;
+		 i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_MST_MASK;
+		 }
+		 */
+
 		buffer.finish = false;
 		buffer.mode = mode_;
 		buffer.state = SR;
@@ -288,7 +295,7 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 
 		valid = true;
 	} else {
-		__asm("BKPT #0");
+		//__asm("BKPT #0");
 		//i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
 	}
 
@@ -323,6 +330,7 @@ void I2C1_IRQHandler(void) {
 void I2C2_IRQHandler(void) {
 	I2CHandler();
 }
+
 /*
  void i2cISR_HANDLER() {
  uint32_t flags = I2C->SR;

@@ -43,13 +43,13 @@ I2C_FAIL _mqx_ints_FXOS8700CQ_start(void) {
 	bool trans_ok = i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_WHOAMI,
 			&databyte, 1, I2C_READ, callback_init);
 
-	if (trans_ok) {
-	}
-	while (i2c_finished == false) {
-		/*
-		 if (i2cStatus() != I2C_NO_FAULT) {
-		 return (I2C_ERROR);
-		 }*/
+	if (!trans_ok) {
+		while (i2c_finished == false) {
+			/*
+			 if (i2cStatus() != I2C_NO_FAULT) {
+			 return (I2C_ERROR);
+			 }*/
+		}
 	}
 
 	if (databyte != FXOS8700CQ_WHOAMI_VAL) {
