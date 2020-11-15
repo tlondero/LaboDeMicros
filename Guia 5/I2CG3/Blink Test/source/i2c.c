@@ -53,7 +53,6 @@ typedef struct {
 
 callbackptr callback;
 static bool isInit = false;
-//bool isFirstTime;
 static I2C_Type *i2cptr;
 static i2c_buffer_t buffer;
 uint8_t I2CIRQS_[] = I2C_IRQS;
@@ -171,7 +170,6 @@ bool i2cInit(ic2_channel_t chan) {
 	if ((chan < I2C_COUNT) && (isInit == false)) {
 
 		callback = NULL;
-		//isFirstTime = true;
 
 		I2C_Type *i2cPeriphPtr[] = I2C_BASE_PTRS;
 		i2cptr = i2cPeriphPtr[chan];
@@ -275,13 +273,6 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 
 	if (!(i2cptr->S & I2C_S_BUSY_MASK)) {
 
-		/*
-		 if (isFirstTime) {
-		 isFirstTime = false;
-		 i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_MST_MASK;
-		 }
-		 */
-
 		buffer.finish = false;
 		buffer.mode = mode_;
 		buffer.state = SR;
@@ -298,6 +289,7 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 
 		valid = true;
 	} else {
+		callback = NULL;
 		__asm("BKPT #0");
 		//i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
 	}
