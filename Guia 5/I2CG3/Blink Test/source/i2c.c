@@ -90,75 +90,78 @@ void I2CHandler(void) {
 
 			buffer.count++;
 			if (buffer.count == 1) {
-				i2cptr->D = buffer.slave << 1 | 0;
+				i2cptr->D = buffer.slave << 1;
+				return;
 			} else {
 				i2cptr->D = buffer.slave << 1 | 1;
+				return;
+			}
+
+		} else {
+			i2cptr->S |= I2C_S_IICIF_MASK;					//Clear interrupt
+		}
+
+		if ((i2cptr->C1 & I2C_C1_TX_MASK) == I2C_C1_TX_MASK) {	//TX
+
+			if (!(~(i2cptr->S & I2C_S_RXAK_MASK))) {	//Not receive AK
+				i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
+				buffer.finish = true;
+				return;
+			}
+
+			switch (buffer.state) {
+			case ST:
+				i2cptr->D = buffer.reg;
+				if (buffer.mode == I2C_READ) {
+					buffer.state = SR;
+				} else {
+					buffer.state = DATA;
+				}
+				break;
+			case SR:
+				if (buffer.mode == I2C_READ) {
+					i2cptr->C1 |= I2C_C1_TX_MASK;
+					i2cptr->C1 |= I2C_C1_RSTA_MASK;
+					buffer.state = DATA;
+					return;
+				}
+				break;
+			case DATA:
+				if (buffer.mode == I2C_READ) {
+					i2cptr->C1 &= ~I2C_C1_TX_MASK;			//RX
+					if (buffer.size == 1) {
+						i2cptr->C1 |= I2C_C1_TXAK_MASK;		//NAK
+					}
+					uint8_t dummyRread = i2cptr->D;
+					dummyRread++;
+				} else {
+					if (buffer.size == 0) {
+						i2cptr->C1 &= ~I2C_C1_MST_MASK;		//Send stop
+						return;
+					} else {
+						i2cptr->D = (uint8_t) *buffer.data;			//Write
+						buffer.data++;
+						buffer.size--;
+					}
+				}
+				buffer.state = DATA;
+				break;
+			default:
+				break;
 			}
 		} else {
-
-			i2cptr->S |= I2C_S_IICIF_MASK;					//Clear interrupt
-
-			if ((i2cptr->C1 & I2C_C1_TX_MASK) == I2C_C1_TX_MASK) {	//TX
-
-				if (~(i2cptr->S & I2C_S_RXAK_MASK)) {	//Receive AK
-
-					switch (buffer.state) {
-					case ST:
-						i2cptr->D = buffer.reg;
-						if (buffer.mode == I2C_READ) {
-							buffer.state = SR;
-						} else {
-							buffer.state = DATA;
-						}
-						break;
-					case SR:
-						if (buffer.mode == I2C_READ) {
-							i2cptr->C1 |= I2C_C1_TX_MASK;
-							i2cptr->C1 |= I2C_C1_RSTA_MASK;
-							buffer.state = DATA;
-						}
-						break;
-					case DATA:
-						if (buffer.mode == I2C_READ) {
-							i2cptr->C1 &= ~I2C_C1_TX_MASK;			//RX
-							if (buffer.size == 1) {
-								i2cptr->C1 |= I2C_C1_TXAK_MASK;		//NAK
-							}
-							/*
-							 uint8_t tuvi = i2cptr->D;
-							 tuvi++;
-							 */
-						} else {
-							if (buffer.size == 0) {
-								i2cptr->C1 &= ~I2C_C1_MST_MASK;		//Send stop
-							} else {
-								i2cptr->D = *buffer.data;			//Write
-								buffer.data++;
-								buffer.size--;
-							}
-						}
-						//buffer.state = DATA;
-						break;
-					default:
-						break;
-					}
-				} else {
-					i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
-					buffer.finish = true;
-				}
-			} else {
-				if ((buffer.state == DATA) && (buffer.size == 1)) {
-					i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
-				} else if ((buffer.state == DATA) && (buffer.size == 2)) {
-					i2cptr->C1 |= I2C_C1_TXAK_MASK;			//NAK
-				}
-				*buffer.data = i2cptr->D;
-				buffer.data++;
-				buffer.size--;
+			if ((buffer.state == DATA) && (buffer.size == 1)) {
+				i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
+			} else if ((buffer.state == DATA) && (buffer.size == 2)) {
+				i2cptr->C1 |= I2C_C1_TXAK_MASK;			//NAK
 			}
+			*buffer.data = i2cptr->D;
+			buffer.data++;
+			buffer.size--;
 		}
 	}
 }
+
 
 /*******************************************************************************
  * FUNCTION DEFINITIONS WITH GLOBAL SCOPE
@@ -295,7 +298,7 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 
 		valid = true;
 	} else {
-		//__asm("BKPT #0");
+		__asm("BKPT #0");
 		//i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
 	}
 
