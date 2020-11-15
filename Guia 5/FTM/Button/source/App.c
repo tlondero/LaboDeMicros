@@ -20,6 +20,7 @@
 #include "header/FTM.h"
 #include "header/timer.h"
 #include "header/PORT.h"
+#include "header/WS2812B.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -48,32 +49,13 @@
 /*******************************************************************************
  * BALIZA
  ******************************************************************************/
-static int8_t ftmid1;
-static int8_t ftmid2;
-static int8_t ftmid3;
-static int8_t ftmid4;
-static int8_t ftmid5;
-static int8_t ftmid6;
-static int8_t ftmid7;
-static int8_t ftmid8;
+
 void App_Init (void)
 {
-	FTM_DATA data;
-	PORT_Init();
-	data.CNTIN = 0;
-	data.CNV = 0xFFFF/2;
-	data.EPWM_LOGIC = FTM_lAssertedHigh;
-	data.MODE = FTM_mPulseWidthModulation;
-	data.MODULO = 0xFFFF;
-	data.PSC = FTM_PSC_x1;
-	ftmid4 = FTMInit(PC, 9, data);
-	ftmid5 = FTMInit(PC, 8, data);
-	ftmid6 = FTMInit(PC, 1, data);
-	ftmid7 = FTMInit(PB, 19, data);
-	ftmid8 = FTMInit(PB, 18, data);
-	FTMStartClock(0);
-	FTMStartClock(2);
-	FTMStartClock(3);
+	//Esta puesto para que la señal FTM salga por el PC3, para cambiar qué se muestra en la matriz actualmente
+	//hay que cambiarlo en el driver WS2812B en el init, esta ahi hardcodeado a mano que arranque to do apagado
+	//y despues prende uno solo, el segundo led.
+	WS2812B_init();
 }
 
 /* Función que se llama constantemente en un ciclo infinito */

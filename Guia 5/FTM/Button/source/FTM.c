@@ -266,7 +266,9 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 		/*
 		 * INICIALIZACION POR CANAL
 		 */
-		FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
+		if(!(data.DMA)){
+			FTM_POINTERS[module]->MODE = (FTM_POINTERS[module]->MODE & ~FTM_MODE_FTMEN_MASK) | FTM_MODE_FTMEN(1);
+		}
 		FTM_POINTERS[module]->SC = (FTM_POINTERS[module]->SC & ~FTM_SC_PS_MASK) | FTM_SC_PS(data.PSC);
 		FTM_POINTERS[module]->CNTIN = data.CNTIN;						//CNTIN
 		FTM_POINTERS[module]->CNT = data.CNT;							//CNT
@@ -320,7 +322,12 @@ uint8_t FTMInit(uint8_t port, uint8_t num, FTM_DATA data) {
 		/*
 		 * ACTIVO LA SINCRONIZACION POR SOFTWARE DE MOD, CNTIN Y CNV
 		 */
-		FTMSetSoftwareSync(id); //TODO: Cuando se implementen las interrupciones por hardware, hacer que se pueda pedir una u otra.
+		if(data.DMA){
+			FTMSetDMA(id, 1);
+		}
+		else{
+			FTMSetSoftwareSync(id); //TODO: Cuando se implementen las interrupciones por hardware, hacer que se pueda pedir una u otra.
+		}
 	}
 	return id;
 }
@@ -407,4 +414,9 @@ void FTMSetSWSYNC(uint8_t id){
 	if(FTMX_INIT[FTM_PINOUT[id].MODULE]){
 		FTM_POINTERS[FTM_PINOUT[id].MODULE]->SYNC |= FTM_SYNC_SWSYNC(1);
 	}
+}
+
+void FTMSetDMA(uint8_t id, uint8_t mode){
+	FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC = (FTM_POINTERS[FTM_PINOUT[id].MODULE]->CONTROLS[FTM_PINOUT[id].CHANNEL].CnSC & ~(FTM_CnSC_DMA_MASK)) |
+				                      (FTM_CnSC_DMA(mode));
 }
