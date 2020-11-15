@@ -12,6 +12,7 @@
 
 #define CNV_ON 39 //39 ticks -> 0.8us
 #define CNV_OFF 22 //22 ticks -> 0.46us
+#define MOD 62//62ticks ->1.26us
 
 #define MAT_SIZE 64*3*2
 #define ROW_SIZE 8
@@ -43,7 +44,7 @@ void WS2812B_init(void){
 	FTM_DATA data;
 	PORT_Init();
 	data.CNTIN = 0;
-	data.MODULO = 0x0062;	//62 ticks -> 1.26us
+	data.MODULO = MOD;	//62 ticks -> 1.26us
 	data.CNV = 0x005;
 	data.EPWM_LOGIC = FTM_lAssertedHigh;
 	data.MODE = FTM_mPulseWidthModulation;
