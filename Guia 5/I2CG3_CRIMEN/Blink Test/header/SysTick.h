@@ -1,58 +1,49 @@
+
 /***************************************************************************//**
- @file     App.c
- @brief    Application functions
- @author   Nicolás Magliola
+  @file     SysTick.h
+  @brief    SysTick driver
+  @author   MAGT
  ******************************************************************************/
+
+#ifndef _SYSTICK_H_
+#define _SYSTICK_H_
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-
-#include "header/Button.h"
-#include "header/i2c.h"
-#include "header/gpio.h"
-#include "MK64F12.h"
-#include "header/board.h"
-#include "header/FXOS8700CQ.h"
-#include "timer.h"
+#include <stdbool.h>
+#include <stdint.h>
 #include "hardware.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
+
+#define SYSTICK_ISR_FREQUENCY_HZ 1000U
+
+
 /*******************************************************************************
- * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
 /*******************************************************************************
- *******************************************************************************
- GLOBAL FUNCTION DEFINITIONS
- *******************************************************************************
- *******************************************************************************
+ * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
 
 /*******************************************************************************
- * INTERRUPCIONES
+ * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
+
+/**
+ * @brief Initialize SysTic driver
+ * @param funcallback Function to be call every SysTick
+ * @return Initialization and registration succeed
+ */
+bool SysTick_Init (void (*funcallback)(void));
+
 
 /*******************************************************************************
- * BALIZA
  ******************************************************************************/
 
-
-
-void I2CInit_tb(void) {
-	FXOS8700CQInit();
-}
-
-/* Función que se llama constantemente en un ciclo infinito */
-SRAWDATA_f ac;
-void I2CRun_tb(void) {
-	FXOS8700CQ_ReadAccelMagnData();
-
-	if(FXOS8700CQ_getDataFlag()){
-		ac = FXOS8700CQ_getAcc();
-	}
-}
-
+#endif // _SYSTICK_H_

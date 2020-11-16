@@ -8,7 +8,7 @@
  ******************************************************************************/
 
 #include "header/FXOS8700CQ.h"
-#include "header/i2c.h"
+#include "i2c.h"
 #include "hardware.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -31,7 +31,7 @@
 // number of bytes to be read from the FXOS8700CQ
 #define FXOS8700CQ_READ_LEN 	13 // uno de status, y 6*2 de data accel/magn
 
-#define I2C0_NUM (0)
+#define I2C0 (0)
 #define G_CONVERSION	(0.000488)		//G
 #define	TESLA_CONVERSION	(0.1)		//uT
 /*******************************************************************************
@@ -97,7 +97,7 @@ void callback_read()
 
 void FXOS8700CQInit(void)
 {
-	i2cInit(I2C0_NUM);
+	i2cInit(I2C0);
 	FXOS8700CQConfiguration();
 }
 
@@ -109,7 +109,7 @@ void FXOS8700CQConfiguration(void)
     i2c_done = false;
 
     // read and check the FXOS8700CQ WHOAMI register
-    i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_WHOAMI,&databyte, (uint8_t)1, I2C_READ, &callback_init);
+    i2cReadReg(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_WHOAMI, &databyte,(uint8_t) 1, &callback_init);
     while(!i2c_done);
     i2c_done=false;
 
@@ -120,8 +120,7 @@ void FXOS8700CQConfiguration(void)
      [7-1] = 0000 000
      [0]: active=0*/
     databyte = 0x00;
-
-    i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_CTRL_REG1, &databyte, 1,	I2C_WRITE, callback_init);
+    i2cWriteReg(FXOS8700CQ_SLAVE_ADDR,FXOS8700CQ_CTRL_REG1, &databyte,(uint8_t) 1, &callback_init);
     while(!i2c_done);
     i2c_done=false;
 
@@ -132,7 +131,7 @@ void FXOS8700CQConfiguration(void)
      [4-2]: m_os=111=7: 8x oversampling (for 200Hz) to reduce magnetometer noise
      [1-0]: m_hms=11=3: select hybrid mode with accel and magnetometer active*/
     databyte = 0x1F;
-    i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_M_CTRL_REG1, &databyte, 1,	I2C_WRITE, callback_init);
+    i2cWriteReg(FXOS8700CQ_SLAVE_ADDR,FXOS8700CQ_M_CTRL_REG1,&databyte, (uint8_t) 1, &callback_init);
     while(!i2c_done);
     i2c_done=false;
 
@@ -144,8 +143,7 @@ void FXOS8700CQConfiguration(void)
      [2]: m_maxmin_rst=0
      [1-0]: m_rst_cnt=00 to enable magnetic reset each cycle*/
     databyte = 0x20;
-
-    i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_M_CTRL_REG2, &databyte, 1,	I2C_WRITE, callback_init);
+    i2cWriteReg(FXOS8700CQ_SLAVE_ADDR,FXOS8700CQ_M_CTRL_REG2,&databyte, (uint8_t) 1, &callback_init);
     while(!i2c_done);
     i2c_done=false;
 
@@ -153,7 +151,7 @@ void FXOS8700CQConfiguration(void)
      [4]: hpf_out=0
      [1-0]: fs=01 for accelerometer range of +/-4g range with 0.488mg/LSB*/
     databyte = 0x01;
-    i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_XYZ_DATA_CFG, &databyte, 1,I2C_WRITE, callback_init);
+    i2cWriteReg(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_XYZ_DATA_CFG, &databyte, (uint8_t) 1, &callback_init);
     while(!i2c_done);
     i2c_done=false;
 
@@ -164,30 +162,31 @@ void FXOS8700CQConfiguration(void)
      [1]: f_read=0 for normal 16 bit reads
      [0]: active=1 to take the part out of standby and enable sampling*/
     databyte = 0x0D;
-    i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_CTRL_REG1, &databyte, 1,I2C_WRITE, callback_init);
+    i2cWriteReg(FXOS8700CQ_SLAVE_ADDR,FXOS8700CQ_CTRL_REG1, &databyte,(uint8_t) 1, &callback_init);
     while(!i2c_done);
     i2c_done=false;
 }
 
-void FXOS8700CQ_ReadAccelMagnData(void)
+void ReadAccelMagnData(void)
 {
 	new_data = false;
-	i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_STATUS, buffer,FXOS8700CQ_READ_LEN, I2C_READ, callback_read);
+	i2cReadReg(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_STATUS, buffer, FXOS8700CQ_READ_LEN, &callback_read);
 }
 
 
-SRAWDATA_f FXOS8700CQ_getMag(void)
+SRAWDATA_f getMag(void)
 {
 	return Mag;
 }
 
-SRAWDATA_f FXOS8700CQ_getAcc(void)
+SRAWDATA_f getAcc(void)
 {
 	return Acc;
 }
 
-bool FXOS8700CQ_getDataFlag(void)
+bool getDataReady(void)
 {
 	return new_data;
 }
+
 

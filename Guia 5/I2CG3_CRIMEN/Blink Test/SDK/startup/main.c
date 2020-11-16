@@ -13,7 +13,7 @@ int main(void) {
 	hw_Init();
 	hw_EnableInterrupts();
 	I2CInit_tb(); /* Program-specific setup */
-
+	//hw_EnableInterrupts();
 
 	__FOREVER__
 		I2CRun_tb(); /* Program-specific loop  */

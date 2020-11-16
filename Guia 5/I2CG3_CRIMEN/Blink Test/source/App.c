@@ -1,65 +1,62 @@
 /***************************************************************************//**
-  @file     App.c
-  @brief    Application functions
-  @author   Nicolás Magliola
+ @file     App.c
+ @brief    Application functions
+ @author   Nicolás Magliola
  ******************************************************************************/
 
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-//#include <header/ejercicios_headers/BalizaSwitchSysTick/balizaSwitchSysTick.h>
-//#include "header/ejercicios_headers/Baliza/baliza.h"
-//#include "header/ejercicios_headers/BalizaSysTick/balizast.h"
-#include "header/board.h"
-#include "stdbool.h"
-#include <stdio.h>
-#include "header/SysTick.h"
-#include "header/timer.h"
+
 #include "header/Button.h"
-#include "header/FTM.h"
-#include "header/timer.h"
-#include "header/PORT.h"
-#include "header/WS2812B.h"
+#include "header/gpio.h"
+#include "MK64F12.h"
+#include "header/board.h"
+#include "header/FXOS8700CQ.h"
+#include "timer.h"
+#include "hardware.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
-
 
 /*******************************************************************************
  * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
  ******************************************************************************/
 
-
 /*******************************************************************************
  *******************************************************************************
-                        GLOBAL FUNCTION DEFINITIONS
+ GLOBAL FUNCTION DEFINITIONS
  *******************************************************************************
  *******************************************************************************
  ******************************************************************************/
-
 
 /*******************************************************************************
  * INTERRUPCIONES
  ******************************************************************************/
 
-
-
-
 /*******************************************************************************
  * BALIZA
  ******************************************************************************/
 
-void App_Init (void)
-{
-	//Esta puesto para que la señal FTM salga por el PC3, para cambiar qué se muestra en la matriz actualmente
-	//hay que cambiarlo en el driver WS2812B en el init, esta ahi hardcodeado a mano que arranque to do apagado
-	//y despues prende uno solo, el segundo led.
-	WS2812B_init();
+uint8_t slave;
+uint8_t reg;
+read_data *data;
+uint8_t size;
+
+void I2CInit_tb(void) {
+	FXOS8700CQInit();
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
-void App_Run (void)
-{
+SRAWDATA_f ac;
+void I2CRun_tb(void) {
+
+	ReadAccelMagnData();
+
+	if(getDataReady()){
+		ac = getAcc();
+	}
 
 }
+

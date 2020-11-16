@@ -92,6 +92,7 @@ typedef struct{
 	uint16_t CNTIN;				//Valor al que se reiniciara el FTM_CNT cuando FTM_CNT == MODULO
 	uint16_t CNV;				//Cuando CNV == FTM_CNT, y si las interrupciones del modulo estan habilitadas,
 								//se interrumpirá.
+	uint8_t DMA;				//Configuracion de dma
 
 	uint8_t useCallback;		//Enable para utilizar o no el callback provisto
 	void (*CALLBACK)(void);		//Callback que se ejecutará en las interrupciones SI EL DEFINE CALLBACK_MODE ESTÁ
@@ -159,6 +160,12 @@ void FTMSetSoftwareSync(uint8_t id);
  * @param cnv
  */
 void FTMSetSWSYNC(uint8_t id);
+
+/* @brief: Set del bit de DMA
+ * @param  id: id de la FTM
+ * @param mode: 1 o 0
+ */
+void FTMSetDMA(uint8_t id, uint8_t mode);
 
 //TODO:
 //void FTMSetHardwareSync(uint8_t id, uint8_t mode);
