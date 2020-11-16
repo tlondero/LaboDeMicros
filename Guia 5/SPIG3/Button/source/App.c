@@ -10,12 +10,11 @@
 #include "header/board.h"
 #include "stdbool.h"
 #include <stdio.h>
-#include "header/SysTick.h"
 #include "header/timer.h"
 #include "header/Button.h"
 #include "header/timer.h"
-#include "header/PORT.h"
 #include "header/SPI.h"
+#include "header/PISO.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -44,20 +43,20 @@
 /*******************************************************************************
  * BALIZA
  ******************************************************************************/
-static uint8_t source[4] = {20,20,20,20};
+static uint8_t source[1] = {0b10000001};//,20,20,20,10,10,10,10};
 static uint8_t debug = 1;
+static uint8_t destination[1];
+
 
 void App_Init (void)
 {
 	spi_init();
-
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
 void App_Run (void)
 {
 	if(debug){
-		spi_transaction(source, sizeof(source), NULL);
-		debug = 0;
+		spi_transaction(source, sizeof(source), destination);
 	}
 }
