@@ -51,11 +51,10 @@ void I2CInit_tb(void) {
 /* Función que se llama constantemente en un ciclo infinito */
 SRAWDATA_f ac;
 void I2CRun_tb(void) {
-static int i=0;
-	if(i++==3232)
-		ReadAccelMagnData();
 
-	if(getDataReady){
+	ReadAccelMagnData();
+
+	if(getDataReady()){
 		ac = getAcc();
 	}
 

@@ -44,7 +44,7 @@
 
 uint8_t buffer[FXOS8700CQ_READ_LEN]; // read buffer
 static bool i2c_done = false;
-static bool new_data;
+static bool new_data=false;
 static SRAWDATA_f Acc;
 static SRAWDATA_f Mag;
 /*******************************************************************************
