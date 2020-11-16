@@ -52,27 +52,28 @@ void FXOS8700CQInit(void);
 
 /**
  * @brief Updates the accelerometer and magnetometer.
- *
+ * there is a flag that is turned on when there's new data, you can check if theres new data with the function
+ * FXOS8700CQ_getDataFlag when you call FXOS8700CQ_ReadAccelMagnData the flag is cleared.
  */
-void ReadAccelMagnData(void);
+void FXOS8700CQ_ReadAccelMagnData(void);
 
 /**
  * @brief returns if theres new information
  *
  */
-bool getDataReady(void);
+bool FXOS8700CQ_getDataFlag(void);
 
 /**
  * @brief returns the acceleration vector.
  *
  */
 
-SRAWDATA_f getAcc(void);
+SRAWDATA_f FXOS8700CQ_getAcc(void);
 
 /**
  * @brief Returns the magnetization vector
  */
 
-SRAWDATA_f getMag(void);
+SRAWDATA_f FXOS8700CQ_getMag(void);
 
 #endif /* FXOS8700CQ_H_ */

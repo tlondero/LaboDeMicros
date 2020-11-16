@@ -49,10 +49,10 @@ void I2CInit_tb(void) {
 /* Función que se llama constantemente en un ciclo infinito */
 SRAWDATA_f ac;
 void I2CRun_tb(void) {
-	ReadAccelMagnData();
+	FXOS8700CQ_ReadAccelMagnData();
 
-	if(getDataReady()){
-		ac = getAcc();
+	if(FXOS8700CQ_getDataFlag()){
+		ac = FXOS8700CQ_getAcc();
 	}
 }
 
