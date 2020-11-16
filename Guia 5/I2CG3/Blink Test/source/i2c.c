@@ -75,19 +75,22 @@ void I2CHandler(void) {
 		i2cptr->S |= I2C_S_IICIF_MASK;			//Clear interrupt
 		i2cptr->C1 &= ~I2C_C1_TXAK_MASK;		//Unset NAK
 
-		buffer.count = 0;
 		buffer.finish = true;
+		buffer.count = 0;
+
 		if (callback != NULL) {
 			callback();
 		}
+
 	} else {
 
 		if (i2cptr->FLT & I2C_FLT_STARTF_MASK) {			//Start flag
 
-			i2cptr->FLT |= I2C_FLT_STARTF_MASK;				//Clear star
+			i2cptr->FLT |= I2C_FLT_STARTF_MASK;				//Clear start
 			i2cptr->S |= I2C_S_IICIF_MASK;					//Clear interrupt
 
 			buffer.count++;
+
 			if (buffer.count == 1) {
 				i2cptr->D = buffer.slave << 1;
 				return;
@@ -119,8 +122,7 @@ void I2CHandler(void) {
 				break;
 			case SR:
 				if (buffer.mode == I2C_READ) {
-					i2cptr->C1 |= I2C_C1_TX_MASK;
-					i2cptr->C1 |= I2C_C1_RSTA_MASK;
+					i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_RSTA_MASK;
 					buffer.state = DATA;
 					return;
 				}
@@ -138,29 +140,31 @@ void I2CHandler(void) {
 						i2cptr->C1 &= ~I2C_C1_MST_MASK;		//Send stop
 						return;
 					} else {
-						i2cptr->D = (uint8_t) *buffer.data;			//Write
+						i2cptr->D = *buffer.data;			//Write
 						buffer.data++;
 						buffer.size--;
 					}
 				}
-				buffer.state = DATA;
+				//buffer.state = DATA;
 				break;
 			default:
 				break;
 			}
 		} else {
-			if ((buffer.state == DATA) && (buffer.size == 1)) {
-				i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
-			} else if ((buffer.state == DATA) && (buffer.size == 2)) {
-				i2cptr->C1 |= I2C_C1_TXAK_MASK;			//NAK
+			if (buffer.state == DATA) {
+				if (buffer.size == 1) {
+					i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
+				} else if (buffer.size == 2) {
+					i2cptr->C1 |= I2C_C1_TXAK_MASK;			//NAK
+				}
+
+				*buffer.data = i2cptr->D;
+				buffer.data++;
+				buffer.size--;
 			}
-			*buffer.data = i2cptr->D;
-			buffer.data++;
-			buffer.size--;
 		}
 	}
 }
-
 
 /*******************************************************************************
  * FUNCTION DEFINITIONS WITH GLOBAL SCOPE
@@ -171,18 +175,18 @@ bool i2cInit(ic2_channel_t chan) {
 
 		callback = NULL;
 
-		I2C_Type *i2cPeriphPtr[] = I2C_BASE_PTRS;
-		i2cptr = i2cPeriphPtr[chan];
+		I2C_Type *i2cBasePtr[] = I2C_BASE_PTRS;
+		i2cptr = i2cBasePtr[chan];
 
-		SIM_Type *sim = SIM_BASE_PTRS;		//SIM;
+		SIM_Type *sim = SIM;
 		uint8_t mux = 5;
 
-		PORT_Type *portptr[] = PORT_BASE_PTRS;
+		PORT_Type *portBasePtr[] = PORT_BASE_PTRS;
 
-		PORT_Type *sdaPtr;
+		uint8_t sdaPtr;
 		uint8_t sdaPin;
 
-		PORT_Type *sclPtr;
+		uint8_t sclPtr;
 		uint8_t sclPin;
 
 		//Clk gating
@@ -191,9 +195,9 @@ bool i2cInit(ic2_channel_t chan) {
 			sim->SCGC4 |= SIM_SCGC4_I2C0_MASK;
 			sim->SCGC5 |= SIM_SCGC5_PORTE_MASK;
 
-			sdaPtr = portptr[PE];
+			sdaPtr = PE;
 			sdaPin = 25;
-			sclPtr = portptr[PE];
+			sclPtr = PE;
 			sclPin = 24;
 
 			break;
@@ -202,9 +206,9 @@ bool i2cInit(ic2_channel_t chan) {
 			sim->SCGC5 |= SIM_SCGC5_PORTC_MASK;
 			mux = 1;
 
-			sdaPtr = portptr[PC];
+			sdaPtr = PC;
 			sdaPin = 11;
-			sclPtr = portptr[PC];
+			sclPtr = PC;
 			sclPin = 10;
 
 			break;
@@ -212,9 +216,9 @@ bool i2cInit(ic2_channel_t chan) {
 			sim->SCGC1 |= SIM_SCGC1_I2C2_MASK;
 			sim->SCGC5 |= SIM_SCGC5_PORTA_MASK;
 
-			sdaPtr = portptr[PA];
+			sdaPtr = PA;
 			sdaPin = 13;
-			sclPtr = portptr[PA];
+			sclPtr = PA;
 			sclPin = 14;
 
 			break;
@@ -222,45 +226,48 @@ bool i2cInit(ic2_channel_t chan) {
 			break;
 		}
 
+		//Set Mux
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] &= ~PORT_PCR_MUX_MASK;
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= PORT_PCR_MUX(mux);
+
+		(portBasePtr[sclPtr]->PCR)[sclPin] &= ~PORT_PCR_MUX_MASK;
+		(portBasePtr[sclPtr]->PCR)[sclPin] |= PORT_PCR_MUX(mux);
+
+		//Disable int
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] &= (~PORT_PCR_IRQC_MASK);
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= PORT_PCR_IRQC(
+				GPIO_IRQ_MODE_DISABLE);
+
+		(portBasePtr[sclPtr]->PCR)[sclPin] &= ~PORT_PCR_IRQC_MASK;
+		(portBasePtr[sclPtr]->PCR)[sclPin] |= PORT_PCR_IRQC(
+				GPIO_IRQ_MODE_DISABLE);
+
+		//Set open drain
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= PORT_PCR_ODE_MASK;
+		(portBasePtr[sclPtr]->PCR)[sclPin] |= PORT_PCR_ODE_MASK;
+
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= (HIGH << PORT_PCR_PE_SHIFT);
+		(portBasePtr[sclPtr]->PCR)[sclPin] |= (HIGH << PORT_PCR_PE_SHIFT);
+
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= (HIGH << PORT_PCR_PS_SHIFT);
+		(portBasePtr[sclPtr]->PCR)[sclPin] |= (HIGH << PORT_PCR_PS_SHIFT);
+
 		//baudrate
-		i2cptr->F = I2C_F_ICR(0x3F) | I2C_F_MULT(4);
+		i2cptr->F = I2C_F_ICR(0x35) | I2C_F_MULT(0x02);
 		//I2C_F_ICR(0x35) | I2C_F_MULT(2);
 		//I2C_F_MULT(0) | I2C_F_ICR(0x09);
 		//I2C_F_ICR(5) | I2C_F_MULT(2);
 
-		i2cptr->C1 = 0;
-		i2cptr->C1 |= I2C_C1_IICEN_MASK;
-		i2cptr->C1 |= I2C_C1_IICIE_MASK;	//module on
-		//i2cptr->FLT |= I2C_FLT_SSIE_MASK;					//startf stopf on
-		i2cptr->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;			//interrupt on
-
-		//i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_MST_MASK;			//Control Register 1 to enable TX and MST
-
 		NVIC_EnableIRQ(I2CIRQS_[chan]);
 
-		//Set Mux
-		//(sdaPtr->PCR)[sdaPin] &= ~PORT_PCR_MUX_MASK;
-		(sdaPtr->PCR)[sdaPin] |= PORT_PCR_MUX(mux);					//la posta
-		//Disable int
-		//(sdaPtr->PCR)[sdaPin] &= ~PORT_PCR_IRQC_MASK;
-		//(sdaPtr->PCR)[sdaPin] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
-		//Set open drain
-		(sdaPtr->PCR)[sdaPin] |= PORT_PCR_ODE_MASK;					//la posta
-		//(sdaPtr->PCR)[sdaPin] |= (HIGH << PORT_PCR_PE_SHIFT);
-		//(sdaPtr->PCR)[sdaPin] |= (HIGH << PORT_PCR_PS_SHIFT);
+		i2cptr->C1 = 0;
+		i2cptr->C1 |= I2C_C1_IICIE_MASK;
+		i2cptr->C1 |= I2C_C1_IICEN_MASK;	//module on
 
-		//(sclPtr->PCR)[sclPin] &= ~PORT_PCR_MUX_MASK;
-		(sclPtr->PCR)[sclPin] |= PORT_PCR_MUX(mux);
-
-		//(sclPtr->PCR)[sclPin] &= ~PORT_PCR_IRQC_MASK;
-		//(sclPtr->PCR)[sclPin] |= PORT_PCR_IRQC(GPIO_IRQ_MODE_DISABLE);
-
-		(sclPtr->PCR)[sclPin] |= PORT_PCR_ODE_MASK;
-		//(sclPtr->PCR)[sclPin] |= (HIGH << PORT_PCR_PE_SHIFT);
-		//(sclPtr->PCR)[sclPin] |= (HIGH << PORT_PCR_PS_SHIFT);
+		i2cptr->FLT |= I2C_FLT_SSIE_MASK;					//startf stopf on
+		i2cptr->S = I2C_S_TCF_MASK | I2C_S_IICIF_MASK;		//interrupt on
 
 		isInit = true;
-
 	}
 
 	return isInit;
