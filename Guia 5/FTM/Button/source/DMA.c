@@ -46,8 +46,9 @@ void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size){
 	//DMA_TCD0_BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(0x05);
 
 	/* Autosize for Current major iteration count */
-	DMA0->TCD[0].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(192);	//(sizeof(sourceBuffer)/sizeof(sourceBuffer[0]))
-	DMA0->TCD[0].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(192);
+
+	DMA0->TCD[0].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(matrix_size/2);	//(sizeof(sourceBuffer)/sizeof(sourceBuffer[0]))
+	DMA0->TCD[0].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(matrix_size/2);
 
 
 	//DMA_TCD0_SLAST = 0x00;
