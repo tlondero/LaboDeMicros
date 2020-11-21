@@ -66,6 +66,7 @@ void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size){
 
 	DMA0->TCD[0].CSR = DMA_CSR_INTMAJOR_MASK;	//Enable Major Interrupt.
 
+
 	/* Enable request signal for channel 0. */
 	DMA0->ERQ = DMA_ERQ_ERQ0_MASK;
 
