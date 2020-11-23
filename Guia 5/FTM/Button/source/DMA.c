@@ -6,9 +6,12 @@
  */
 
 #include "header/DMA.h"
+#include "header/FTM.h"
 #include "hardware.h"
+static void (*cb)(void);
+void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size, void* cb_){
 
-void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size){
+	cb = cb_;
 
 	/* Enable the clock for the eDMA and the DMAMUX. */
 	SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;
@@ -76,7 +79,7 @@ void DMA0_IRQHandler()
 {
 	/* Clear the interrupt flag. */
 	DMA0->CINT |= 0;
-
+	cb();
 }
 
 /* The red LED is toggled when an error occurs. */

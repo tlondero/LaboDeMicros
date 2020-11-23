@@ -189,7 +189,7 @@ void FTMStartClock(uint8_t module) {
  */
 void FTMStopClock(uint8_t module) {
 	if(FTMX_INIT[module]){
-		FTM_POINTERS[module]->SC |= FTM_SC_CLKS(SC_CLKS_OFF);
+		FTM_POINTERS[module]->SC &= ~FTM_SC_CLKS(SC_CLKS_SYSCLK);
 	}
 }
 
