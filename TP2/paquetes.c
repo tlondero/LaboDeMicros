@@ -3,7 +3,7 @@
 	you will have to zero padd the binits not used.
 	Header- num_data (if there is any) - zero padd.
 
-Package header:
+Packages:
 	Brightness package:
 		header :   'B'//Brightness
 		num data:  ascii character that ranges from 0 to 100.
@@ -17,7 +17,7 @@ Package header:
 
 	Movement package:
 		header  : 'E' or 'D' or 'A' or 'G' //Eizquierda, Derecha, Abajo, Girar
-		binits  :  3
+		binits  :  1
 
 	Reset package:
 		header  :  'R'//Reset
@@ -29,6 +29,7 @@ Package header:
 		binits  :  4
 
 */
+
 #define BRIGHTNESS_H ('B')
 
 #define FALL_H ('F')
@@ -41,9 +42,9 @@ Package header:
 #define RESET_H ('R')
 
 #define PIECE_L_H ('L')
-#define PIECE_L_H ('J')
-#define PIECE_L_H ('T')
-#define PIECE_L_H ('I')
-#define PIECE_L_H ('Z')
-#define PIECE_L_H ('O')
-#define PIECE_L_H ('S')
+#define PIECE_J_H ('J')
+#define PIECE_T_H ('T')
+#define PIECE_I_H ('I')
+#define PIECE_Z_H ('Z')
+#define PIECE_O_H ('O')
+#define PIECE_S_H ('S')
