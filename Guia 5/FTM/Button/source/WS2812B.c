@@ -16,7 +16,7 @@
 #define MOD 62//62ticks ->1.26us
 
 #define CANT_LEDS 64
-#define CANT_LEDS_ZERO 10
+#define CANT_LEDS_ZERO 0
 
 #define MAT_SIZE (CANT_LEDS+CANT_LEDS_ZERO)*8*3*2 //(64 LEDS+10LEDS en zero para reset) * 8BITS * 3 COLORES * 2bytes (CNV son 16 bits)
 #define ROW_SIZE 8
@@ -40,25 +40,28 @@ static void set_color_brightness(uint16_t *ptr, uint8_t brightness){
 }
 void WS2812B_init(void){
 	uint8_t i;
-	uint8_t j;
 
 	for(i = 0; i < CANT_LEDS+CANT_LEDS_ZERO; i++){
 
 		if(i < CANT_LEDS){
-		set_color_brightness(led_matrix[i].R, 0);
-		set_color_brightness(led_matrix[i].G, 0);
-		set_color_brightness(led_matrix[i].B, 0);
+			set_color_brightness(led_matrix[i].R, 255);
+			set_color_brightness(led_matrix[i].G, 255);
+			set_color_brightness(led_matrix[i].B, 255);
 		}
 
 	}
-
+	/*
+	set_color_brightness(led_matrix[1].R, 255);
+	set_color_brightness(led_matrix[1].G, 255);
+	set_color_brightness(led_matrix[1].B, 255);
+*/
 	DMAInitWS2812b((uint16_t*)(&led_matrix), MAT_SIZE);
 
 	FTM_DATA data;
 	PORT_Init();
 	data.CNTIN = 0;
 	data.MODULO = MOD;	//62 ticks -> 1.26us
-	data.CNV = 0x00FF;
+	data.CNV = 0x000A; //
 	data.EPWM_LOGIC = FTM_lAssertedHigh;
 	data.MODE = FTM_mPulseWidthModulation;
 	data.PSC = FTM_PSC_x1;
@@ -73,13 +76,13 @@ void WS2812B_matrix_set(uint8_t color, uint8_t brightness, uint8_t row, uint8_t 
 
 	switch(color){
 	case GREEN:
-		set_led_brightness(led_matrix[ROW_SIZE*row+col].G, brightness);
+		set_color_brightness(led_matrix[ROW_SIZE*row+col].G, brightness);
 		break;
 	case RED:
-		set_led_brightness(led_matrix[ROW_SIZE*row+col].R, brightness);
+		set_color_brightness(led_matrix[ROW_SIZE*row+col].R, brightness);
 		break;
 	case BLUE:
-		set_led_brightness(led_matrix[ROW_SIZE*row+col].B, brightness);
+		set_color_brightness(led_matrix[ROW_SIZE*row+col].B, brightness);
 		break;
 	default: break;
 	}

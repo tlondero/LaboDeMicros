@@ -58,8 +58,8 @@ PubSubClient mqtt_client(wclient);
 //=====================================================================
 // WiFi credentials
 
-char ssid[] = "network name";
-char password[] = "network pass";   // Set password to "" for open networks
+char ssid[] = "tomates y aceitunas";
+char password[] = "POM26dulc";   // Set password to "" for open networks
 
 
 //char ssid[] = "NODE_RED";

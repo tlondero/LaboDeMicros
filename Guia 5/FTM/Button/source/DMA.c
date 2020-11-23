@@ -7,8 +7,26 @@
 
 #include "header/DMA.h"
 #include "hardware.h"
+#include "header/timer.h"
+#include "header/FTM.h"
+#include "header/board.h"
+#include "header/gpio.h"
+
+static tim_id_t refresh_timer;
+
+void refresh_handler(void){
+	FTMStartClock(0);
+	gpioToggle(PORTNUM2PIN(PB,18));
+}
 
 void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size){
+	//Debug pins
+	gpioMode(PORTNUM2PIN(PB,18),OUTPUT);
+	gpioWrite(PORTNUM2PIN(PB,18), LOW);
+	//Timers
+	timerInit();
+	refresh_timer = timerGetId();
+	timerStart(refresh_timer ,TIMER_MS2TICKS(2) , TIM_MODE_SINGLESHOT, refresh_handler);
 
 	/* Enable the clock for the eDMA and the DMAMUX. */
 	SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;
@@ -47,8 +65,8 @@ void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size){
 
 	/* Autosize for Current major iteration count */
 
-	DMA0->TCD[0].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(matrix_size/2);	//(sizeof(sourceBuffer)/sizeof(sourceBuffer[0]))
-	DMA0->TCD[0].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(matrix_size/2);
+	DMA0->TCD[0].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(matrix_size/2);	// div 2 //(sizeof(sourceBuffer)/sizeof(sourceBuffer[0]))
+	DMA0->TCD[0].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(matrix_size/2);  // div 2
 
 
 	//DMA_TCD0_SLAST = 0x00;
@@ -76,7 +94,8 @@ void DMA0_IRQHandler()
 {
 	/* Clear the interrupt flag. */
 	DMA0->CINT |= 0;
-
+	FTMStopClock(0);
+	timerReset(refresh_timer);
 }
 
 /* The red LED is toggled when an error occurs. */
