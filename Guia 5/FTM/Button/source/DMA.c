@@ -6,6 +6,7 @@
  */
 
 #include "header/DMA.h"
+#include "header/FTM.h"
 #include "hardware.h"
 #include "header/timer.h"
 #include "header/FTM.h"
@@ -27,6 +28,10 @@ void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size){
 	timerInit();
 	refresh_timer = timerGetId();
 	timerStart(refresh_timer ,TIMER_MS2TICKS(2) , TIM_MODE_SINGLESHOT, refresh_handler);
+static void (*cb)(void);
+void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size, void* cb_){
+
+	cb = cb_;
 
 	/* Enable the clock for the eDMA and the DMAMUX. */
 	SIM->SCGC7 |= SIM_SCGC7_DMA_MASK;
@@ -96,6 +101,7 @@ void DMA0_IRQHandler()
 	DMA0->CINT |= 0;
 	FTMStopClock(0);
 	timerReset(refresh_timer);
+	cb();
 }
 
 /* The red LED is toggled when an error occurs. */
