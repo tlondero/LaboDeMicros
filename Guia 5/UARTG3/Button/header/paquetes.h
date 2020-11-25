@@ -25,7 +25,7 @@ Packages:
 
 	Color package:
 		header  :  'L' or 'J' or 'T' or 'I' or 'Z' or 'O' or 'S'
-		num data:  3 ascii character that ranges from 0 to 255
+		num data:  3 ascii character that ranges from 0 to 255 RGB
 		binits  :  4
 
 */
@@ -36,7 +36,7 @@ Packages:
 
 #define MOV_LEFT_H ('E')
 #define MOV_RIGHT_H ('D')
-#define MOV_UP_H ('A')
+#define MOV_DOWN_H ('A')
 #define MOV_ROTATE_H ('G')
 
 #define RESET_H ('R')

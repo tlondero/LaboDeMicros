@@ -298,8 +298,9 @@ void UARTX_RX_TX_IRQHandler(uint8_t id) {
 	if (uart_p->S1 & UART_S1_RDRF_MASK) { //recibi data
 		if (!flags_reading[id]) {
 			if (latest_ch_rec_cnt_RX[id] < RX_BUFFER_LEN - 1) {
-				(latest_ch_rec_cnt_RX[id])++; //Points to the position of hte latest ch entered
+
 				RX_buffers[id][(latest_ch_rec_cnt_RX[id])] = uart_p->D;
+				(latest_ch_rec_cnt_RX[id])++; //Points to the position of hte latest ch entered
 				counters_RX_failed[id] = 0;
 			} else {(counters_RX_failed[id])++;}
 
