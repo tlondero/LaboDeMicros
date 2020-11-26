@@ -30,9 +30,9 @@
 void uartPackProcess(package * data, uint8_t id){
 	static char msg[1000];
 
-	if (uartIsRxMsg(id) && (uartGetRxMsgLength(id) >= 5)) {
+	if (uartIsRxMsg(id) && (uartGetRxMsgLength(id) >PACKAGE_SIZE)) {
 		uint16_t len = 0;
-		len = uartReadMsg(id, msg, 4);
+		len = uartReadMsg(id, msg, PACKAGE_SIZE);
 		switch (msg[0]) {
 		case BRIGHTNESS_H:
 #if DEV_MODE
