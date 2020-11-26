@@ -26,29 +26,6 @@
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
-typedef struct{
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-}color_t;
-typedef struct{
-	char piece;
-	color_t color;
-}piece_prop;
-
-typedef struct{
-	bool left;
-	bool right;
-	bool down;
-	bool rotate;
-}piece_movement;
-typedef struct{
-	uint8_t birghtness;
-	uint8_t fall_speed;
-	piece_movement action;
-	piece_prop piece;
-	bool reset;
-}package;
 
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
