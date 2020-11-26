@@ -65,10 +65,17 @@ typedef struct{
 	bool down;
 	bool rotate;
 }piece_movement;
+
 typedef struct{
-	uint8_t birghtness;
+	uint8_t brightness;
 	uint8_t fall_speed;
 	piece_movement action;
 	piece_prop piece;
 	bool reset;
 }package;
+
+
+
+
+
+

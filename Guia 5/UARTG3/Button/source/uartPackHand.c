@@ -36,43 +36,43 @@ void uartPackProcess(package * data, uint8_t id){
 		switch (msg[0]) {
 		case BRIGHTNESS_H:
 #if DEV_MODE
-			uartWriteMsg(id, "Brightness changed\r\n", 21);
+			uartWriteMsg(0, "Brightness changed\r\n", 21);
 #endif
 			data->birghtness=msg[1];
 			break;
 		case FALL_H:
 #if DEV_MODE
-			uartWriteMsg(id, "Fall speed changed\r\n", 21);
+			uartWriteMsg(0, "Fall speed changed\r\n", 21);
 #endif
 			data->fall_speed=msg[1];
 			break;
 		case MOV_LEFT_H:
 #if DEV_MODE
-			uartWriteMsg(id, "Action Left\r\n", 14);
+			uartWriteMsg(0, "Action Left\r\n", 14);
 #endif
 			data->action.left=true;
 			break;
 		case MOV_RIGHT_H:
 #if DEV_MODE
-			uartWriteMsg(id, "Action Right\r\n", 15);
+			uartWriteMsg(0, "Action Right\r\n", 15);
 #endif
 			data->action.right=true;
 			break;
 		case MOV_DOWN_H:
 #if DEV_MODE
-			uartWriteMsg(id, "Action Down\r\n", 14);
+			uartWriteMsg(0, "Action Down\r\n", 14);
 #endif
 			data->action.down=true;
 			break;
 		case MOV_ROTATE_H:
 #if DEV_MODE
-			uartWriteMsg(id, "Action Rotate\r\n", 16);
+			uartWriteMsg(0, "Action Rotate\r\n", 16);
 #endif
 			data->action.rotate=true;
 			break;
 		case RESET_H:
 #if DEV_MODE
-			uartWriteMsg(id, "Action Reset\r\n", 15);
+			uartWriteMsg(0, "Action Reset\r\n", 15);
 #endif
 			data->reset=true;
 			break;
@@ -82,7 +82,7 @@ void uartPackProcess(package * data, uint8_t id){
 			data->piece.color.g=msg[2];
 			data->piece.color.b=msg[3];
 #if DEV_MODE
-			uartWriteMsg(id, "Piece L prop changed\r\n", 23);
+			uartWriteMsg(0, "Piece L prop changed\r\n", 23);
 #endif
 			break;
 		case PIECE_J_H:
@@ -91,7 +91,7 @@ void uartPackProcess(package * data, uint8_t id){
 			data->piece.color.g=msg[2];
 			data->piece.color.b=msg[3];
 #if DEV_MODE
-			uartWriteMsg(id, "Piece J prop changed\r\n", 23);
+			uartWriteMsg(0, "Piece J prop changed\r\n", 23);
 #endif
 			break;
 		case PIECE_T_H:
@@ -100,7 +100,7 @@ void uartPackProcess(package * data, uint8_t id){
 			data->piece.color.g=msg[2];
 			data->piece.color.b=msg[3];
 #if DEV_MODE
-			uartWriteMsg(id, "Piece T prop changed\r\n", 23);
+			uartWriteMsg(0, "Piece T prop changed\r\n", 23);
 #endif
 			break;
 		case PIECE_I_H:
@@ -109,7 +109,7 @@ void uartPackProcess(package * data, uint8_t id){
 			data->piece.color.g=msg[2];
 			data->piece.color.b=msg[3];
 #if DEV_MODE
-			uartWriteMsg(id, "Piece I prop changed\r\n", 23);
+			uartWriteMsg(0, "Piece I prop changed\r\n", 23);
 #endif
 			break;
 		case PIECE_Z_H:
@@ -118,7 +118,7 @@ void uartPackProcess(package * data, uint8_t id){
 			data->piece.color.g=msg[2];
 			data->piece.color.b=msg[3];
 #if DEV_MODE
-			uartWriteMsg(id, "Piece Z prop changed\r\n", 23);
+			uartWriteMsg(0, "Piece Z prop changed\r\n", 23);
 #endif
 			break;
 		case PIECE_O_H:
@@ -127,7 +127,7 @@ void uartPackProcess(package * data, uint8_t id){
 			data->piece.color.g=msg[2];
 			data->piece.color.b=msg[3];
 #if DEV_MODE
-			uartWriteMsg(id, "Piece O prop changed\r\n", 23);
+			uartWriteMsg(0, "Piece O prop changed\r\n", 23);
 #endif
 			break;
 		case PIECE_S_H:
@@ -136,7 +136,7 @@ void uartPackProcess(package * data, uint8_t id){
 			data->piece.color.g=msg[2];
 			data->piece.color.b=msg[3];
 #if DEV_MODE
-			uartWriteMsg(id, "Piece S prop changed\r\n", 23);
+			uartWriteMsg(0, "Piece S prop changed\r\n", 23);
 #endif
 			break;
 		default:
@@ -148,7 +148,6 @@ void uartPackProcess(package * data, uint8_t id){
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH FILE SCOPE DEFINITION
  *******************************************************************************/
-
 
 
 
