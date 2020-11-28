@@ -6,8 +6,8 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include <header/drivers/gpio.h>
-#include <header/drivers/uart.h>
+#include <../header/drivers/gpio.h>
+#include <../header/drivers/uart.h>
 #include <stdbool.h>
 #include "hardware.h"
 /*******************************************************************************

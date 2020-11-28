@@ -7,8 +7,8 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include <header/drivers/FXOS8700CQ.h>
-#include <header/drivers/i2c.h>
+#include <../header/drivers/FXOS8700CQ.h>
+#include <../header/drivers/i2c.h>
 #include "hardware.h"
 #include "header/drivers/timer.h"
 /*******************************************************************************
