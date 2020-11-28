@@ -12,9 +12,9 @@
 #include "header/PORT.h"
 
 #define CNV_ON 39 //39 ticks -> 0.8us
-#define CNV_OFF 22 //22 ticks -> 0.46us
+#define CNV_OFF 20 //20 ticks -> 0.4us
 #define CNV_ZERO 0
-#define MOD 62//62ticks ->1.26us
+#define MOD 62//62+1ticks ->1.26us
 
 #define CANT_LEDS 64
 #define CANT_LEDS_ZERO 0
@@ -61,22 +61,16 @@ void WS2812B_init(void){
 	for(i = 0; i < CANT_LEDS+CANT_LEDS_ZERO; i++){
 
 		if(i < CANT_LEDS){
-			set_color_brightness(led_matrix[i].R, 255);
-			set_color_brightness(led_matrix[i].G, 255);
-			set_color_brightness(led_matrix[i].B, 255);
+		set_color_brightness(led_matrix[i].R, 0);
+		set_color_brightness(led_matrix[i].G, 0);
+		set_color_brightness(led_matrix[i].B, 0);
 		}
 
 	}
-	/*
-	set_color_brightness(led_matrix[1].R, 255);
-	set_color_brightness(led_matrix[1].G, 255);
-	set_color_brightness(led_matrix[1].B, 255);
-*/
-	DMAInitWS2812b((uint16_t*)(&led_matrix), MAT_SIZE);
 
-	set_color_brightness(led_matrix[1].R, 255);
-	set_color_brightness(led_matrix[1].G, 255);
-	set_color_brightness(led_matrix[1].B, 255);
+	set_color_brightness(led_matrix[60].R, 0);
+	set_color_brightness(led_matrix[60].G, 128);
+	set_color_brightness(led_matrix[60].B, 0);
 
 	timerInit();
 	timerid = timerGetId();
@@ -89,7 +83,6 @@ void WS2812B_init(void){
 	PORT_Init();
 	data.CNTIN = 0;
 	data.MODULO = MOD;	//62 ticks -> 1.26us
-	data.CNV = 0x000A; //
 	data.CNV = 22;
 	data.EPWM_LOGIC = FTM_lAssertedHigh;
 	data.MODE = FTM_mPulseWidthModulation;
@@ -105,13 +98,13 @@ void WS2812B_matrix_set(uint8_t color, uint8_t brightness, uint8_t row, uint8_t 
 
 	switch(color){
 	case GREEN:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].G, brightness);
+		set_led_brightness(led_matrix[ROW_SIZE*row+col].G, brightness);
 		break;
 	case RED:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].R, brightness);
+		set_led_brightness(led_matrix[ROW_SIZE*row+col].R, brightness);
 		break;
 	case BLUE:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].B, brightness);
+		set_led_brightness(led_matrix[ROW_SIZE*row+col].B, brightness);
 		break;
 	default: break;
 	}

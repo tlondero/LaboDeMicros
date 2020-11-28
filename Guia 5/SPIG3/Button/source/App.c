@@ -54,9 +54,23 @@ void App_Init (void)
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
+static int a;
 void App_Run (void)
 {
 	if(debug){
+		spi_transaction(source, sizeof(source), destination);
+		if(destination[0] & 16){ //left
+			a = 1;
+		}
+		if(destination[0] & 32){ //down
+			a = 2;
+		}
+		if(destination[0] & 64){ //right
+			a = 3;
+		}
+		if(destination[0] & 128){ //rotate
+			a = 4;
+		}
 		spi_transaction(source, sizeof(source), destination);
 	}
 }
