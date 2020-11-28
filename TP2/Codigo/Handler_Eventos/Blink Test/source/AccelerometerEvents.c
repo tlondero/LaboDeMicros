@@ -57,7 +57,6 @@ void accelerometerGetEvent(package * data){
 			go_back_to_center=false;
 		}
 	}
-	return ret;
 }
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH FILE SCOPE DEFINITION

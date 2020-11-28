@@ -29,6 +29,8 @@ Packages:
 		binits  :  4
 
 */
+#include <stdbool.h>
+#include <stdint.h>
 
 #define BRIGHTNESS_H ('B')
 
