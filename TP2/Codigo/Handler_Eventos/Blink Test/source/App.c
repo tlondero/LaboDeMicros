@@ -18,6 +18,8 @@
 #include "header/timer.h"
 #include <math.h>
 #include "hardware.h"
+#include "header/uartPackHand.h"
+#include "header/uart.h"
 #include "header/AccelerometerEvents.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -44,13 +46,26 @@
 
 
 void appInit(void) {
+	//Accelerometer init
 	FXOS8700CQInit();
+
+	//UART init
+	uart_cfg_t init_config;
+	init_config.baudRate = 9600;
+	init_config.mode = NON_BLOCKING;
+	init_config.parity = NO_PARITY_UART;
+	init_config.nBits = NBITS_8;
+	uartInit(U0, init_config);
+
+	//leds init
 	gpioMode(PIN_LED_BLUE, OUTPUT);
 	gpioMode(PIN_LED_RED, OUTPUT);
 	gpioMode(PIN_LED_GREEN, OUTPUT);
 	gpioWrite(PIN_LED_RED, HIGH);
 	gpioWrite(PIN_LED_GREEN, HIGH);
 	gpioWrite(PIN_LED_BLUE, HIGH);
+
+	//timer init
 	timerInit();
 	tim_id_t tid = timerGetId();
 	timerStart(tid, TIMER_MS2TICKS(200),TIM_MODE_PERIODIC,FXOS8700CQ_ReadAccelMagnData);
@@ -62,56 +77,29 @@ SRAWDATA_f ac;
 void appRun(void){
 	package data={0};
 	accelerometerGetEvent(&data);
-	if(data.action.down){
-		gpioWrite(PIN_LED_RED, LOW);
-		gpioWrite(PIN_LED_BLUE, LOW);
-	}
-	else if(data.action.left){
-		gpioWrite(PIN_LED_GREEN, LOW);
-	}
-	else if(data.action.right){
-		gpioWrite(PIN_LED_RED, LOW);
-	}
-	else if(data.action.rotate){
-		gpioWrite(PIN_LED_GREEN, LOW);
-		gpioWrite(PIN_LED_RED, LOW);
-	}
-
+	uartPackProcess(&data, U0);
+	processEvents(&data);
 }
-void I2CRunDeltas_tb(void) {
-	static bool first=true;
-	static bool go_back_to_center=false;
-	if(FXOS8700CQ_getDataFlag()  && !first ){
-		ac = FXOS8700CQ_getAcc();
-		if(((fabs(ac.x)> THRESHOLD) && !go_back_to_center )){// || (fabs(ac.y-old_ac.y)> THRESHOLD) || (fabs(ac.z-old_ac.z)> THRESHOLD)) ){
-			if(((ac.x)< 0) ){//|| ((ac.y-old_ac.y)< 0) || ((ac.z-old_ac.z)< 0)){
-				gpioWrite(PIN_LED_GREEN, LOW);
-			}
-			else{
-				gpioWrite(PIN_LED_RED, LOW);
-			}
-			go_back_to_center=true;
-		}
-		else if(((fabs(ac.y)> THRESHOLD) && !go_back_to_center )){
-			if(((ac.x)< 0) ){
-				gpioWrite(PIN_LED_GREEN, LOW);
-				gpioWrite(PIN_LED_RED, LOW);
-			}
-			else{
-				gpioWrite(PIN_LED_RED, LOW);
-				gpioWrite(PIN_LED_BLUE, LOW);
 
-			}
-			go_back_to_center=true;
-
-		}
-		else if((fabs(ac.x) <= THRESHOLD) && (fabs(ac.y) <= THRESHOLD)){
-			gpioWrite(PIN_LED_RED, HIGH);
-			gpioWrite(PIN_LED_BLUE, HIGH);
-			gpioWrite(PIN_LED_GREEN, HIGH);
-			go_back_to_center=false;
-		}
+void processEvents(package * PEvents){
+	if(PEvents->action.down== true){
+		gpioToggle(PIN_LED_RED);
+		gpioToggle(PIN_LED_BLUE);
 	}
-	if(first)
-		first=false;
+	else if(PEvents->action.left == true){
+		gpioToggle(PIN_LED_GREEN);
+	}
+	else if(PEvents->action.right== true){
+		gpioToggle(PIN_LED_RED);
+	}
+	else if(PEvents->action.rotate== true){
+		gpioToggle(PIN_LED_GREEN);
+		gpioToggle(PIN_LED_RED);
+	}
+	else if(PEvents->reset == true){
+		gpioToggle(PIN_LED_GREEN);
+		gpioToggle(PIN_LED_RED);
+		gpioToggle(PIN_LED_BLUE);
+	}
 }
+

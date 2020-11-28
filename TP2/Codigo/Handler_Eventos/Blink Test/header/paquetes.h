@@ -29,6 +29,8 @@ Packages:
 		binits  :  4
 
 */
+#ifndef paquetes_H
+#define paquetes_H
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -74,3 +76,4 @@ typedef struct{
 	piece_prop piece;
 	bool reset;
 }package;
+#endif /* paquetes_H */

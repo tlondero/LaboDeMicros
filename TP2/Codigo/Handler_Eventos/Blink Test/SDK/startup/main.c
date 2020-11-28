@@ -15,5 +15,5 @@ int main(void) {
 	appInit(); /* Program-specific setup */
 
 	__FOREVER__
-	I2CRunDeltas_tb(); /* Program-specific loop  */
+	appRun(); /* Program-specific loop  */
 }

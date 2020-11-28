@@ -10,6 +10,7 @@
  ******************************************************************************/
 #include "header/AccelerometerEvents.h"
 #include "header/FXOS8700CQ.h"
+#include <math.h>
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
@@ -55,6 +56,7 @@ void accelerometerGetEvent(package * data){
 		}
 		else if((fabs(ac.x) <= THRESHOLD) && (fabs(ac.y) <= THRESHOLD)){
 			go_back_to_center=false;
+
 		}
 	}
 }
