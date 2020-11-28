@@ -16,5 +16,5 @@ int main(void) {
 
 
 	__FOREVER__
-		I2CRun_tb(); /* Program-specific loop  */
+	I2CRunDeltas_tb(); /* Program-specific loop  */
 }
