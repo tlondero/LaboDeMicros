@@ -1,9 +1,3 @@
-/***************************************************************************/ /**
-  @file     timer.h
-  @brief    Timer driver. Advance implementation
-  @author   MAGT
-  @date Spring 2020
- ******************************************************************************/
 
 #ifndef _TIMER_H_
 #define _TIMER_H_
@@ -20,10 +14,10 @@
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
 
-#define TIMER_TICK_MS 10
-#define TIMER_MS2TICKS(ms) ((ms)*TIMER_TICK_MS)
+#define TIMER_TICK_MS       1
+#define TIMER_MS2TICKS(ms)  ((ms)/TIMER_TICK_MS)
 #define TIMER_INVALID_ID 255
-#define TIMER_ID_INTERNAL 0
+#define TIMER_ID_INTERNAL   0
 /*******************************************************************************
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
@@ -54,6 +48,8 @@ typedef void (*tim_callback_t)(void);
  */
 void timerInit(void);
 
+// Non-Blocking services ////////////////////////////////////////////////
+
 /**
  * @brief Request a timer
  * @return ID of the next, not already in use, available timer
@@ -64,7 +60,7 @@ tim_id_t timerGetId(void);
  * @brief Begin to run a new timer
  * @param id ID of the timer to start
  * @param ticks time until timer expires, in ticks
- * @param mode TIM_MODE_SINGLESHOT TIM_MODE_PERIODIC
+ * @param mode SINGLESHOT or PERIODIC
  * @param callback Function to be call when timer expires
  * @return true if everything went smooth. false otherwise.
  */
@@ -110,6 +106,8 @@ uint8_t isTimerPaused(tim_id_t id);
  * @param ticks time to wait in ticks
  */
 void timerDelay(ttick_t ticks);
+
+
 
 /*******************************************************************************
  ******************************************************************************/
