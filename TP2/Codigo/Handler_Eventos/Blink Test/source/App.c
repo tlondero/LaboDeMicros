@@ -80,15 +80,13 @@ void appInit(void) {
 	tetris_set_difficulty(EASY);
 	tim_id_t teturisuID = timerGetId();
 	//
-	timerStart(teturisuID, TIMER_MS2TICKS(50),TIM_MODE_PERIODIC,tetrisRun);
+//	timerStart(teturisuID, TIMER_MS2TICKS(50),TIM_MODE_PERIODIC,tetrisRun);
 	//
-
-
 }
 
 
 /* Función que se llama constantemente en un ciclo infinito */
-SRAWDATA_f ac;
+
 void tetrisRun(void){
 	static bool bGameOver = false;
 	if(((tetris_get_game_status() == TETRIS_RUNNING_ST) && !bGameOver)){
@@ -102,5 +100,6 @@ void tetrisRun(void){
 }
 appRun(){
 	//do nothing
+	EvHandGetEvents();
 }
 
