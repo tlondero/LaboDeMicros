@@ -5,8 +5,8 @@
  *      Author: MAGT
  */
 
-#include <header/drivers/gpio.h>
-#include <header/drivers/i2c.h>
+#include <../header/drivers/gpio.h>
+#include <../header/drivers/i2c.h>
 #include "MK64F12.h"
 #include <stddef.h>
 
