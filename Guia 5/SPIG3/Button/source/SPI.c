@@ -58,9 +58,9 @@ void spi_init(void)
 {
 	init_spi_pin(PORTNUM2PIN(PD, 0));//PCS
 
-	init_spi_pin(PORTNUM2PIN(PD, 1));
-	init_spi_pin(PORTNUM2PIN(PD, 2));
-	init_spi_pin(PORTNUM2PIN(PD, 3));
+	init_spi_pin(PORTNUM2PIN(PD, 1)); //SCK
+	init_spi_pin(PORTNUM2PIN(PD, 2)); //MOSI
+	init_spi_pin(PORTNUM2PIN(PD, 3)); //MISO
 
 	//Clock gating
 	SIM->SCGC6 |= SIM_SCGC6_SPI0(1);
