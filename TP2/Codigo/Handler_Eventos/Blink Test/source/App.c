@@ -22,7 +22,7 @@
 #include "header/drivers/timer.h"
 #include "header/event_handlers/paquetes.h"
 #include "header/board.h"
-
+#include "header/tetris_game.h"
 #include "MK64F12.h"
 #include <math.h>
 #include "hardware.h"
@@ -51,10 +51,14 @@
  ******************************************************************************/
 
 //void processEvents( package * PEvents);
-
+void tetrisRun(void);
 void appInit(void) {
+
+	timerInit();
+
 	//Accelerometer init
 	FXOS8700CQInit();
+
 
 	//UART init
 	uart_cfg_t init_config;
@@ -62,52 +66,41 @@ void appInit(void) {
 	init_config.mode = NON_BLOCKING;
 	init_config.parity = NO_PARITY_UART;
 	init_config.nBits = NBITS_8;
-	uartInit(U0, init_config);
+	uartInit(U0, init_config); //ESTE ES EL USB, el 3 es el que hay que iniciar para el ESP
 
-	//leds init
-	gpioMode(PIN_LED_BLUE, OUTPUT);
-	gpioMode(PIN_LED_RED, OUTPUT);
-	gpioMode(PIN_LED_GREEN, OUTPUT);
-	gpioWrite(PIN_LED_RED, HIGH);
-	gpioWrite(PIN_LED_GREEN, HIGH);
-	gpioWrite(PIN_LED_BLUE, HIGH);
 
-	//timer init
-	timerInit();
-	tim_id_t tid = timerGetId();
-	timerStart(tid, TIMER_MS2TICKS(200),TIM_MODE_PERIODIC,FXOS8700CQ_ReadAccelMagnData);
+	static uint8_t nFieldWidth = 10;
+	static uint8_t nFieldHeight = 9;
+
+
+
+	tetris_init(nFieldWidth, nFieldHeight);
+
+	tetris_begin_game(); //Sets game mode to RUNNING
+	tetris_set_difficulty(EASY);
+	tim_id_t teturisuID = timerGetId();
+	//
+	timerStart(teturisuID, TIMER_MS2TICKS(50),TIM_MODE_PERIODIC,tetrisRun);
+	//
+
+
 }
 
 
 /* Función que se llama constantemente en un ciclo infinito */
 SRAWDATA_f ac;
-void appRun(void){
-	package data={0};
-	accelerometerGetEvent(&data);
-	uartGetEvent(&data, U0);
-	processEvents(&data);
+void tetrisRun(void){
+	static bool bGameOver = false;
+	if(((tetris_get_game_status() == TETRIS_RUNNING_ST) && !bGameOver)){
+		EvHandGetEvents();
+		tetris_update_board();
+	}
+	else if(tetris_get_game_status()  == TETRIS_GAME_OVER_ST){
+		//otra cosa
+		//quizá mostrar score y eso antes d eresetear.
+	}
 }
-
-
-//void processEvents( package * PEvents){
-//	if(PEvents->action.down== true){
-//		gpioToggle(PIN_LED_RED);
-//		gpioToggle(PIN_LED_BLUE);
-//	}
-//	else if(PEvents->action.left == true){
-//		gpioToggle(PIN_LED_GREEN);
-//	}
-//	else if(PEvents->action.right== true){
-//		gpioToggle(PIN_LED_RED);
-//	}
-//	else if(PEvents->action.rotate== true){
-//		gpioToggle(PIN_LED_GREEN);
-//		gpioToggle(PIN_LED_RED);
-//	}
-//	else if(PEvents->reset == true){
-//		gpioToggle(PIN_LED_GREEN);
-//		gpioToggle(PIN_LED_RED);
-//		gpioToggle(PIN_LED_BLUE);
-//	}
-//}
+appRun(){
+	//do nothing
+}
 

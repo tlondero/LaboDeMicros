@@ -13,11 +13,10 @@
 #include "../header/event_handlers/uartPackHand.h"
 #include "../header/event_handlers/paquetes.h"
 #include "../header/drivers/uart.h"
-
+#include "../header/tetris_game.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
-
 
 
 /*******************************************************************************
@@ -32,7 +31,14 @@
  * FUNCTION DECLARATION WITH LOCAL SCOPE
  ******************************************************************************/
 void processEvents( package * PEvents);
-
+void resetFunction(void);
+void leftFunction(void);
+void rightFunction(void);
+void downFunction(void);
+void rotateFunction(void);
+void brightnessFunction(uint8_t br);
+void fallSpeedFunction(uint8_t fs);
+void piecePropertyFunction(char p, uint8_t r,uint8_t g, uint8_t b);
 /*******************************************************************************
  * FUNCTION DEFINITION WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -43,6 +49,7 @@ void EvHandGetEvents(void){
 	accelerometerGetEvent(&data);//I2C events
 
 	uartGetEvent(&data, U0);//Uart events
+	//ESTE ES EL USB, el 3 es el que hay que iniciar para el ESP
 
 	//SPI events
 
@@ -58,30 +65,60 @@ void EvHandGetEvents(void){
  ******************************************************************************/
 void processEvents( package * PEvents){
 	if(PEvents->reset){
-		//reset function
+		resetFunction();//reset function
 	}
 	else{
 		if(PEvents->action.down){
-			//Down function
+			downFunction();//Down function
 		}
 		if(PEvents->action.left){
-			//Left function
+			leftFunction();//Left function
 		}
 		if(PEvents->action.right){
-			//Right function
+			rightFunction();//Right function
 		}
 		if(PEvents->action.rotate){
-			//rotate function
+			rotateFunction();//rotate function
 		}
 		if(PEvents->birghtness.change){
-			//brightness function
+			brightnessFunction(PEvents->birghtness.birghtness);//brightness function
 		}
 		if(PEvents->fall_speed.change){
-			//fall speed function
+			fallSpeedFunction(PEvents->fall_speed.fall_speedowagon);//fall speed function
 		}
 		if(PEvents->piece.changed){
-			//update piece property
+			piecePropertyFunction(PEvents->piece.piece, PEvents->piece.color.r, PEvents->piece.color.g, PEvents->piece.color.b);//update piece property
 		}
 	}
 }
+
+void resetFunction(void){
+	tetris_restart_game();
+}
+void leftFunction(void){
+	tetris_move_left();
+}
+void rightFunction(void){
+	tetris_move_right();
+}
+
+void downFunction(void){
+	tetris_move_down();
+}
+
+void rotateFunction(void){
+	tetris_rotate_piece();
+}
+
+void brightnessFunction(uint8_t br){
+	//Front end.
+}
+void fallSpeedFunction(uint8_t fs){
+	tetris_set_difficulty(fs);
+	//ver que esto esté entre 0 y 30 para que sea humano
+}
+void piecePropertyFunction(char p, uint8_t r,uint8_t g, uint8_t b){
+	//Front end.
+}
+
 

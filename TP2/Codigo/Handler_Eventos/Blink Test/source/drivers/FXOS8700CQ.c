@@ -10,6 +10,7 @@
 #include <header/drivers/FXOS8700CQ.h>
 #include <header/drivers/i2c.h>
 #include "hardware.h"
+#include "header/drivers/timer.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -99,6 +100,9 @@ void FXOS8700CQInit(void)
 {
 	i2cInit(I2C0_NUM);
 	FXOS8700CQConfiguration();
+	timerInit();
+	tim_id_t tid = timerGetId();
+	timerStart(tid, TIMER_MS2TICKS(200),TIM_MODE_PERIODIC,FXOS8700CQ_ReadAccelMagnData);
 }
 
 

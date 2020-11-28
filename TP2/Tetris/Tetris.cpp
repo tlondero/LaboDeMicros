@@ -83,7 +83,7 @@ int main()
 	tetris_init(nFieldWidth, nFieldHeight);
 	//Step 2- Begin game
 	tetris_begin_game(); //Sets game mode to RUNNING
-	tetris_set_difficulty(HELL);
+	tetris_set_difficulty(EASY);
 	/***************TETRIS*******************/
 
 	// Create Screen Buffer
