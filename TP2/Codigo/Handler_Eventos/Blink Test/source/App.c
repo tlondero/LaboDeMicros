@@ -50,7 +50,7 @@
  * BALIZA
  ******************************************************************************/
 
-void processEvents( package * PEvents);
+//void processEvents( package * PEvents);
 
 void appInit(void) {
 	//Accelerometer init
@@ -84,30 +84,30 @@ SRAWDATA_f ac;
 void appRun(void){
 	package data={0};
 	accelerometerGetEvent(&data);
-	uartPackProcess(&data, U0);
+	uartGetEvent(&data, U0);
 	processEvents(&data);
 }
 
 
-void processEvents( package * PEvents){
-	if(PEvents->action.down== true){
-		gpioToggle(PIN_LED_RED);
-		gpioToggle(PIN_LED_BLUE);
-	}
-	else if(PEvents->action.left == true){
-		gpioToggle(PIN_LED_GREEN);
-	}
-	else if(PEvents->action.right== true){
-		gpioToggle(PIN_LED_RED);
-	}
-	else if(PEvents->action.rotate== true){
-		gpioToggle(PIN_LED_GREEN);
-		gpioToggle(PIN_LED_RED);
-	}
-	else if(PEvents->reset == true){
-		gpioToggle(PIN_LED_GREEN);
-		gpioToggle(PIN_LED_RED);
-		gpioToggle(PIN_LED_BLUE);
-	}
-}
+//void processEvents( package * PEvents){
+//	if(PEvents->action.down== true){
+//		gpioToggle(PIN_LED_RED);
+//		gpioToggle(PIN_LED_BLUE);
+//	}
+//	else if(PEvents->action.left == true){
+//		gpioToggle(PIN_LED_GREEN);
+//	}
+//	else if(PEvents->action.right== true){
+//		gpioToggle(PIN_LED_RED);
+//	}
+//	else if(PEvents->action.rotate== true){
+//		gpioToggle(PIN_LED_GREEN);
+//		gpioToggle(PIN_LED_RED);
+//	}
+//	else if(PEvents->reset == true){
+//		gpioToggle(PIN_LED_GREEN);
+//		gpioToggle(PIN_LED_RED);
+//		gpioToggle(PIN_LED_BLUE);
+//	}
+//}
 

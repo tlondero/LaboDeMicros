@@ -61,6 +61,7 @@ typedef struct{
 typedef struct{
 	char piece;
 	color_t color;
+	bool changed;
 }piece_prop;
 
 typedef struct{
@@ -69,9 +70,19 @@ typedef struct{
 	bool down;
 	bool rotate;
 }piece_movement;
+
 typedef struct{
 	uint8_t birghtness;
-	uint8_t fall_speed;
+	bool change;
+}brightness_t;
+typedef struct{
+	uint8_t fall_speedowagon;
+	bool change;
+}fall_t;
+
+typedef struct{
+	brightness_t birghtness;
+	fall_t fall_speed;
 	piece_movement action;
 	piece_prop piece;
 	bool reset;

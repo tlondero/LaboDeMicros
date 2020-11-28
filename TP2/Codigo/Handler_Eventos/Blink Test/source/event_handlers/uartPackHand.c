@@ -26,7 +26,7 @@
 /*******************************************************************************
  * FUNCTION PROTOTYPES WITH GLOBAL SCOPE DEFINITION
  *******************************************************************************/
-void uartPackProcess(package * data, uint8_t id){
+void uartGetEvent(package * data, uint8_t id){
 	static char msg[1000];
 
 	if (uartIsRxMsg(id) && (uartGetRxMsgLength(id) > PACKAGE_SIZE)) {
@@ -37,13 +37,15 @@ void uartPackProcess(package * data, uint8_t id){
 #if DEV_MODE
 			uartWriteMsg(id, "Brightness changed\r\n", 21);
 #endif
-			data->birghtness=msg[1];
+			data->birghtness.birghtness=msg[1];
+			data->birghtness.change=true;
 			break;
 		case FALL_H:
 #if DEV_MODE
 			uartWriteMsg(id, "Fall speed changed\r\n", 21);
 #endif
-			data->fall_speed=msg[1];
+			data->fall_speed.fall_speedowagon=msg[1];
+			data->fall_speed.change=true;
 			break;
 		case MOV_LEFT_H:
 #if DEV_MODE
@@ -76,6 +78,7 @@ void uartPackProcess(package * data, uint8_t id){
 			data->reset=true;
 			break;
 		case PIECE_L_H:
+			data->piece.changed=true;
 			data->piece.piece='L';
 			data->piece.color.r=msg[1];
 			data->piece.color.g=msg[2];
@@ -85,6 +88,7 @@ void uartPackProcess(package * data, uint8_t id){
 #endif
 			break;
 		case PIECE_J_H:
+			data->piece.changed=true;
 			data->piece.piece='H';
 			data->piece.color.r=msg[1];
 			data->piece.color.g=msg[2];
@@ -94,6 +98,7 @@ void uartPackProcess(package * data, uint8_t id){
 #endif
 			break;
 		case PIECE_T_H:
+			data->piece.changed=true;
 			data->piece.piece='T';
 			data->piece.color.r=msg[1];
 			data->piece.color.g=msg[2];
@@ -103,6 +108,7 @@ void uartPackProcess(package * data, uint8_t id){
 #endif
 			break;
 		case PIECE_I_H:
+			data->piece.changed=true;
 			data->piece.piece='I';
 			data->piece.color.r=msg[1];
 			data->piece.color.g=msg[2];
@@ -112,6 +118,7 @@ void uartPackProcess(package * data, uint8_t id){
 #endif
 			break;
 		case PIECE_Z_H:
+			data->piece.changed=true;
 			data->piece.piece='Z';
 			data->piece.color.r=msg[1];
 			data->piece.color.g=msg[2];
@@ -121,6 +128,7 @@ void uartPackProcess(package * data, uint8_t id){
 #endif
 			break;
 		case PIECE_O_H:
+			data->piece.changed=true;
 			data->piece.piece='O';
 			data->piece.color.r=msg[1];
 			data->piece.color.g=msg[2];
@@ -130,6 +138,7 @@ void uartPackProcess(package * data, uint8_t id){
 #endif
 			break;
 		case PIECE_S_H:
+			data->piece.changed=true;
 			data->piece.piece='S';
 			data->piece.color.r=msg[1];
 			data->piece.color.g=msg[2];

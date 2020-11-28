@@ -26,7 +26,6 @@
  * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
  ******************************************************************************/
 
-
 /*******************************************************************************
  * VARIABLE PROTOTYPES WITH GLOBAL SCOPE
  ******************************************************************************/
@@ -41,6 +40,6 @@
  * @id UART's number
  * @return A new byte has being received
 */
-void uartPackProcess(package * data, uint8_t id );
+void uartGetEvent(package * data, uint8_t id );
 
 #endif /* UARTPACKHAND_H_ */
