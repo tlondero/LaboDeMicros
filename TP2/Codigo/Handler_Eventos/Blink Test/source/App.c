@@ -9,16 +9,15 @@
  ******************************************************************************/
 
 
-#include <header/event_handlers/uartPackHand.h>
-
-#include <header/event_handlers/uartPackHand.h>
 #include "header/event_handlers/AccelerometerEvents.h"
-
+#include "header/drivers/POTE_ADC.h"
 
 #include <header/drivers/FXOS8700CQ.h>
 #include <header/drivers/gpio.h>
 #include <header/drivers/i2c.h>
 #include <header/drivers/uart.h>
+#include <header/event_handlers/uartGetEvent.h>
+#include <header/event_handlers/uartGetEvent.h>
 #include "header/drivers/timer.h"
 #include "header/event_handlers/paquetes.h"
 #include "header/board.h"
@@ -82,6 +81,9 @@ void appInit(void) {
 	//
 //	timerStart(teturisuID, TIMER_MS2TICKS(50),TIM_MODE_PERIODIC,tetrisRun);
 	//
+
+	//Pote
+	PoteInit();
 }
 
 
