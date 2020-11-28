@@ -11,7 +11,7 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 #include <stdbool.h>
-#include "header/gpio.h"
+#include "gpio.h"
 #include <stdint.h>
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE

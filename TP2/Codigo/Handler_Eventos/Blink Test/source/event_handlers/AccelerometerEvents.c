@@ -8,8 +8,8 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include "header/AccelerometerEvents.h"
-#include "header/FXOS8700CQ.h"
+#include <header/drivers/FXOS8700CQ.h>
+#include <header/event_handlers/AccelerometerEvents.h>
 #include <math.h>
 
 /*******************************************************************************

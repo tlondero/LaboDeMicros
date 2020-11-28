@@ -9,18 +9,24 @@
  ******************************************************************************/
 
 
-#include "header/Button.h"
-#include "header/i2c.h"
-#include "header/gpio.h"
-#include "MK64F12.h"
+#include <header/event_handlers/uartPackHand.h>
+
+#include <header/event_handlers/uartPackHand.h>
+#include "header/event_handlers/AccelerometerEvents.h"
+
+
+#include <header/drivers/FXOS8700CQ.h>
+#include <header/drivers/gpio.h>
+#include <header/drivers/i2c.h>
+#include <header/drivers/uart.h>
+#include "header/drivers/timer.h"
+#include "header/event_handlers/paquetes.h"
 #include "header/board.h"
-#include "header/FXOS8700CQ.h"
-#include "header/timer.h"
+
+#include "MK64F12.h"
 #include <math.h>
 #include "hardware.h"
-#include "header/uartPackHand.h"
-#include "header/uart.h"
-#include "header/AccelerometerEvents.h"
+
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
@@ -44,6 +50,7 @@
  * BALIZA
  ******************************************************************************/
 
+void processEvents( package * PEvents);
 
 void appInit(void) {
 	//Accelerometer init
@@ -81,7 +88,8 @@ void appRun(void){
 	processEvents(&data);
 }
 
-void processEvents(package * PEvents){
+
+void processEvents( package * PEvents){
 	if(PEvents->action.down== true){
 		gpioToggle(PIN_LED_RED);
 		gpioToggle(PIN_LED_BLUE);

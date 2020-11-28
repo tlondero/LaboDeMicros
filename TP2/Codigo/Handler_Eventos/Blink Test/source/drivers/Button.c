@@ -7,11 +7,11 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include "header/SysTick.h"
-#include "header/gpio.h"
+#include <header/drivers/Button.h>
+#include <header/drivers/gpio.h>
+#include <header/drivers/SysTick.h>
+#include <header/drivers/timer.h>
 #include "header/board.h"
-#include "header/Button.h"
-#include "header/timer.h"
 
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE

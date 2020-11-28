@@ -8,10 +8,8 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include "header/timer.h"
-#include "header/SysTick.h"
-
-
+#include <header/drivers/SysTick.h>
+#include <header/drivers/timer.h>
 #include <stdbool.h>
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE

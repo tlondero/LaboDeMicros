@@ -11,7 +11,7 @@
  * @param funcallback Function to be call every SysTick
  * @return Initialization and registration succeed
  */
-#include "header/SysTick.h"
+#include <header/drivers/SysTick.h>
 #include <stddef.h>
 #include <stdint.h>
 #include "MK64F12.h"

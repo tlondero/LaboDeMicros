@@ -7,8 +7,8 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-#include "header/FXOS8700CQ.h"
-#include "header/i2c.h"
+#include <header/drivers/FXOS8700CQ.h>
+#include <header/drivers/i2c.h>
 #include "hardware.h"
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE

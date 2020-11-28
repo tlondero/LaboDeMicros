@@ -7,8 +7,8 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include "header/uartPackHand.h"
-#include "header/uart.h"
+#include <header/drivers/uart.h>
+#include <header/event_handlers/uartPackHand.h>
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
