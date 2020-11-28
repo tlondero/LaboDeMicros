@@ -6,8 +6,8 @@
  */
 
 
-#include <header/drivers/SysTick.h>
-#include "header/board.h"
+#include <../header/drivers/SysTick.h>
+#include "../header/board.h"
 #include "MK64F12.h"
 #include "hardware.h"
 //Clock gating masks
