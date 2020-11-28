@@ -8,10 +8,13 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
+#include <header/event_handlers/uartGetEvent.h>
 #include "../header/event_handlers/event_handler.h"
 #include "../header/event_handlers/AccelerometerEvents.h"
-#include "../header/event_handlers/uartPackHand.h"
+#include "../header/drivers/POTE_ADC.h"
+
 #include "../header/event_handlers/paquetes.h"
+
 #include "../header/drivers/uart.h"
 #include "../header/tetris_game.h"
 /*******************************************************************************
@@ -54,7 +57,7 @@ void EvHandGetEvents(void) {
 	//SPI events
 
 	//ADC events
-
+	PoteGetEvent(&data);
 //	processEvents(&data);
 	processEventsTB(&data);
 }

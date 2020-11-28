@@ -1,5 +1,5 @@
 /***************************************************************************//**
- @file     uartPackHand.c
+ @file     uartGetEvent.c
  @brief    Application functions
  @author   MAGT
  ******************************************************************************/
@@ -8,7 +8,7 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 #include <header/drivers/uart.h>
-#include <header/event_handlers/uartPackHand.h>
+#include <header/event_handlers/uartGetEvent.h>
 /*******************************************************************************
  * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
  ******************************************************************************/
