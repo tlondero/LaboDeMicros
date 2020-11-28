@@ -10,11 +10,23 @@
 #include "./SPI.h"
 #include <stdint.h>
 
+typedef struct
+{
+	bool left;
+	bool right;
+	bool down;
+	bool rotate;
+	bool pause_resume;
+	bool reset;
+} button_status;
+
 typedef uint8_t action_589;
+typedef button_status* _status_pointer;
+typedef const button_status* status_pointer;
 
-#define LEFT_589 16
-#define DOWN_589 32
-#define RIGHT_589 64
-#define ROTATE_589 128
 
+//PUBLIC API
+void SPI_589_init(void);
+void SPI_589_update_buttons(void);
+status_pointer SPI_589_get_buttons_status(void);
 #endif /* SPI_BOTONES_H_ */

@@ -43,34 +43,27 @@
 /*******************************************************************************
  * BALIZA
  ******************************************************************************/
-static uint8_t source[1] = {0b10000001};//,20,20,20,10,10,10,10};
-static uint8_t debug = 1;
-static uint8_t destination[1];
+// uint8_t source[1] = {0b10000001};//,20,20,20,10,10,10,10};
+//static uint8_t debug = 1;
+//static uint8_t destination[1];
 
-
+#include "header/spi_botones.h"
+status_pointer p;
 void App_Init (void)
 {
-	spi_init();
+	SPI_589_init();
+	p = SPI_589_get_buttons_status();
 }
 
 /* Función que se llama constantemente en un ciclo infinito */
-static int a;
+
 void App_Run (void)
-{
-	if(debug){
-		spi_transaction(source, sizeof(source), destination);
-		if(destination[0] & 16){ //left
-			a = 1;
-		}
-		if(destination[0] & 32){ //down
-			a = 2;
-		}
-		if(destination[0] & 64){ //right
-			a = 3;
-		}
-		if(destination[0] & 128){ //rotate
-			a = 4;
-		}
-		spi_transaction(source, sizeof(source), destination);
+{	SPI_589_update_buttons();
+	if(p->right){
+		int a = 1;
+	}
+	if(p->left){
+
+		int a = 1;
 	}
 }
