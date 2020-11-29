@@ -101,21 +101,11 @@ void WS2812B_init(void){
 
 
 
-void WS2812B_matrix_set(uint8_t color, uint8_t brightness, uint8_t row, uint8_t col){
+void WS2812B_matrix_set(uint8_t row, uint8_t col, uint8_t r, uint8_t g, uint8_t b){
 
-	switch(color){
-	case GREEN:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].G, brightness);
-		break;
-	case RED:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].R, brightness);
-		break;
-	case BLUE:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].B, brightness);
-		break;
-	default: break;
-	}
-
+	set_color_brightness(led_matrix[ROW_SIZE*row+col].G, g);
+	set_color_brightness(led_matrix[ROW_SIZE*row+col].R, r);
+	set_color_brightness(led_matrix[ROW_SIZE*row+col].B, b);
 }
 
 
