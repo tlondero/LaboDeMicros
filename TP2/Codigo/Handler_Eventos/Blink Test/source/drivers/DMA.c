@@ -5,21 +5,9 @@
  *      Author: Acer
  */
 
-#include "../header/drivers/DMA.h"
-#include "../header/drivers/FTM.h"
+#include "header/drivers/DMA.h"
+#include "header/drivers/FTM.h"
 #include "hardware.h"
-#include "../header/drivers/timer.h"
-#include "../header/drivers/FTM.h"
-#include "../header/board.h"
-#include "../header/drivers/gpio.h"
-
-static tim_id_t refresh_timer;
-
-void refresh_handler(void){
-	FTMStartClock(0);
-	gpioToggle(PORTNUM2PIN(PB,18));
-}
-
 static void (*cb)(void);
 void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size, void* cb_){
 
@@ -62,8 +50,8 @@ void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size, void* cb_){
 
 	/* Autosize for Current major iteration count */
 
-	DMA0->TCD[0].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(matrix_size/2);	// div 2 //(sizeof(sourceBuffer)/sizeof(sourceBuffer[0]))
-	DMA0->TCD[0].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(matrix_size/2);  // div 2
+	DMA0->TCD[0].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(matrix_size/2);	//(sizeof(sourceBuffer)/sizeof(sourceBuffer[0]))
+	DMA0->TCD[0].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(matrix_size/2);
 
 
 	//DMA_TCD0_SLAST = 0x00;
@@ -87,19 +75,18 @@ void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size, void* cb_){
 
 }
 
-void DMA0_IRQHandler(void)
+void DMA0_IRQHandler()
 {
 	/* Clear the interrupt flag. */
 	DMA0->CINT |= 0;
-	FTMStopClock(0);
-	timerReset(refresh_timer);
 	cb();
 }
 
 /* The red LED is toggled when an error occurs. */
-void DMA_Error_IRQHandler(void)
+void DMA_Error_IRQHandler()
 {
 	/* Clear the error interrupt flag.*/
 	DMA0->CERR |= 0;
+
 }
 

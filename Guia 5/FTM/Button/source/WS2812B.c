@@ -58,19 +58,13 @@ static void set_color_brightness(uint16_t *ptr, uint8_t brightness){
 void WS2812B_init(void){
 	uint8_t i;
 
-	for(i = 0; i < CANT_LEDS+CANT_LEDS_ZERO; i++){
+	for(i = 0; i < CANT_LEDS; i++){
 
-		if(i < CANT_LEDS){
 		set_color_brightness(led_matrix[i].R, 0);
 		set_color_brightness(led_matrix[i].G, 0);
 		set_color_brightness(led_matrix[i].B, 0);
-		}
 
 	}
-
-	set_color_brightness(led_matrix[60].R, 0);
-	set_color_brightness(led_matrix[60].G, 128);
-	set_color_brightness(led_matrix[60].B, 0);
 
 	timerInit();
 	timerid = timerGetId();
