@@ -58,11 +58,11 @@ void EvHandGetEvents(void)
 	spiEventHandler(&data);
 
 	//ADC events
-	//PoteGetEvent(&data);
+	PoteGetEvent(&data);
 
 
 	processEvents(&data);
-//	processEventsTB(&data);
+
 }
 
 /*******************************************************************************

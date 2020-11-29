@@ -174,18 +174,20 @@ void FXOS8700CQConfiguration(void)
 }
 
 void FXOS8700CQ_ReadAccelMagnData(void){
-	new_data = false;
+
 	i2cTransaction(FXOS8700CQ_SLAVE_ADDR, FXOS8700CQ_STATUS, buffer,FXOS8700CQ_READ_LEN, I2C_READ, callback_read);
 }
 
 
 SRAWDATA_f FXOS8700CQ_getMag(void)
 {
+	new_data = false;
 	return Mag;
 }
 
 SRAWDATA_f FXOS8700CQ_getAcc(void)
 {
+	new_data = false;
 	return Acc;
 }
 

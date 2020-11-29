@@ -80,12 +80,12 @@ void appInit(void) {
 	SPI_589_init();
 
 	//Matriz de led
-	WS2812B_init();
+	//WS2812B_init();
 
 
 
 	//Pote
-	//PoteInit();
+	PoteInit();
 
 
 	static uint8_t nFieldWidth = 10;
@@ -134,7 +134,7 @@ void appInit(void) {
 	tetris_set_difficulty(EASY);
 	tim_id_t teturisuID = timerGetId();
 	//
-	timerStart(teturisuID, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC, tetrisRun);
+	timerStart(teturisuID, TIMER_MS2TICKS(200), TIM_MODE_PERIODIC, tetrisRun);
 	front_end_tetris =tetris_get_board();
 	//
 
@@ -145,8 +145,10 @@ void appInit(void) {
 /* Función que se llama constantemente en un ciclo infinito */
 
 void tetrisRun(void){
+
+	EvHandGetEvents();
+
 	if((((tetris_get_game_status() == TETRIS_RUNNING_ST) || (tetris_get_game_status() ==  TETRIS_PAUSED_ST) ))){
-		EvHandGetEvents();
 		tetris_update_board();
 	}
 	else if(tetris_get_game_status()  == TETRIS_GAME_OVER_ST){
