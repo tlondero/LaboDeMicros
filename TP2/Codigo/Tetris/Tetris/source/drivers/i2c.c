@@ -122,7 +122,7 @@ void I2CHandler(void) {
 				break;
 			case ST:
 				if (buffer.mode == I2C_READ) {
-					i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_RSTA_MASK;		//Set rstart
+					i2cptr->C1 |= I2C_C1_TX_MASK | I2C_C1_RSTA_MASK;//Set rstart
 					buffer.state = DATA;
 					return;
 				}
@@ -141,7 +141,7 @@ void I2CHandler(void) {
 				} else {
 					i2cptr->D = *buffer.data;			//Write
 					buffer.data++;
-					buffer.size--;					
+					buffer.size--;
 				}
 				buffer.state = DATA;
 				break;
@@ -240,13 +240,13 @@ bool i2cInit(ic2_channel_t chan) {
 		(portBasePtr[sclPtr]->PCR)[sclPin] |= PORT_PCR_IRQC(
 				GPIO_IRQ_MODE_DISABLE);
 
-		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= PORT_PCR_ODE_MASK;				//Set open drain
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= PORT_PCR_ODE_MASK;//Set open drain
 		(portBasePtr[sclPtr]->PCR)[sclPin] |= PORT_PCR_ODE_MASK;
 
-		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= (HIGH << PORT_PCR_PE_SHIFT);		//Enable
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= (HIGH << PORT_PCR_PE_SHIFT);//Enable
 		(portBasePtr[sclPtr]->PCR)[sclPin] |= (HIGH << PORT_PCR_PE_SHIFT);
 
-		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= (HIGH << PORT_PCR_PS_SHIFT);		//Pull Up
+		(portBasePtr[sdaPtr]->PCR)[sdaPin] |= (HIGH << PORT_PCR_PS_SHIFT);//Pull Up
 		(portBasePtr[sclPtr]->PCR)[sclPin] |= (HIGH << PORT_PCR_PS_SHIFT);
 
 		//baudrate
@@ -289,6 +289,12 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 		i2cptr->C1 |= I2C_C1_MST_MASK;	//Send start
 
 		valid = true;
+	} else {
+
+		callback = NULL;
+		//__asm("BKPT #0");			//Debug breakpoint
+
+		//BUS BUSY!!
 	}
 
 	return valid;
