@@ -80,7 +80,7 @@ void appInit(void) {
 	SPI_589_init();
 
 	//Matriz de led
-	WS2812B_init();
+	//WS2812B_init();
 
 
 
@@ -134,7 +134,7 @@ void appInit(void) {
 	tetris_set_difficulty(EASY);
 	tim_id_t teturisuID = timerGetId();
 	//
-	timerStart(teturisuID, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC, tetrisRun);
+	timerStart(teturisuID, TIMER_MS2TICKS(200), TIM_MODE_PERIODIC, tetrisRun);
 	front_end_tetris =tetris_get_board();
 	//
 

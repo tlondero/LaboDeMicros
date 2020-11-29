@@ -111,6 +111,8 @@ void fill_board(void) {
 
 /*********Context control******/
 void tetris_init(uint8_t board_w, uint8_t board_h) {
+   /* Intializes random number generator */
+
 	//Get boad ready
 	tetris_game.bForceDown = false;
 	tetris_game.bRotateHold = true;
