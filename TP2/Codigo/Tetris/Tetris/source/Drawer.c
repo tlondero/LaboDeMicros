@@ -9,12 +9,46 @@
 #include "header/drivers/WS2812B.h"
 #include "header/event_handlers/paquetes.h"
 #include "header/Drawer.h"
+#include "header/drivers/timer.h"
 #define DEFAULT_BRIGHTNESS 50
 
 static piece_prop pieces[PKG_CANT_PIECES];
 static uint8_t br = DEFAULT_BRIGHTNESS;
 static uint8_t board_w;
 static uint8_t board_h;
+static uint8_t timerperid;
+static uint8_t gv_aux = 0;
+
+void tim_per_cb(void){
+	gv_aux = !gv_aux;
+}
+
+void clean_board(void){
+	uint8_t row;
+	uint8_t col;
+	uint8_t col_board;
+	for(row = 0; row < board_h-1 ; row++){
+		for(col = 1; col < board_w-1; col++){
+			col_board = col-1;
+			WS2812B_matrix_set(row, col_board, 0, 0, 0);
+		}
+	}
+}
+
+void draw_cross(void){
+	WS2812B_matrix_set(1, 1, 120, 0, 0);
+	WS2812B_matrix_set(2, 2, 120, 0, 0);
+	WS2812B_matrix_set(3, 3, 120, 0, 0);
+	WS2812B_matrix_set(4, 4, 120, 0, 0);
+	WS2812B_matrix_set(5, 5, 120, 0, 0);
+	WS2812B_matrix_set(6, 6, 120, 0, 0);
+	WS2812B_matrix_set(1, 6, 120, 0, 0);
+	WS2812B_matrix_set(2, 5, 120, 0, 0);
+	WS2812B_matrix_set(3, 4, 120, 0, 0);
+	WS2812B_matrix_set(4, 3, 120, 0, 0);
+	WS2812B_matrix_set(5, 2, 120, 0, 0);
+	WS2812B_matrix_set(6, 1, 120, 0, 0);
+}
 
 void drawer_change_brightness(uint8_t br){
 	br = br;
@@ -30,7 +64,16 @@ void drawer_change_piece(char p, uint8_t r, uint8_t g, uint8_t b){
 	}
 }
 void drawer_draw_gameover(uint8_t score){
-
+	//por ahora no muestra score, hay que ver como hacemos eso.
+	//como es 8x8, no podemos mostrarlo tipo columnas para unidades/decenas/centenas
+	//etc porque necesitariamos 9leds en la columna.. ver que hacer
+	if(!gv_aux){
+		clean_board();
+		draw_cross();
+	}
+	else{
+		clean_board();
+	}
 }
 void drawer_update_board(board_ptr board){
 	uint8_t row;
@@ -93,6 +136,11 @@ void drawer_init(uint8_t nFieldWidth, uint8_t nFieldHeight, color_t* colors){
 
 	pieces[6].piece = PIECE_J_H;
 	pieces[6].color = colors[6];
+
+	timerInit();
+	timerperid = timerGetId();
+	timerStart(timerperid, 500, TIM_MODE_PERIODIC, tim_per_cb);
+	timerStop(timerperid);
 
 	WS2812B_init();
 
