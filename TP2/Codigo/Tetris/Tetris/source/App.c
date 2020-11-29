@@ -1,7 +1,7 @@
 /***************************************************************************//**
  @file     App.c
  @brief    Application functions
- @author   Nicolás Magliola
+ @author   MAGT
  ******************************************************************************/
 
 /*******************************************************************************
@@ -74,10 +74,9 @@ void appInit(void) {
 	//Pote
 	PoteInit();
 
-	///////VER TINCHO///////////////
+
 	static uint8_t nFieldWidth = 10;
 	static uint8_t nFieldHeight = 9;
-	///////VER TINCHO///////////////
 
 
 	tetris_init(nFieldWidth, nFieldHeight);
@@ -107,7 +106,5 @@ void tetrisRun(void){
 	drawer_update_board(tetris_get_board());
 }
 void appRun(void){
-	//do nothing
-//	EvHandGetEvents();
 }
 

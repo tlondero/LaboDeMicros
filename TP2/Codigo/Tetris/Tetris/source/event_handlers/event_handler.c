@@ -61,8 +61,8 @@ void EvHandGetEvents(void)
 	PoteGetEvent(&data);
 
 
-//	processEvents(&data);
-	processEventsTB(&data);
+	processEvents(&data);
+//	processEventsTB(&data);
 }
 
 /*******************************************************************************
