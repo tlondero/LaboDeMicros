@@ -8,7 +8,7 @@
 #include "header/tetris_game.h"
 #include "header/drivers/WS2812B.h"
 #include "header/event_handlers/paquetes.h"
-
+#include "header/Drawer.h"
 #define DEFAULT_BRIGHTNESS 50
 
 static piece_prop pieces[PKG_CANT_PIECES];
@@ -32,12 +32,12 @@ void drawer_change_piece(char p, uint8_t r, uint8_t g, uint8_t b){
 void drawer_draw_gameover(uint8_t score){
 
 }
-void drawer_update_board(unsigned char* board){
+void drawer_update_board(board_ptr board){
 	uint8_t row;
 	uint8_t col;
 	for(row = 0; row < board_w; row++){
 		for(col = 0; col < board_h; col++){
-			switch(*(board+board_w*row+col)){
+			switch(board[board_w*row+col]){
 			case EMPTY:
 				WS2812B_matrix_set(row, col, 0, 0, 0);
 				break;

@@ -10,16 +10,19 @@
 
 
 #include "header/event_handlers/AccelerometerEvents.h"
-#include <header/event_handlers/uartGetEvent.h>
+#include "header/event_handlers/uartGetEvent.h"
 #include "header/event_handlers/event_handler.h"
 #include "header/event_handlers/spiEventHandler.h"
 #include "header/event_handlers/paquetes.h"
 
-#include <header/drivers/FXOS8700CQ.h>
-#include <header/drivers/gpio.h>
-#include <header/drivers/i2c.h>
-#include <header/drivers/uart.h>
+#include "header/drivers/FXOS8700CQ.h"
+#include "header/drivers/WS2812B.h"
+#include "header/drivers/gpio.h"
+#include "header/drivers/i2c.h"
+#include "header/drivers/uart.h"
 #include "header/drivers/timer.h"
+
+#include "header/Drawer.h"
 
 
 
@@ -70,22 +73,32 @@ void appInit(void) {
 	init_config.nBits = NBITS_8;
 	uartInit(U3, init_config);
 
+	//SPI init
+	SPI_589_init();
+
+	//Matriz de led
+	WS2812B_init();
+
+
 
 	//Pote
-	PoteInit();
+	//PoteInit();
 
 
 	static uint8_t nFieldWidth = 10;
 	static uint8_t nFieldHeight = 9;
 
+	//Drawer
+	drawer_init(nFieldWidth, nFieldHeight);
 
+	//Tetris init
 	tetris_init(nFieldWidth, nFieldHeight);
 
 	tetris_begin_game(); //Sets game mode to RUNNING
 	tetris_set_difficulty(EASY);
 	tim_id_t teturisuID = timerGetId();
 	//
-	timerStart(teturisuID, TIMER_MS2TICKS(50),TIM_MODE_PERIODIC,tetrisRun);
+	timerStart(teturisuID, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC, tetrisRun);
 	//
 
 
