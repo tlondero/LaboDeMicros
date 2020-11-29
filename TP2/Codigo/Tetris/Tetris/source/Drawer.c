@@ -47,22 +47,22 @@ void drawer_update_board(board_ptr board){
 				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T1-1].color.r*(br/100.0)), (uint8_t)(pieces[T1-1].color.g*(br/100.0)), (uint8_t)(pieces[T1-1].color.b*(br/100.0)));
 				break;
 			case T2:
-				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T2-1].color.r*(br/100.0)), (uint8_t)(pieces[T1-1].color.g*(br/100.0)), (uint8_t)(pieces[T1-1].color.b*(br/100.0)));
+				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T2-1].color.r*(br/100.0)), (uint8_t)(pieces[T2-1].color.g*(br/100.0)), (uint8_t)(pieces[T2-1].color.b*(br/100.0)));
 				break;
 			case T3:
-				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T3-1].color.r*(br/100.0)), (uint8_t)(pieces[T1-1].color.g*(br/100.0)), (uint8_t)(pieces[T1-1].color.b*(br/100.0)));
+				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T3-1].color.r*(br/100.0)), (uint8_t)(pieces[T3-1].color.g*(br/100.0)), (uint8_t)(pieces[T3-1].color.b*(br/100.0)));
 				break;
 			case T4:
-				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T4-1].color.r*(br/100.0)), (uint8_t)(pieces[T1-1].color.g*(br/100.0)), (uint8_t)(pieces[T1-1].color.b*(br/100.0)));
+				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T4-1].color.r*(br/100.0)), (uint8_t)(pieces[T4-1].color.g*(br/100.0)), (uint8_t)(pieces[T4-1].color.b*(br/100.0)));
 				break;
 			case T5:
-				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T5-1].color.r*(br/100.0)), (uint8_t)(pieces[T1-1].color.g*(br/100.0)), (uint8_t)(pieces[T1-1].color.b*(br/100.0)));
+				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T5-1].color.r*(br/100.0)), (uint8_t)(pieces[T5-1].color.g*(br/100.0)), (uint8_t)(pieces[T5-1].color.b*(br/100.0)));
 				break;
 			case T6:
-				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T6-1].color.r*(br/100.0)), (uint8_t)(pieces[T1-1].color.g*(br/100.0)), (uint8_t)(pieces[T1-1].color.b*(br/100.0)));
+				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T6-1].color.r*(br/100.0)), (uint8_t)(pieces[T6-1].color.g*(br/100.0)), (uint8_t)(pieces[T6-1].color.b*(br/100.0)));
 				break;
 			case T7:
-				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T7-1].color.r*(br/100.0)), (uint8_t)(pieces[T1-1].color.g*(br/100.0)), (uint8_t)(pieces[T1-1].color.b*(br/100.0)));
+				WS2812B_matrix_set(row, col_board, (uint8_t)(pieces[T7-1].color.r*(br/100.0)), (uint8_t)(pieces[T7-1].color.g*(br/100.0)), (uint8_t)(pieces[T7-1].color.b*(br/100.0)));
 				break;
 			default:
 				break;

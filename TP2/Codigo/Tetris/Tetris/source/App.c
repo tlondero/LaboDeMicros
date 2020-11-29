@@ -85,7 +85,7 @@ void appInit(void) {
 
 
 	//Pote
-	//PoteInit();
+	PoteInit();
 
 
 	static uint8_t nFieldWidth = 10;
