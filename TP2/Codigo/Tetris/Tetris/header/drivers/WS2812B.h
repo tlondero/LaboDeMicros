@@ -12,6 +12,6 @@
 #include <stdbool.h>
 
 void WS2812B_init(void);
-void WS2812B_matrix_set(uint8_t color, uint8_t brightness, uint8_t row, uint8_t col);
+void WS2812B_matrix_set(uint8_t row, uint8_t col, uint8_t r, uint8_t g, uint8_t b);
 
 #endif /* WS2812B_H_ */
