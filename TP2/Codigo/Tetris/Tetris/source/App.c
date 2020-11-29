@@ -56,7 +56,10 @@
  ******************************************************************************/
 
 //void processEvents( package * PEvents);
+
+board_ptr front_end_tetris;
 void tetrisRun(void);
+
 void appInit(void) {
 
 	timerInit();
@@ -91,7 +94,7 @@ void appInit(void) {
 	//Drawer
 
 
-	color_t colors[7];
+	color_t color[7];
 
 	color[0].r = 0;			// PIECE_I_H
 	color[0].g = 240;
@@ -122,7 +125,7 @@ void appInit(void) {
 	color[6].b = 240;
 
 
-	drawer_init(nFieldWidth, nFieldHeight, colors);
+	drawer_init(nFieldWidth, nFieldHeight, color);
 
 	//Tetris init
 	tetris_init(nFieldWidth, nFieldHeight);
@@ -132,6 +135,7 @@ void appInit(void) {
 	tim_id_t teturisuID = timerGetId();
 	//
 	timerStart(teturisuID, TIMER_MS2TICKS(100), TIM_MODE_PERIODIC, tetrisRun);
+	front_end_tetris =tetris_get_board();
 	//
 
 
@@ -148,7 +152,7 @@ void tetrisRun(void){
 	else if(tetris_get_game_status()  == TETRIS_GAME_OVER_ST){
 		drawer_draw_gameover(tetris_get_score());
 	}
-	drawer_update_board(tetris_get_board());
+	drawer_update_board(front_end_tetris);
 }
 void appRun(void){
 }

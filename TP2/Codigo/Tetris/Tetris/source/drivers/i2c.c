@@ -289,10 +289,6 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 		i2cptr->C1 |= I2C_C1_MST_MASK;	//Send start
 
 		valid = true;
-	} else {
-		//callback = NULL;
-		__asm("BKPT #0");
-		//i2cptr->C1 &= ~I2C_C1_MST_MASK;			//Send stop
 	}
 
 	return valid;
