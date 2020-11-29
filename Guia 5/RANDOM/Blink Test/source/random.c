@@ -37,7 +37,7 @@ static RNG_Type *randBase;
 bool RandInit(void) {
 
 	bool valid = false;
-
+	uint32_t first_value;
 	if (isInit == false) {
 
 		isInit = true;
@@ -45,33 +45,26 @@ bool RandInit(void) {
 
 		SIM_Type *sim = SIM;
 		sim->SCGC3 |= SIM_SCGC3_RNGA_MASK;
-		sim->SCGC3 &= ~SIM_SCGC3_RNGA_MASK;
-		sim->SCGC3 |= SIM_SCGC3_RNGA_MASK;
-
-		randBase = RNG;
+		sim->SCGC6 |= SIM_SCGC6_RNGA_MASK;
+		randBase =RNG ;
 
 		//Config
-		NVIC_EnableIRQ(RNG_IRQn);
+//		NVIC_EnableIRQ(RNG_IRQn);
+		randBase->CR |=  RNG_CR_INTM_MASK;
 
-		randBase->CR = 0;
-
-		randBase->CR |= RNG_CR_GO_MASK;
-
-		randBase->CR |= RNG_CR_INTM_MASK;
 		randBase->CR |= RNG_CR_HA_MASK;
-
-		randBase->CR &= ~RNG_CR_SLP_MASK;			//Normal mode
+		randBase->CR |= RNG_CR_GO_MASK;
+		while( !(randBase->SR & RNG_SR_OREG_LVL_MASK) ){}
+		first_value=randBase->OR ;
 	}
 
 	return valid;
 }
 
-bool RandCheck(void){
-	return !(randBase->SR & RNG_SR_OREG_LVL_MASK);
-}
 
 uint32_t RandGet(void){
-	return randBase->OR;
+	while( !(randBase->SR & RNG_SR_OREG_LVL_MASK) ){}
+	return randBase->OR ;
 }
 
 /*

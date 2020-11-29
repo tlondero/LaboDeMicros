@@ -40,8 +40,6 @@ typedef void (*callbackptr)(void);
 
 bool RandInit(void);
 
-bool RandCheck(void);
-
 uint32_t RandGet(void);
 
 

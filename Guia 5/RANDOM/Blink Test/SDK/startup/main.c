@@ -15,14 +15,9 @@ int main(void) {
 	hw_Init();
 	hw_EnableInterrupts();
 	RandInit();
+	uint32_t tuvi;
 
 	while (1) {
-
-		if (RandCheck()) {
-
-			uint32_t tuvi = RandGet();
-			tuvi++;
-		}
-
+		tuvi = RandGet();
 	}
 }
