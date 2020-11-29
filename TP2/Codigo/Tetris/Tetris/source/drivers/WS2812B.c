@@ -5,16 +5,16 @@
  *      Author: Acer
  */
 
-#include "../header/drivers/WS2812B.h"
-#include "../header/drivers/DMA.h"
-#include "../header/drivers/FTM.h"
-#include "../header/drivers/timer.h"
-#include "../header/drivers/PORT.h"
+#include "header/drivers/WS2812B.h"
+#include "header/drivers/DMA.h"
+#include "header/drivers/FTM.h"
+#include "header/drivers/timer.h"
+#include "header/drivers/PORT.h"
 
 #define CNV_ON 39 //39 ticks -> 0.8us
-#define CNV_OFF 22 //22 ticks -> 0.46us
+#define CNV_OFF 20 //20 ticks -> 0.4us
 #define CNV_ZERO 0
-#define MOD 62//62ticks ->1.26us
+#define MOD 62//62+1ticks ->1.26us
 
 #define CANT_LEDS 64
 #define CANT_LEDS_ZERO 0
@@ -58,25 +58,13 @@ static void set_color_brightness(uint16_t *ptr, uint8_t brightness){
 void WS2812B_init(void){
 	uint8_t i;
 
-	for(i = 0; i < CANT_LEDS+CANT_LEDS_ZERO; i++){
+	for(i = 0; i < CANT_LEDS; i++){
 
-		if(i < CANT_LEDS){
-			set_color_brightness(led_matrix[i].R, 255);
-			set_color_brightness(led_matrix[i].G, 255);
-			set_color_brightness(led_matrix[i].B, 255);
-		}
+		set_color_brightness(led_matrix[i].R, 0);
+		set_color_brightness(led_matrix[i].G, 0);
+		set_color_brightness(led_matrix[i].B, 0);
 
 	}
-	/*
-	set_color_brightness(led_matrix[1].R, 255);
-	set_color_brightness(led_matrix[1].G, 255);
-	set_color_brightness(led_matrix[1].B, 255);
-*/
-	DMAInitWS2812b((uint16_t*)(&led_matrix), MAT_SIZE, dma_cb);
-
-	set_color_brightness(led_matrix[1].R, 255);
-	set_color_brightness(led_matrix[1].G, 255);
-	set_color_brightness(led_matrix[1].B, 255);
 
 	timerInit();
 	timerid = timerGetId();
@@ -89,7 +77,6 @@ void WS2812B_init(void){
 	PORT_Init();
 	data.CNTIN = 0;
 	data.MODULO = MOD;	//62 ticks -> 1.26us
-	data.CNV = 0x000A; //
 	data.CNV = 22;
 	data.EPWM_LOGIC = FTM_lAssertedHigh;
 	data.MODE = FTM_mPulseWidthModulation;
@@ -100,22 +87,11 @@ void WS2812B_init(void){
 }
 
 
+void WS2812B_matrix_set(uint8_t row, uint8_t col, uint8_t r, uint8_t g, uint8_t b){
 
-void WS2812B_matrix_set(uint8_t color, uint8_t brightness, uint8_t row, uint8_t col){
-
-	switch(color){
-	case GREEN:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].G, brightness);
-		break;
-	case RED:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].R, brightness);
-		break;
-	case BLUE:
-		set_color_brightness(led_matrix[ROW_SIZE*row+col].B, brightness);
-		break;
-	default: break;
-	}
-
+	set_color_brightness(led_matrix[ROW_SIZE*row+col].G, g);
+	set_color_brightness(led_matrix[ROW_SIZE*row+col].R, r);
+	set_color_brightness(led_matrix[ROW_SIZE*row+col].B, b);
 }
 
 

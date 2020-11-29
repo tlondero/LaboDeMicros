@@ -26,7 +26,7 @@ typedef const uint8_t* board_ptr;
 
 //AVAILABLE TOKENS TO DRAW THE BOARD
 typedef enum {
-	EMPTY, T1, T2, T3, T4, T5, T6, T7, LINE, BORDER
+	EMPTY, T1, T2, T3, T4, T5, T6, T7, LINE, BORDER, CANT_TOKENS
 }board_token;
 /*
 EMPTY: describes the empty cell

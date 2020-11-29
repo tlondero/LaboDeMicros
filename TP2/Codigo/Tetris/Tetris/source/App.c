@@ -1,7 +1,7 @@
 /***************************************************************************//**
  @file     App.c
  @brief    Application functions
- @author   Nicolás Magliola
+ @author   MAGT
  ******************************************************************************/
 
 /*******************************************************************************
@@ -10,16 +10,19 @@
 
 
 #include "header/event_handlers/AccelerometerEvents.h"
-#include "header/drivers/POTE_ADC.h"
+#include <header/event_handlers/uartGetEvent.h>
+#include "header/event_handlers/event_handler.h"
+#include "header/event_handlers/spiEventHandler.h"
+#include "header/event_handlers/paquetes.h"
 
 #include <header/drivers/FXOS8700CQ.h>
 #include <header/drivers/gpio.h>
 #include <header/drivers/i2c.h>
 #include <header/drivers/uart.h>
-#include <header/event_handlers/uartGetEvent.h>
-#include <header/event_handlers/uartGetEvent.h>
 #include "header/drivers/timer.h"
-#include "header/event_handlers/paquetes.h"
+
+
+
 #include "header/board.h"
 #include "header/tetris_game.h"
 #include "MK64F12.h"
@@ -71,10 +74,9 @@ void appInit(void) {
 	//Pote
 	PoteInit();
 
-	///////VER TINCHO///////////////
+
 	static uint8_t nFieldWidth = 10;
 	static uint8_t nFieldHeight = 9;
-	///////VER TINCHO///////////////
 
 
 	tetris_init(nFieldWidth, nFieldHeight);
@@ -103,8 +105,6 @@ void tetrisRun(void){
 	}
 	drawer_update_board(tetris_get_board());
 }
-appRun(){
-	//do nothing
-//	EvHandGetEvents();
+void appRun(void){
 }
 

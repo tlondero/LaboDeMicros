@@ -52,6 +52,7 @@ Packages:
 #define PIECE_Z_H ('Z')
 #define PIECE_O_H ('O')
 #define PIECE_S_H ('S')
+#define PKG_CANT_PIECES 7
 
 typedef struct{
 	uint8_t r;
