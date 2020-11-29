@@ -22,10 +22,10 @@ void drawer_change_brightness(uint8_t br){
 void drawer_change_piece(char p, uint8_t r, uint8_t g, uint8_t b){
 	uint8_t i;
 	for(i = 0; i < PKG_CANT_PIECES; i++){
-		if(pieces.piece == p){
-			pieces.color.r = r;
-			pieces.color.g = g;
-			pieces.color.b = b;
+		if(pieces[i].piece == p){
+			pieces[i].color.r = r;
+			pieces[i].color.g = g;
+			pieces[i].color.b = b;
 		}
 	}
 }
