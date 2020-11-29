@@ -145,8 +145,10 @@ void appInit(void) {
 /* Función que se llama constantemente en un ciclo infinito */
 
 void tetrisRun(void){
+
+	EvHandGetEvents();
+
 	if((((tetris_get_game_status() == TETRIS_RUNNING_ST) || (tetris_get_game_status() ==  TETRIS_PAUSED_ST) ))){
-		EvHandGetEvents();
 		tetris_update_board();
 	}
 	else if(tetris_get_game_status()  == TETRIS_GAME_OVER_ST){

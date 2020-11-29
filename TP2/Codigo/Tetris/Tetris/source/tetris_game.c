@@ -153,9 +153,14 @@ void tetris_resume_game(void) {
 
 void tetris_restart_game(void) {
 	_tetris_clean_board();
+	_tetris_set_board_borders();
+	tetris_game.current_x = tetris_game.board_w / 2; //Begin in the middle of the board
+	tetris_game.current_y = 0; //Begin at the top
+	tetris_game.score = 0;
 	tetris_set_difficulty(EASY);
 	tetris_game.score = 0;
 	tetris_game.game_status = TETRIS_RUNNING_ST;
+
 }
 
 void tetris_end_game(void) {
