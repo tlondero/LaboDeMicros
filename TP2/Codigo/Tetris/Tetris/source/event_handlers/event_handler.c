@@ -53,32 +53,35 @@ void EvHandGetEvents(void)
 	package data = {0};
 	accelerometerGetEvent(&data); //I2C events
 
-	uartGetEvent(&data, U0); //Uart events
-	//ESTE ES EL USB, el 3 es el que hay que iniciar para el ESP
-
+	uartGetEvent(&data, U3); //Uart events
 	//SPI events
 	spiEventHandler(&data);
 
 	//ADC events
 	PoteGetEvent(&data);
-	//	processEvents(&data);
+
+
+//	processEvents(&data);
 	processEventsTB(&data);
 }
 
 /*******************************************************************************
  * FUNCTION DEFINITION WITH LOCAL SCOPE
  ******************************************************************************/
-void processEvents(package *PEvents)
-{
-	if (PEvents->reset)
-	{
-		resetFunction(); //reset function
+
+void processEvents(package * PEvents) {
+
+	if (PEvents->reset) {
+		resetFunction();	//reset function
+	} else if(PEvents->pause){
+		if(tetris_get_game_status() == TETRIS_PAUSED_ST)
+			tetris_resume_game();
+		else if(tetris_get_game_status() == TETRIS_RUNNING_ST)
+			tetris_pause_game();
 	}
-	else
-	{
-		if (PEvents->action.down)
-		{
-			downFunction(); //Down function
+	else if(tetris_get_game_status() == TETRIS_RUNNING_ST) {
+		if (PEvents->action.down) {
+			downFunction();	//Down function
 		}
 		if (PEvents->action.left)
 		{
@@ -152,12 +155,12 @@ void resetFunction(void)
 {
 	tetris_restart_game();
 }
-void leftFunction(void)
-{
+
+void leftFunction(void) {
 	tetris_move_left();
 }
-void rightFunction(void)
-{
+
+void rightFunction(void) {
 	tetris_move_right();
 }
 
@@ -171,16 +174,3 @@ void rotateFunction(void)
 	tetris_rotate_piece();
 }
 
-void brightnessFunction(uint8_t br)
-{
-	//Front end.
-}
-void fallSpeedFunction(uint8_t fs)
-{
-	tetris_set_difficulty(fs);
-	//ver que esto esté entre 0 y 30 para que sea humano
-}
-void piecePropertyFunction(char p, uint8_t r, uint8_t g, uint8_t b)
-{
-	//Front end.
-}
