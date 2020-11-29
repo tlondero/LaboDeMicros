@@ -126,9 +126,11 @@ void processEventsTB(package * PEvents) {
 void resetFunction(void) {
 	tetris_restart_game();
 }
+
 void leftFunction(void) {
 	tetris_move_left();
 }
+
 void rightFunction(void) {
 	tetris_move_right();
 }
@@ -144,10 +146,12 @@ void rotateFunction(void) {
 void brightnessFunction(uint8_t br) {
 	//Front end.
 }
+
 void fallSpeedFunction(uint8_t fs) {
 	tetris_set_difficulty(fs);
 	//ver que esto esté entre 0 y 30 para que sea humano
 }
+
 void piecePropertyFunction(char p, uint8_t r, uint8_t g, uint8_t b) {
 	//Front end.
 }
