@@ -7,9 +7,9 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include "../header/drivers/FTM.h"
+#include "header/drivers/FTM.h"
 #include "MK64F12.h"
-#include "../header/drivers/PORT.h"
+#include "header/drivers/PORT.h"
 #include <stdbool.h>
 //FTM0, FTM0_CH0
 
@@ -189,7 +189,6 @@ void FTMStartClock(uint8_t module) {
  */
 void FTMStopClock(uint8_t module) {
 	if(FTMX_INIT[module]){
-		FTM_POINTERS[module]->SC &= ~FTM_SC_CLKS(1);
 		FTM_POINTERS[module]->SC &= ~FTM_SC_CLKS(SC_CLKS_SYSCLK);
 	}
 }

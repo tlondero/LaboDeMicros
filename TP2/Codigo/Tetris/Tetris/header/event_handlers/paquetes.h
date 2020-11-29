@@ -87,5 +87,6 @@ typedef struct{
 	piece_movement action;
 	piece_prop piece;
 	bool reset;
+	bool pause;
 }package;
 #endif /* paquetes_H */
