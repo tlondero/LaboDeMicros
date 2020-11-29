@@ -22,6 +22,8 @@
 #define MAT_SIZE ((CANT_LEDS+CANT_LEDS_ZERO)*8*3*2)+(1*2) //(64 LEDS+10LEDS en zero para reset) * 8BITS * 3 COLORES * 2bytes (CNV son 16 bits)
 #define ROW_SIZE 8
 
+static bool init = 0;
+
 typedef enum {RED, GREEN, BLUE} led_color;
 
 typedef struct{
@@ -56,6 +58,8 @@ static void set_color_brightness(uint16_t *ptr, uint8_t brightness){
 
 }
 void WS2812B_init(void){
+
+	if(!init){
 	uint8_t i;
 
 	for(i = 0; i < CANT_LEDS; i++){
@@ -84,6 +88,8 @@ void WS2812B_init(void){
 	data.DMA = 1;
 	ftmid1 = FTMInit(2, 1, data); //FTM0 CH0
 	FTMStartClock(0);
+	init = true;
+	}
 }
 
 
