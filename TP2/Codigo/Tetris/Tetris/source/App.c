@@ -108,8 +108,7 @@ void appInit(void) {
 /* Función que se llama constantemente en un ciclo infinito */
 
 void tetrisRun(void){
-	static bool bGameOver = false;
-	if((((tetris_get_game_status() == TETRIS_RUNNING_ST) || (tetris_get_game_status() ==  TETRIS_PAUSED_ST) )&& !bGameOver)){
+	if((((tetris_get_game_status() == TETRIS_RUNNING_ST) || (tetris_get_game_status() ==  TETRIS_PAUSED_ST) ))){
 		EvHandGetEvents();
 		tetris_update_board();
 	}

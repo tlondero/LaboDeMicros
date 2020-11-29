@@ -35,6 +35,6 @@ void drawer_change_brightness(uint8_t br);
 void drawer_change_piece(char p, uint8_t r, uint8_t g, uint8_t b);
 void drawer_draw_gameover(uint8_t score);
 void drawer_update_board(board_ptr board);
-void drawer_init(uint8_t nFieldWidth, uint8_t nFieldHeight);
+void drawer_init(uint8_t nFieldWidth, uint8_t nFieldHeight, color_t* colors);
 
 #endif /* DRAWER_H_ */
