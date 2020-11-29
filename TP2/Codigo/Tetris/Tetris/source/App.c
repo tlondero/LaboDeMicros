@@ -89,7 +89,40 @@ void appInit(void) {
 	static uint8_t nFieldHeight = 9;
 
 	//Drawer
-	drawer_init(nFieldWidth, nFieldHeight);
+
+
+	color_t colors[7];
+
+	color[0].r = 0;			// PIECE_I_H
+	color[0].g = 0;
+	color[0].b = 0;
+
+	color[1].r = 0;			// PIECE_T_H
+	color[1].g = 0;
+	color[1].b = 0;
+
+	color[2].r = 0;			// PIECE_O_H
+	color[2].g = 0;
+	color[2].b = 0;
+
+	color[3].r = 0;			// PIECE_S_H
+	color[3].g = 0;
+	color[3].b = 0;
+
+	color[4].r = 0;			// PIECE_Z_H
+	color[4].g = 0;
+	color[4].b = 0;
+
+	color[5].r = 0;			// PIECE_L_H
+	color[5].g = 0;
+	color[5].b = 0;
+
+	color[6].r = 0;			// PIECE_J_H
+	color[6].g = 0;
+	color[6].b = 0;
+
+
+	drawer_init(nFieldWidth, nFieldHeight, colors);
 
 	//Tetris init
 	tetris_init(nFieldWidth, nFieldHeight);
