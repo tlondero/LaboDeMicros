@@ -68,14 +68,23 @@ void drawer_update_board(board_ptr board){
 		}
 	}
 }
-void drawer_init(uint8_t nFieldWidth, uint8_t nFieldHeight){
+void drawer_init(uint8_t nFieldWidth, uint8_t nFieldHeight, color_t* colors){
 	board_w = nFieldWidth;
 	board_h = nFieldHeight;
 	pieces[0].piece = PIECE_I_H;
+	pieces[0].color = colors[0];
 	pieces[1].piece = PIECE_T_H;
+	pieces[1].color = colors[1];
 	pieces[2].piece = PIECE_O_H;
+	pieces[2].color = colors[2];
 	pieces[3].piece = PIECE_S_H;
+	pieces[3].color = colors[3];
 	pieces[4].piece = PIECE_Z_H;
+	pieces[4].color = colors[4];
 	pieces[5].piece = PIECE_L_H;
+	pieces[5].color = colors[5];
 	pieces[6].piece = PIECE_J_H;
+	pieces[6].color = colors[6];
+	WS2812B_init();
+
 }
