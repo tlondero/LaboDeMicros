@@ -18,5 +18,6 @@ void spiEventHandler(package *data)
     data->action.left = spi_status->left;
     data->action.right = spi_status->right;
     data->action.rotate = spi_status->rotate;
+    data->pause = spi_status->pause_resume;
     data->reset = spi_status->reset;
 }
