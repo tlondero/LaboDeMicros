@@ -51,13 +51,12 @@ void EvHandGetEvents(void) {
 	package data = { 0 };
 	accelerometerGetEvent(&data); //I2C events
 
-	uartGetEvent(&data, U0); //Uart events
-	//ESTE ES EL USB, el 3 es el que hay que iniciar para el ESP
-
+	uartGetEvent(&data, U3); //Uart events
 	//SPI events
 
 	//ADC events
 	PoteGetEvent(&data);
+
 //	processEvents(&data);
 	processEventsTB(&data);
 }
@@ -66,9 +65,16 @@ void EvHandGetEvents(void) {
  * FUNCTION DEFINITION WITH LOCAL SCOPE
  ******************************************************************************/
 void processEvents(package * PEvents) {
+
 	if (PEvents->reset) {
 		resetFunction();	//reset function
-	} else {
+	} else if(PEvents->pause){
+		if(tetris_get_game_status() == TETRIS_PAUSED_ST)
+			tetris_resume_game();
+		else if(tetris_get_game_status() == TETRIS_RUNNING_ST)
+			tetris_pause_game();
+	}
+	else if(tetris_get_game_status() == TETRIS_RUNNING_ST) {
 		if (PEvents->action.down) {
 			downFunction();	//Down function
 		}
