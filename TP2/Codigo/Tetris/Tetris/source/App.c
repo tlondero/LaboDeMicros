@@ -96,9 +96,9 @@ void tetrisRun(void){
 		tetris_update_board();
 	}
 	else if(tetris_get_game_status()  == TETRIS_GAME_OVER_ST){
-		//otra cosa
-		//quizá mostrar score y eso antes d eresetear.
+		drawer_draw_gameover(tetris_get_score());
 	}
+	drawer_update_board(tetris_get_board());
 }
 appRun(){
 	//do nothing

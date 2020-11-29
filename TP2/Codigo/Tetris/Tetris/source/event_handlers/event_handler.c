@@ -144,7 +144,7 @@ void rotateFunction(void) {
 }
 
 void brightnessFunction(uint8_t br) {
-	//Front end.
+	drawer_change_brightness(br);
 }
 
 void fallSpeedFunction(uint8_t fs) {
@@ -153,6 +153,6 @@ void fallSpeedFunction(uint8_t fs) {
 }
 
 void piecePropertyFunction(char p, uint8_t r, uint8_t g, uint8_t b) {
-	//Front end.
+	drawer_change_piece(p, r, g, b);
 }
 
