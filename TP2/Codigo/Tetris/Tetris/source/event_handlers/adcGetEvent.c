@@ -10,7 +10,7 @@
 
 #define TIMER_MS 1000
 #define MAX_ADC 4096
-#define THRESHOLD 100
+#define THRESHOLD 50
 #define ADC_0_DP0_CHANNEL 0x00
 
 static ADCData_t data;

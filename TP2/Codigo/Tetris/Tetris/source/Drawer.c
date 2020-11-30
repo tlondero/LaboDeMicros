@@ -58,8 +58,8 @@ void tim_per_cb(void){
 	}
 }
 
-void drawer_change_brightness(uint8_t br){
-	br = br;
+void drawer_change_brightness(uint8_t br_new){
+	br = br_new;
 }
 void drawer_change_piece(char p, uint8_t r, uint8_t g, uint8_t b){
 	uint8_t i;

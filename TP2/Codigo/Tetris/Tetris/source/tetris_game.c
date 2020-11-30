@@ -1,4 +1,5 @@
 #include "../header/tetris_game.h"
+#include "../header/drivers/random.h"
 
 /******************************
  * ENUMS TYPEDEF
@@ -112,7 +113,8 @@ void fill_board(void) {
 /*********Context control******/
 void tetris_init(uint8_t board_w, uint8_t board_h) {
    /* Intializes random number generator */
-
+	RandInit();
+	srand(RandGet());
 	//Get boad ready
 	tetris_game.bForceDown = false;
 	tetris_game.bRotateHold = true;
@@ -136,7 +138,8 @@ void tetris_init(uint8_t board_w, uint8_t board_h) {
 
 void tetris_begin_game(void) {
 	tetris_game.game_status = TETRIS_RUNNING_ST;
-	tetris_game.current_piece = rand() % 7;
+	//tetris_game.current_piece = rand() % 7;
+	_tetris_sort_new_piece();
 	tetris_game.game_status = _tetris_piece_fits(tetris_game.current_x,
 												tetris_game.current_y,
 												tetris_game.current_rotation)? TETRIS_RUNNING_ST:TETRIS_GAME_OVER_ST;
@@ -157,6 +160,7 @@ void tetris_restart_game(void) {
 	tetris_game.current_x = tetris_game.board_w / 2; //Begin in the middle of the board
 	tetris_game.current_y = 0; //Begin at the top
 	tetris_game.score = 0;
+	_tetris_sort_new_piece();
 	tetris_set_difficulty(EASY);
 	tetris_game.score = 0;
 	tetris_game.game_status = TETRIS_RUNNING_ST;

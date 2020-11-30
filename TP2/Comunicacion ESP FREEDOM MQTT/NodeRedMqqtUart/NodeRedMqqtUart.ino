@@ -10,6 +10,8 @@
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+
+#include <ArduinoJson.h> 
 #include <string.h>
 /***************************************
  * PubSubClient Documentation
@@ -256,8 +258,14 @@ void ParseTopic(char *topic, byte *payload, unsigned int length)
    }*/
   if (!strcmp(topic, "bright"))
   {
+    DynamicJsonDocument doc(1024);
+    String data = String((char *)payload);
+    char buff[100];
+    data.toCharArray(buff,100);
+    deserializeJson(doc, (const char*)buff);
+    const uint8_t brightness = doc["bright"];
     Serial.write('B');
-    Serial.write(25);//(uint8_t)String(((char *)payload)).toInt());
+    Serial.write(brightness);
     Serial.write('D');
     Serial.write('D');
     }
@@ -299,21 +307,22 @@ void ParseTopic(char *topic, byte *payload, unsigned int length)
 
   if (!strcmp(topic, "Piece-RGB"))
   {
-    //D: dont care
-    //T-rgb(135, 82, 161)
-    Serial.write( ((char *)payload)[0]);
-    String a;
-    int i = 6;
-    while (((char *)payload)[i])
-    {
-      if(((char *)payload)[i] == ',' || ((char *)payload)[i] == ')'){
-        Serial.write((uint8_t)a.toInt());
-        a = "";
-      }
-      a+=String(((char *)payload)[i]);
-      //Serial.write(((char *)payload)[i]);
-      i++;
-    }
+    //Read JSON
+   DynamicJsonDocument doc(1024);
+   String data = String((char *)payload);
+   char buff[100];
+   data.toCharArray(buff,100);
+   deserializeJson(doc, (const char*)buff);
+   
+   const char* piece = doc["piece"];
+   const uint8_t r = doc["r"];
+   const uint8_t g = doc["g"];
+   const uint8_t b = doc["b"];
+   Serial.write(piece);
+   Serial.write(r);
+   Serial.write(g);
+   Serial.write(b);
+   
   }
   if (!strcmp(topic, "reset")){
     Serial.write('R');
