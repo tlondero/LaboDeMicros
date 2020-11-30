@@ -5,10 +5,10 @@
  *      Author: Acer
  */
 
-#include <../header/drivers/POTE_ADC.h>
 #include <../header/drivers/timer.h>
+#include <header/drivers/adcGetEvent.h>
 
-#define TIMER_MS 500
+#define TIMER_MS 1000
 #define MAX_ADC 4096
 #define THRESHOLD 310
 #define ADC_0_DP0_CHANNEL 0x00
@@ -25,7 +25,8 @@ void PoteInit(void){
 	prev_data = 0;
 	data = 0;
 	timerInit();
-	timerStart(timerid, TIMER_MS, TIM_MODE_PERIODIC, timcb);
+	tim_id_t pote_timer_id = timerGetId();
+	timerStart(pote_timer_id, TIMER_MS2TICKS(TIMER_MS), TIM_MODE_PERIODIC, timcb);
 }
 
 void PoteGetEvent(package* pkg){

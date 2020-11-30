@@ -7,13 +7,12 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
+#include <header/drivers/adcGetEvent.h>
 #include "../header/event_handlers/event_handler.h"
 
 #include "header/event_handlers/uartGetEvent.h"
 #include "../header/event_handlers/AccelerometerEvents.h"
 #include "header/event_handlers/spiEventHandler.h"
-#include "../header/drivers/POTE_ADC.h"
-
 #include "../header/event_handlers/paquetes.h"
 
 #include "../header/drivers/uart.h"

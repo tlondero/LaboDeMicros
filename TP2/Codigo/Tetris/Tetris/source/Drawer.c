@@ -139,7 +139,7 @@ void drawer_init(uint8_t nFieldWidth, uint8_t nFieldHeight, color_t* colors){
 
 	timerInit();
 	timerperid = timerGetId();
-	timerStart(timerperid, 500, TIM_MODE_PERIODIC, tim_per_cb);
+	timerStart(timerperid, TIMER_MS2TICKS(500), TIM_MODE_PERIODIC, tim_per_cb);
 	timerStop(timerperid);
 
 	WS2812B_init();
