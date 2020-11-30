@@ -18,10 +18,7 @@ static uint8_t board_w;
 static uint8_t board_h;
 static uint8_t timerperid;
 static uint8_t gv_aux = 0;
-
-void tim_per_cb(void){
-	gv_aux = !gv_aux;
-}
+static uint8_t gv_first = 0;
 
 void clean_board(void){
 	uint8_t row;
@@ -50,6 +47,17 @@ void draw_cross(void){
 	WS2812B_matrix_set(6, 1, 120, 0, 0);
 }
 
+void tim_per_cb(void){
+	gv_aux = !gv_aux;
+	if(!gv_aux){
+		clean_board();
+		draw_cross();
+	}
+	else{
+		clean_board();
+	}
+}
+
 void drawer_change_brightness(uint8_t br){
 	br = br;
 }
@@ -64,21 +72,16 @@ void drawer_change_piece(char p, uint8_t r, uint8_t g, uint8_t b){
 	}
 }
 void drawer_draw_gameover(uint8_t score){
-	//por ahora no muestra score, hay que ver como hacemos eso.
-	//como es 8x8, no podemos mostrarlo tipo columnas para unidades/decenas/centenas
-	//etc porque necesitariamos 9leds en la columna.. ver que hacer
-	if(!gv_aux){
-		clean_board();
-		draw_cross();
-	}
-	else{
-		clean_board();
+	if(gv_first){
+		timerReset(timerperid);
+		gv_first = false;
 	}
 }
 void drawer_update_board(board_ptr board){
 	uint8_t row;
 	uint8_t col;
 	uint8_t col_board;
+	gv_first = 1;
 	for(row = 0; row < board_h-1 ; row++){
 		for(col = 1; col < board_w-1; col++){
 			col_board = col-1;
