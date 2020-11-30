@@ -150,11 +150,11 @@ void tetrisRun(void){
 
 	if((((tetris_get_game_status() == TETRIS_RUNNING_ST) || (tetris_get_game_status() ==  TETRIS_PAUSED_ST) ))){
 		tetris_update_board();
+		drawer_update_board(front_end_tetris);
 	}
 	else if(tetris_get_game_status()  == TETRIS_GAME_OVER_ST){
 		drawer_draw_gameover(tetris_get_score());
 	}
-	drawer_update_board(front_end_tetris);
 }
 void appRun(void){
 }

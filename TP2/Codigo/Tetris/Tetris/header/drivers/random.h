@@ -29,7 +29,7 @@
  */
 bool RandInit(void);
 /**
- * @brief getter a random number
+ * @brief random number getter
  * @returns the random number generated.
  */
 uint32_t RandGet(void);

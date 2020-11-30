@@ -167,9 +167,4 @@ void FTMSetSWSYNC(uint8_t id);
  */
 void FTMSetDMA(uint8_t id, uint8_t mode);
 
-//TODO:
-//void FTMSetHardwareSync(uint8_t id, uint8_t mode);
-//void FTMSetHWTriggerPin(uint8_t port, uint8_t num);
-//void FTMSetLoadingPoint(?);
-
 #endif /* FTM_H_ */

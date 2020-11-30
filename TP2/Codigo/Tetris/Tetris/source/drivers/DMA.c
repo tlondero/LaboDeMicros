@@ -8,9 +8,14 @@
 #include "header/drivers/DMA.h"
 #include "header/drivers/FTM.h"
 #include "hardware.h"
+
+#define TRANSFER_SIZE 0x02*0x01
+
 static void (*cb)(void);
+
 void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size, void* cb_){
 
+	/* Store the callback provided. */
 	cb = cb_;
 
 	/* Enable the clock for the eDMA and the DMAMUX. */
@@ -33,7 +38,7 @@ void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size, void* cb_){
 	DMA0->TCD[0].DADDR = (uint32_t)(&(FTM0->CONTROLS[0].CnV));  // To change FTM Duty
 
 
-		/* Set an offset for source and destination address. */
+	/* Set an offset for source and destination address. */
 	DMA0->TCD[0].SOFF =0x02; // Source address offset of 2 bytes per transaction.
 	DMA0->TCD[0].DOFF =0x00; // Destination address offset is 0. (Siempre al mismo lugar)
 
@@ -41,17 +46,11 @@ void DMAInitWS2812b(uint16_t * matrix_ptr, uint32_t matrix_size, void* cb_){
 	DMA0->TCD[0].ATTR = DMA_ATTR_SSIZE(1) | DMA_ATTR_DSIZE(1);
 
 	/*Number of bytes to be transfered in each service request of the channel.*/
-	DMA0->TCD[0].NBYTES_MLNO = 0x02;
+	DMA0->TCD[0].NBYTES_MLNO = (TRANSFER_SIZE);
 
-	/* Current major iteration count (5 iteration of 1 byte each one). */
-
-	//DMA_TCD0_CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(0x05);
-	//DMA_TCD0_BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(0x05);
-
-	/* Autosize for Current major iteration count */
-
-	DMA0->TCD[0].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(matrix_size/2);	//(sizeof(sourceBuffer)/sizeof(sourceBuffer[0]))
-	DMA0->TCD[0].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(matrix_size/2);
+	/* Current major iteration count. */
+	DMA0->TCD[0].CITER_ELINKNO = DMA_CITER_ELINKNO_CITER(matrix_size/(TRANSFER_SIZE));	//(sizeof(sourceBuffer)/sizeof(sourceBuffer[0]))
+	DMA0->TCD[0].BITER_ELINKNO = DMA_BITER_ELINKNO_BITER(matrix_size/(TRANSFER_SIZE));
 
 
 	//DMA_TCD0_SLAST = 0x00;

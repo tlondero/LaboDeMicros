@@ -23,14 +23,15 @@ static button_status button_589;
 
 void SPI_589_init(void)
 {
-	spi_init();
+	spi_init(); //Init of the spi module
 }
 
 void SPI_589_update_buttons(void)
 {
-	spi_transaction(source, sizeof(source), destination_button);
-	spi_transaction(source, sizeof(source), destination_button);
+	spi_transaction(source, sizeof(source), destination_button); //First time is to latch the parallel inputs with the chip select
+	spi_transaction(source, sizeof(source), destination_button); //Second time is to shift to the shift register with the chip select and read
 
+	//Read different values with masking
 	button_589.left = ((destination_button[0] & LEFT_589) != 0);
 	button_589.right = ((destination_button[0] & RIGHT_589) != 0);
 	button_589.down = ((destination_button[0] & DOWN_589) != 0);
