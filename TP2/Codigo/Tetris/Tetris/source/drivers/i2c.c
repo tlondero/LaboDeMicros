@@ -300,22 +300,7 @@ bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 	return valid;
 }
 
-I2C_FAULT i2cStatus(void) {
 
-	I2C_FAULT currentState = I2C_NO_FAULT;
-
-	if (i2cptr->S & I2C_S_BUSY_MASK) {			//Busy bus
-		currentState = I2C_BUS_BUSY;
-		// } else if ((i2cptr->SMB & I2C_SMB_SHTF1_MASK) || (i2cptr->SMB & I2C_SMB_SHTF2_MASK)) {
-	} else if (i2cptr->SMB & I2C_SMB_SHTF2_MASK) {
-		currentState = I2C_TIMEOUT;
-	} else if (i2cptr->S & I2C_S_ARBL_MASK) {
-		currentState = I2C_SLAVE_ERROR;
-	}
-
-	return currentState;
-
-}
 
 void I2C0_IRQHandler(void) {
 	I2CHandler();
