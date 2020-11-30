@@ -42,6 +42,6 @@ bool i2cInit(ic2_channel_t chan);
 bool i2cTransaction(uint8_t slave_, uint8_t reg_, uint8_t *data_, uint8_t size_,
 		i2c_mode_t mode_, callbackptr callback_);
 
-I2C_FAULT i2cStatus(void);
+
 
 #endif // _I2C_H_
