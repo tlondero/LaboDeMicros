@@ -81,7 +81,10 @@ void drawer_update_board(board_ptr board){
 	uint8_t row;
 	uint8_t col;
 	uint8_t col_board;
-	gv_first = 1;
+	if(gv_first == 0){
+		gv_first = 1;
+		timerStop(timerperid);
+	}
 	for(row = 0; row < board_h-1 ; row++){
 		for(col = 1; col < board_w-1; col++){
 			col_board = col-1;
