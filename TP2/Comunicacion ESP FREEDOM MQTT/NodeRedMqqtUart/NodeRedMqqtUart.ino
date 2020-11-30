@@ -304,9 +304,24 @@ void ParseTopic(char *topic, byte *payload, unsigned int length)
     }
     //Serial.write("DDDG");
   }
-
+  if (!strcmp(topic, "fall"))
+  {
+    //Read JSON
+   DynamicJsonDocument doc(1024);
+   String data = String((char *)payload);
+   char buff[100];
+   data.toCharArray(buff,100);
+   deserializeJson(doc, (const char*)buff);
+   const uint8_t fall_speed = doc["fall"];
+   uint8_t fall_speed_ = map(fall_speed,0,100,50,1);
+   Serial.write('F');
+   Serial.write(fall_speed_);
+   Serial.write('X');
+   Serial.write('X');
+  }
   if (!strcmp(topic, "Piece-RGB"))
   {
+    
     //Read JSON
    DynamicJsonDocument doc(1024);
    String data = String((char *)payload);

@@ -10,7 +10,7 @@
 
 #define TIMER_MS 1000
 #define MAX_ADC 4096
-#define THRESHOLD 50
+#define THRESHOLD 200
 #define ADC_0_DP0_CHANNEL 0x00
 
 static ADCData_t data;
@@ -30,6 +30,19 @@ void PoteInit(void){
 
 void PoteGetEvent(package* pkg){
 	if (ADC_IsReady(ADC0)) {
+			data = ADC_getData(ADC0);
+			if((data < (MAX_ADC/3)) && (data >= 0)){
+				pkg->action.left = true;
+			}
+			else if((data >= ((2*MAX_ADC)/3)) && (data <= MAX_ADC)){
+				pkg->action.right = true;
+			}
+			else{
+				//no event
+			}
+		}
+
+	/*if (ADC_IsReady(ADC0)) {
 		data = ADC_getData(ADC0);
 		if(data != prev_data){
 
@@ -43,6 +56,6 @@ void PoteGetEvent(package* pkg){
 
 			}
 		}
-	}
+	}*/
 
 }
