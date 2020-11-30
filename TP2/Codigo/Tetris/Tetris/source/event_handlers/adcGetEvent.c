@@ -10,10 +10,9 @@
 
 #define TIMER_MS 1000
 #define MAX_ADC 4096
-#define THRESHOLD 310
+#define THRESHOLD 100
 #define ADC_0_DP0_CHANNEL 0x00
 
-static int8_t timerid;
 static ADCData_t data;
 static ADCData_t prev_data;
 void timcb(void){

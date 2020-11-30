@@ -7,8 +7,9 @@
 /*******************************************************************************
  * INCLUDE HEADER FILES
  ******************************************************************************/
-#include <header/drivers/adcGetEvent.h>
+#include "header/drivers/adcGetEvent.h"
 #include "../header/event_handlers/event_handler.h"
+#include "header/Drawer.h"
 
 #include "header/event_handlers/uartGetEvent.h"
 #include "../header/event_handlers/AccelerometerEvents.h"
@@ -174,6 +175,7 @@ void rotateFunction(void)
 }
 void brightnessFunction(uint8_t br)
 {
+	drawer_change_brightness(br);
 	//Front end.
 }
 void fallSpeedFunction(uint8_t fs)
@@ -184,4 +186,5 @@ void fallSpeedFunction(uint8_t fs)
 void piecePropertyFunction(char p, uint8_t r, uint8_t g, uint8_t b)
 {
 	//Front end.
+	drawer_change_piece(p, r, g, b);
 }
