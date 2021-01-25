@@ -38,7 +38,7 @@ void uartPackProcess(package * data, uint8_t id){
 #if DEV_MODE
 			uartWriteMsg(0, "Brightness changed\r\n", 21);
 #endif
-			data->birghtness=msg[1];
+			data->brightness=msg[1];
 			break;
 		case FALL_H:
 #if DEV_MODE

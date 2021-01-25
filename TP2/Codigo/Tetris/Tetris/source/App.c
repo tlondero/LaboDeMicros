@@ -8,7 +8,6 @@
  * INCLUDE HEADER FILES
  ******************************************************************************/
 
-
 #include "header/event_handlers/AccelerometerEvents.h"
 #include "header/event_handlers/uartGetEvent.h"
 #include "header/event_handlers/event_handler.h"

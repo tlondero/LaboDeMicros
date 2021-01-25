@@ -29,7 +29,8 @@ Packages:
 		binits  :  4
 
 */
-
+#ifndef PATAS
+#define PATAS
 #define BRIGHTNESS_H ('B')
 
 #define FALL_H ('F')
@@ -74,7 +75,7 @@ typedef struct{
 	bool reset;
 }package;
 
-
+#endif
 
 
 

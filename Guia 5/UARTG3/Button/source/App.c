@@ -65,8 +65,8 @@ void App_Init(void) {
 /* Función que se llama constantemente en un ciclo infinito */
 package data={0};
 void App_Run(void) {
-//	UartPackageTB();
-	uartPackProcess(&data,U0);
+	UartPackageTB();
+//	uartPackProcess(&data,U0);
 }
 
 void UartEspTBinit(void) {
@@ -75,7 +75,7 @@ void UartEspTBinit(void) {
 	init_config.mode = NON_BLOCKING;
 	init_config.parity = NO_PARITY_UART;
 	init_config.nBits = NBITS_8;
-	uartInit(U3, init_config);
+	uartInit(U0, init_config);
 
 	gpioWrite(PIN_LED_RED, HIGH);
 	gpioWrite(PIN_LED_GREEN, HIGH);
