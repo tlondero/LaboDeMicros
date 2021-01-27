@@ -65,7 +65,8 @@ void App_Init(void) {
 /* Función que se llama constantemente en un ciclo infinito */
 package data={0};
 void App_Run(void) {
-	UartPackageTB();
+	uartWriteMsg(U0,"Action Reset\r\n", 15);
+	//UartPackageTB();
 //	uartPackProcess(&data,U0);
 }
 
